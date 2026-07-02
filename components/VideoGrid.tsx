@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { VideoThumbnail } from "./VideoThumbnail"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RiVideoLine } from "@remixicon/react"
@@ -10,17 +9,10 @@ interface VideoGridProps {
   videos: VideoItem[]
   playingId: string | null
   onPlay: (id: string | null) => void
+  loading?: boolean
 }
 
-export function VideoGrid({ videos, playingId, onPlay }: VideoGridProps) {
-  const [loading, setLoading] = useState(true)
-
-  // Brief artificial loading to show skeleton state for first-time visitors
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500)
-    return () => clearTimeout(timer)
-  }, [])
-
+export function VideoGrid({ videos, playingId, onPlay, loading = true }: VideoGridProps) {
   // Loading state — skeleton cards matching grid layout
   if (loading) {
     return (

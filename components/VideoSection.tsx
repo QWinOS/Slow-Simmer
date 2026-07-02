@@ -1,29 +1,34 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { VideoGrid } from "./VideoGrid"
 import Reveal from "@/components/Reveal"
+import { fetchVideoLinks } from "@/lib/sheets"
 import type { VideoItem } from "@/lib/video"
-
-// Video configuration — defined inline as a typed constant array
-// Replace these IDs with actual event video IDs as content becomes available
-const VIDEOS: VideoItem[] = [
-  {
-    id: "vid-1",
-    platform: "youtube",
-    videoId: "dQw4w9WgXcQ",
-    title: "Past Event Highlights",
-  },
-  {
-    id: "vid-2",
-    platform: "instagram",
-    videoId: "CxYxZzABCDe",
-    title: "Behind the Scenes",
-  },
-]
 
 export default function VideoSection() {
   const [playingId, setPlayingId] = useState<string | null>(null)
+  const [videos, setVideos] = useState<VideoItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchVideos = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await fetchVideoLinks()
+      setVideos(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load videos")
+      setVideos([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchVideos()
+  }, [fetchVideos])
 
   return (
     <section
@@ -42,9 +47,10 @@ export default function VideoSection() {
 
         <Reveal delay={150}>
           <VideoGrid
-            videos={VIDEOS}
+            videos={videos}
             playingId={playingId}
             onPlay={setPlayingId}
+            loading={loading}
           />
         </Reveal>
       </div>
