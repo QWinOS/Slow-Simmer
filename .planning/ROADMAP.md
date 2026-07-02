@@ -1,12 +1,12 @@
-# Roadmap: Supper Club
+# Roadmap: Slow Simmer
 
 ## Overview
 
-A single-page, mobile-friendly webapp for a supper club. Guests browse past event photos/videos, fill a registration form, pay via PhonePe Business UPI, and get recorded in Google Sheets with a confirmation email. Built in 3 phases: layout+gallery, then form, then payment+sheets+email.
+A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event photos/videos, fill a registration form, pay via GPay UPI, and get recorded in Google Sheets with a confirmation email. Built in 3 phases: layout+gallery, then form, then payment+sheets+email.
 
 ## Phases
 
-- [x] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(4/4 plans complete)*
+- [ ] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(reopened: theme gaps + GALL-05 dynamic video)*
 - [ ] **Phase 2: Registration Form** - Functional registration form collecting all guest details
 - [ ] **Phase 3: Payment, Sheets & Email** - PhonePe payment, Google Sheets logging, and Brevo confirmation email
 
@@ -16,15 +16,16 @@ A single-page, mobile-friendly webapp for a supper club. Guests browse past even
 
 **Goal**: Single-page responsive shell with photo gallery and video embeds
 **Depends on**: Nothing (first phase)
-**Requirements**: UI-01, UI-02, UI-03, GALL-01, GALL-02, GALL-03, GALL-04
+**Requirements**: UI-01, UI-02, UI-03, GALL-01, GALL-02, GALL-03, GALL-04, GALL-05
 **Success Criteria** (what must be TRUE):
 
   1. Page renders in a single scrollable layout on mobile and desktop
   2. Past event photos from Google Drive display in a responsive grid
   3. YouTube and Instagram reels embed and play inline
   4. New images added to the Drive folder appear without code changes
+  5. New videos added to the source Google Sheet appear without code changes
 
-**Plans**: 4/4 plans executed
+**Plans**: 5 plans (4 executed + 1 gap-closure)
 
 Plans:
 
@@ -32,6 +33,7 @@ Plans:
 - [x] 01-02-PLAN.md — Layout shell: NavBar, static sections (Hero, About, Form, Footer), page.tsx composition *(complete 2026-07-02)*
 - [x] 01-03-PLAN.md — Gallery: Drive API grid with loading/empty/error states + lightbox overlay *(complete 2026-07-02)*
 - [x] 01-04-PLAN.md — Video: thumbnail grid with play overlay, inline YouTube/Instagram embeds *(complete 2026-07-02)*
+- [ ] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
 
 ### Phase 2: Registration Form
 
@@ -64,6 +66,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Layout & Gallery | 4/4 | Complete | 2026-07-02 |
+| 1. Foundation, Layout & Gallery | 4/4 | Reopened (gaps + GALL-05) | - |
 | 2. Registration Form | 0/0 | Not started | - |
 | 3. Payment, Sheets & Email | 0/0 | Not started | - |
