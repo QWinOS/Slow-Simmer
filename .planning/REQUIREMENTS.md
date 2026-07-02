@@ -1,7 +1,7 @@
-# Requirements: Supper Club
+# Requirements: Slow Simmer
 
 **Defined:** 2026-07-02
-**Core Value:** Guests can register for a supper club event, pay via PhonePe, and have their registration automatically recorded in Google Sheets.
+**Core Value:** Guests can register for a Slow Simmer event, pay via GPay UPI, and have their registration automatically recorded in Google Sheets.
 
 ## v1 Requirements
 
@@ -13,6 +13,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **GALL-04**: New images added to the Drive folder appear automatically (no code change)
 - [ ] **GALL-02**: Video section embeds YouTube videos and Instagram reels
 - [x] **GALL-03**: Gallery is mobile-responsive (swipeable / grid adapts to mobile)
+- [ ] **GALL-05**: Videos are sourced dynamically at runtime from a Google Sheet of YouTube + Instagram links; new rows appear on the site with no code change or redeploy
 
 ### Registration Form
 
@@ -75,6 +76,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | GALL-02 | Phase 1 | Pending |
 | GALL-03 | Phase 1 | Complete |
 | GALL-04 | Phase 1 | Complete |
+| GALL-05 | Phase 1 | Pending |
 | UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 1 | Complete |
@@ -99,10 +101,10 @@ Deferred to future release. Tracked but not in current roadmap.
 
 **Coverage:**
 
-- v1 requirements: 25 total
-- Mapped to phases: 25
+- v1 requirements: 26 total
+- Mapped to phases: 26
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-02*
-*Last updated: 2026-07-02 after initial definition*
+*Last updated: 2026-07-03 — added GALL-05 (dynamic video sourcing from Google Sheet)*

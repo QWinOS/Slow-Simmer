@@ -31,7 +31,7 @@ Plans:
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities *(complete 2026-07-02)*
-- [ ] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
+- [x] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
 - [ ] 01-06-PLAN.md — Gap closure (GALL-05): source videos dynamically at runtime from a Google Sheet (fetchVideoLinks), replace hardcoded VIDEOS constant
 
 **Wave 2** *(blocked on Wave 1 completion)*
