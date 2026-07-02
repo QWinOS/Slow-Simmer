@@ -1,65 +1,53 @@
 # Roadmap: Supper Club
 
-## Phase 1 — Foundation, Layout & Gallery
+## Overview
 
-**Goal:** Single-page responsive shell with photo gallery and video embeds.
+A single-page, mobile-friendly webapp for a supper club. Guests browse past event photos/videos, fill a registration form, pay via PhonePe Business UPI, and get recorded in Google Sheets with a confirmation email. Built in 3 phases: layout+gallery, then form, then payment+sheets+email.
 
-**Requirements:**
-- UI-01: Single-page layout with smooth scrolling
-- UI-02: Fully responsive (mobile + desktop)
-- UI-03: Clean, elegant supper club branding
-- GALL-01: Photo gallery via Google Drive API
-- GALL-02: YouTube/Instagram reel embeds
-- GALL-03: Mobile-responsive gallery
-- GALL-04: New Drive images appear automatically
+## Phases
 
-**Build order:**
-1. Next.js page setup + mobile-first layout
-2. Hero/section structure (scroll-based navigation)
-3. Google Drive API integration (list image files from folder)
-4. Photo gallery component (responsive grid)
-5. Video embed section (YouTube + Instagram)
+- [ ] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds
+- [ ] **Phase 2: Registration Form** - Functional registration form collecting all guest details
+- [ ] **Phase 3: Payment, Sheets & Email** - PhonePe payment, Google Sheets logging, and Brevo confirmation email
 
----
+## Phase Details
 
-## Phase 2 — Registration Form
+### Phase 1: Foundation, Layout & Gallery
+**Goal**: Single-page responsive shell with photo gallery and video embeds
+**Depends on**: Nothing (first phase)
+**Requirements**: UI-01, UI-02, UI-03, GALL-01, GALL-02, GALL-03, GALL-04
+**Success Criteria** (what must be TRUE):
+  1. Page renders in a single scrollable layout on mobile and desktop
+  2. Past event photos from Google Drive display in a responsive grid
+  3. YouTube and Instagram reels embed and play inline
+  4. New images added to the Drive folder appear without code changes
+**Plans**: TBD
 
-**Goal:** Functional registration form collecting all guest details.
+### Phase 2: Registration Form
+**Goal**: Functional registration form collecting all guest details
+**Depends on**: Phase 1
+**Requirements**: FORM-01, FORM-02, FORM-03, FORM-04, FORM-05, FORM-06, FORM-07, FORM-08, FORM-09
+**Success Criteria** (what must be TRUE):
+  1. Guest can fill and submit all form fields
+  2. Form validates required fields before submission
+  3. Form is usable on mobile with proper touch targets
+**Plans**: TBD
 
-**Requirements:**
-- FORM-01 through FORM-09
+### Phase 3: Payment, Sheets & Email
+**Goal**: PhonePe payment, Google Sheets logging, and Brevo confirmation email
+**Depends on**: Phase 2
+**Requirements**: PAY-01, PAY-02, PAY-03, SHEET-01, SHEET-02, SHEET-03, NOTF-01, NOTF-02, NOTF-03
+**Success Criteria** (what must be TRUE):
+  1. Guest sees PhonePe QR after successful form submission
+  2. Payment webhook confirms transaction
+  3. Guest details appended to Google Sheets on payment success
+  4. Guest receives thank-you email via Brevo with contact number from env var
+**Plans**: TBD
 
-**Build order:**
-1. Form component with all fields
-2. Client-side validation (required fields, email format, phone format)
-3. Mobile-friendly UX (touch targets, scroll behavior, keyboard handling)
-4. Multi-step or single-step form layout decision
-5. Form state management + submission handler
+## Progress
 
----
-
-## Phase 3 — Payment, Sheets & Email
-
-**Goal:** PhonePe payment, Google Sheets logging, and Brevo confirmation email.
-
-**Requirements:**
-- PAY-01 through PAY-03
-- SHEET-01 through SHEET-03
-- NOTF-01 through NOTF-03
-
-**Build order:**
-1. PhonePe QR code display + webhook endpoint
-2. Google Sheets API integration (append registration row on success)
-3. Brevo email API integration (thank-you email)
-4. End-to-end flow: submit form → pay → confirm → sheet → email
-5. Error handling + retry logic
-
----
-
-## Summary
-
-| Phase | Focus | Req Count | Dependencies |
-|-------|-------|-----------|--------------|
-| 1 | Layout, Gallery & Media | 7 | None |
-| 2 | Registration Form | 9 | Phase 1 (layout exists) |
-| 3 | Payment, Sheets, Email | 9 | Phase 2 (form data to submit) |
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Foundation, Layout & Gallery | 0/0 | Not started | - |
+| 2. Registration Form | 0/0 | Not started | - |
+| 3. Payment, Sheets & Email | 0/0 | Not started | - |
