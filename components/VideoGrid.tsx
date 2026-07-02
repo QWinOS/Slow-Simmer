@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { VideoThumbnail } from "./VideoThumbnail"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RiVideoLine } from "@remixicon/react"
-import type { VideoItem } from "./VideoSection"
+import type { VideoItem } from "@/lib/video"
 
 interface VideoGridProps {
   videos: VideoItem[]
@@ -24,13 +24,22 @@ export function VideoGrid({ videos, playingId, onPlay }: VideoGridProps) {
   // Loading state — skeleton cards matching grid layout
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="aspect-video">
-            <Skeleton className="w-full h-full rounded-xl" />
-          </div>
-        ))}
-      </div>
+      <>
+        <div className="flex md:hidden gap-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="aspect-video min-w-[280px] w-[80vw] flex-shrink-0">
+              <Skeleton className="w-full h-full rounded-xl" />
+            </div>
+          ))}
+        </div>
+        <div className="hidden md:grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="aspect-video">
+              <Skeleton className="w-full h-full rounded-xl" />
+            </div>
+          ))}
+        </div>
+      </>
     )
   }
 
@@ -51,15 +60,30 @@ export function VideoGrid({ videos, playingId, onPlay }: VideoGridProps) {
 
   // Loaded state
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-      {videos.map((video) => (
-        <VideoThumbnail
-          key={video.id}
-          video={video}
-          isPlaying={playingId === video.id}
-          onPlay={() => onPlay(playingId === video.id ? null : video.id)}
-        />
-      ))}
-    </div>
+    <>
+      {/* Mobile: horizontal scroll */}
+      <div className="flex md:hidden gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 scrollbar-none">
+        {videos.map((video) => (
+          <div key={video.id} className="min-w-[280px] w-[80vw] flex-shrink-0 snap-center">
+            <VideoThumbnail
+              video={video}
+              isPlaying={playingId === video.id}
+              onPlay={() => onPlay(playingId === video.id ? null : video.id)}
+            />
+          </div>
+        ))}
+      </div>
+      {/* Desktop: grid */}
+      <div className="hidden md:grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        {videos.map((video) => (
+          <VideoThumbnail
+            key={video.id}
+            video={video}
+            isPlaying={playingId === video.id}
+            onPlay={() => onPlay(playingId === video.id ? null : video.id)}
+          />
+        ))}
+      </div>
+    </>
   )
 }

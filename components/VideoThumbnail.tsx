@@ -7,7 +7,7 @@ import {
   getInstagramEmbedUrl,
 } from "@/lib/video"
 import { RiPlayCircleFill, RiCloseLine, RiVideoLine } from "@remixicon/react"
-import type { VideoItem } from "./VideoSection"
+import type { VideoItem } from "@/lib/video"
 
 interface VideoThumbnailProps {
   video: VideoItem
