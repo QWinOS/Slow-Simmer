@@ -16,13 +16,13 @@ Guests can register for a supper club event, pay seamlessly via PhonePe, and hav
 
 ### Active
 
-- [ ] Photo gallery of past events (images from Cloudinary free tier or Google Drive embed)
+- [ ] Photo gallery of past events (images from Google Drive via Drive API)
 - [ ] Video section with YouTube/Instagram reel embeds for past event videos
 - [ ] Registration form with: name, contact no, email, guest name & age (if bringing someone), 1-2 lines about yourself, Instagram/LinkedIn, Aadhar no
-- [ ] PhonePe Business UPI payment integration (QR code / payment link)
+- [ ] PhonePe Business UPI payment integration (QR code + webhook verification)
 - [ ] Google Sheets auto-insert of registration details upon successful payment confirmation
+- [ ] Brevo email notification to guest on successful payment (thank-you note, contact number from env var)
 - [ ] Mobile-responsive single-page layout
-- [ ] Admin view to see registered guests
 
 ### Out of Scope
 
@@ -33,13 +33,13 @@ Guests can register for a supper club event, pay seamlessly via PhonePe, and hav
 
 ## Context
 
-Next.js 16 (App Router) project with React 19, TypeScript, and TailwindCSS v4. Bootstrapped with create-next-app. Will use Cloudinary free tier for image hosting, Google Sheets API for data storage, and PhonePe Business for payments.
+Next.js 16 (App Router) project with React 19, TypeScript, and TailwindCSS v4. Bootstrapped with create-next-app. Will use Google Drive API for photo gallery, Google Sheets API for data storage, PhonePe Business for payments, and Brevo for email notifications.
 
 ## Constraints
 
 - **Tech stack**: Next.js 16, React 19, TypeScript, TailwindCSS v4 — already set up
 - **Payment**: PhonePe Business UPI only (QR code / payment link + webhook/polling for confirmation)
-- **Storage**: Cloudinary free tier for images; Google Drive/YouTube/Instagram for video embeds
+- **Storage**: Google Drive API for images; YouTube/Instagram embeds for video
 - **Data**: Google Sheets as the database (no traditional DB needed for MVP)
 - **Cost**: Zero additional spend beyond what's free
 
@@ -50,7 +50,8 @@ Next.js 16 (App Router) project with React 19, TypeScript, and TailwindCSS v4. B
 | Single-page app | Simple, focused use case — one event at a time | — Pending |
 | Google Sheets as DB | Free, easy to view/manage registrations, no backend infra | — Pending |
 | PhonePe Business UPI | User's existing payment setup, no payment gateway integration needed | — Pending |
-| Cloudinary free tier | Generous free tier for image hosting with CDN delivery | — Pending |
+| Google Drive API for images | Free, no CDN needed for 10 casual photos, user prefers unified Google setup | — Pending |
+| Brevo email notifications | Free tier (300 emails/day), transactional email for payment confirmations | — Pending |
 
 ## Evolution
 
