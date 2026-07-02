@@ -17,7 +17,7 @@ const karla = Karla({
 });
 
 export const metadata: Metadata = {
-  title: "Supper Club",
+  title: "Slow Simmer",
   description:
     "An intimate dining experience — explore past events, photos, and videos.",
 };
@@ -32,7 +32,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
-        "antialiased",
+        "antialiased overflow-x-hidden",
         playfairDisplay.variable,
         karla.variable,
         "font-sans"
