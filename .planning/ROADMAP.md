@@ -21,7 +21,13 @@ A single-page, mobile-friendly webapp for a supper club. Guests browse past even
   2. Past event photos from Google Drive display in a responsive grid
   3. YouTube and Instagram reels embed and play inline
   4. New images added to the Drive folder appear without code changes
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities
+- [ ] 01-02-PLAN.md — Layout shell: NavBar, static sections (Hero, About, Form, Footer), page.tsx composition
+- [ ] 01-03-PLAN.md — Gallery: Drive API grid with loading/empty/error states + lightbox overlay
+- [ ] 01-04-PLAN.md — Video: thumbnail grid with play overlay, inline YouTube/Instagram embeds
 
 ### Phase 2: Registration Form
 **Goal**: Functional registration form collecting all guest details
@@ -48,6 +54,6 @@ A single-page, mobile-friendly webapp for a supper club. Guests browse past even
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Layout & Gallery | 0/0 | Not started | - |
+| 1. Foundation, Layout & Gallery | 0/4 | Not started | - |
 | 2. Registration Form | 0/0 | Not started | - |
 | 3. Payment, Sheets & Email | 0/0 | Not started | - |
