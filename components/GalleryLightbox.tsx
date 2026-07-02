@@ -1,5 +1,20 @@
 "use client"
 
+import { useEffect, useRef, useCallback } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogClose,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { getDriveImageUrl } from "@/lib/drive"
+import {
+  RiCloseLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+} from "@remixicon/react"
 import type { DriveFile } from "@/lib/drive"
 
 interface GalleryLightboxProps {
@@ -15,5 +30,119 @@ export function GalleryLightbox({
   onClose,
   onNavigate,
 }: GalleryLightboxProps) {
-  return null
+  const touchStartX = useRef<number | null>(null)
+  const touchEndX = useRef<number | null>(null)
+
+  const prevIndex =
+    (currentIndex - 1 + images.length) % images.length
+  const nextIndex =
+    (currentIndex + 1) % images.length
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault()
+        onNavigate(prevIndex)
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault()
+        onNavigate(nextIndex)
+      }
+    },
+    [onNavigate, prevIndex, nextIndex]
+  )
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [handleKeyDown])
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchEndX.current = null
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return
+    const diff = touchEndX.current - touchStartX.current
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        onNavigate(prevIndex)
+      } else {
+        onNavigate(nextIndex)
+      }
+    }
+    touchStartX.current = null
+    touchEndX.current = null
+  }
+
+  return (
+    <Dialog
+      open={true}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent
+        className="max-w-5xl w-[95vw] p-0 bg-black/95 border-none"
+        showCloseButton={false}
+      >
+        <DialogTitle className="sr-only">Photo viewer</DialogTitle>
+        <DialogDescription className="sr-only">
+          Viewing photo {currentIndex + 1} of {images.length}
+        </DialogDescription>
+
+        {/* Close button */}
+        <DialogClose asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 z-10 text-white/80 hover:text-white hover:bg-white/10"
+          >
+            <RiCloseLine />
+            <span className="sr-only">Close</span>
+          </Button>
+        </DialogClose>
+
+        {/* Navigation arrows - hidden on mobile */}
+        <button
+          onClick={() => onNavigate(prevIndex)}
+          className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-black/50 text-white/80 hover:bg-black/70 hover:text-white transition-colors"
+          aria-label="Previous photo"
+        >
+          <RiArrowLeftSLine size={28} />
+        </button>
+
+        <button
+          onClick={() => onNavigate(nextIndex)}
+          className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-black/50 text-white/80 hover:bg-black/70 hover:text-white transition-colors"
+          aria-label="Next photo"
+        >
+          <RiArrowRightSLine size={28} />
+        </button>
+
+        {/* Image */}
+        <div
+          className="flex items-center justify-center min-h-[50vh]"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <img
+            src={getDriveImageUrl(images[currentIndex].id)}
+            alt={images[currentIndex].name || "Supper club event photo"}
+            className="max-h-[85vh] w-full object-contain transition-opacity duration-300"
+          />
+        </div>
+
+        {/* Image counter */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm">
+          {currentIndex + 1} / {images.length}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }
