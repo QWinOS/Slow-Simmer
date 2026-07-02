@@ -6,7 +6,7 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
 
 ## Phases
 
-- [ ] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(reopened: theme gaps + GALL-05 dynamic video)*
+- [x] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(reopened: theme gaps + GALL-05 dynamic video)* (completed 2026-07-02)
 - [ ] **Phase 2: Registration Form** - Functional registration form collecting all guest details
 - [ ] **Phase 3: Payment, Sheets & Email** - PhonePe payment, Google Sheets logging, and Brevo confirmation email
 
@@ -25,14 +25,14 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
   4. New images added to the Drive folder appear without code changes
   5. New videos added to the source Google Sheet appear without code changes
 
-**Plans**: 6 plans (4 executed + 2 gap-closure)
+**Plans**: 6/6 plans complete
 
 Plans:
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities *(complete 2026-07-02)*
 - [x] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
-- [ ] 01-06-PLAN.md — Gap closure (GALL-05): source videos dynamically at runtime from a Google Sheet (fetchVideoLinks), replace hardcoded VIDEOS constant
+- [x] 01-06-PLAN.md — Gap closure (GALL-05): source videos dynamically at runtime from a Google Sheet (fetchVideoLinks), replace hardcoded VIDEOS constant
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -79,6 +79,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Layout & Gallery | 4/4 | Reopened (gaps + GALL-05) | - |
+| 1. Foundation, Layout & Gallery | 6/6 | Complete   | 2026-07-02 |
 | 2. Registration Form | 0/0 | Not started | - |
 | 3. Payment, Sheets & Email | 0/0 | Not started | - |

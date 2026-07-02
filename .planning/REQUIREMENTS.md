@@ -13,7 +13,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **GALL-04**: New images added to the Drive folder appear automatically (no code change)
 - [ ] **GALL-02**: Video section embeds YouTube videos and Instagram reels
 - [x] **GALL-03**: Gallery is mobile-responsive (swipeable / grid adapts to mobile)
-- [ ] **GALL-05**: Videos are sourced dynamically at runtime from a Google Sheet of YouTube + Instagram links; new rows appear on the site with no code change or redeploy
+- [x] **GALL-05**: Videos are sourced dynamically at runtime from a Google Sheet of YouTube + Instagram links; new rows appear on the site with no code change or redeploy
 
 ### Registration Form
 
@@ -76,7 +76,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | GALL-02 | Phase 1 | Pending |
 | GALL-03 | Phase 1 | Complete |
 | GALL-04 | Phase 1 | Complete |
-| GALL-05 | Phase 1 | Pending |
+| GALL-05 | Phase 1 | Complete |
 | UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 1 | Complete |
