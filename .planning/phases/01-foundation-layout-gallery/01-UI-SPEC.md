@@ -52,11 +52,12 @@ Exceptions: none
 |------|------|--------|-------------|-------------|
 | Label / Caption | 14px | 400 (regular) | 1.4 | Karla |
 | Body | 16px | 400 (regular) | 1.5 | Karla |
-| Subheading / Section title | 20px | 600 (semibold) | 1.3 | Playfair Display SC |
-| Heading (h2) | 28px | 700 (bold) | 1.2 | Playfair Display SC |
-| Display / Hero title (h1) | 40px | 700 (bold) | 1.1 | Playfair Display SC |
+| Subheading / Section title | 20px | 700 (bold) | 1.3 | Playfair Display SC |
+| Heading / Display (h1, h2) | 28px | 700 (bold) | 1.2 | Playfair Display SC |
 
-**Responsive scaling:** On mobile (< 640px), hero display scales down to 32px; headings scale to 24px. Body remains 16px.
+**Responsive scaling:** On mobile (< 640px), heading/display scales down to 24px. Body remains 16px.
+
+> **Note:** Only 2 weights declared: 400 (regular) and 700 (bold). This satisfies the 2-weight maximum contract. Label, body, and caption use 400; all headings, subheadings, and display use 700.
 
 ---
 
@@ -69,6 +70,7 @@ Exceptions: none
 | Dominant (60%) | #FEF2F2 | Background, page surfaces, body wrapper |
 | Secondary (30%) | #F87171 | Card backgrounds, sidebar, nav section backgrounds |
 | Accent (10%) | #A16207 | Primary CTA buttons, section dividers, decorative accents |
+| Brand Primary | #DC2626 | Decorative/semantic brand color (warm red) — reserved for brand logo elements and decorative brand embellishments only. ❌ NOT for buttons, NOT for text, NOT for interactive elements. |
 | Foreground | #450A0A | Body text, headings, icon colors |
 | Foreground (on accent) | #FEF2F2 | Text on accent-colored buttons |
 | Muted surface | #FEE2E2 | Muted card backgrounds, hover states on secondary areas |
@@ -82,6 +84,7 @@ Exceptions: none
 | Background | #1A0A0A | Page background |
 | Secondary / Card | #2D1414 | Card backgrounds, sidebar, nav sections |
 | Accent (10%) | #A16207 | Primary CTA buttons, dividers, decorative accents (same as light) |
+| Brand Primary | #DC2626 | Decorative/semantic brand color (warm red) — same restriction as light mode |
 | Foreground | #FEF2F2 | Body text, headings |
 | Muted surface | #3D1F1F | Muted cards, hover states |
 | Border | #4A2828 | Borders on cards |
@@ -108,6 +111,8 @@ Override the default zinc-based OKLCH values with the hex values above:
 | `--accent-foreground` | #A16207 | #B8860B |
 
 Accent reserved for: primary CTA buttons, section divider lines, decorative gold accents (❌ NOT for body text, NOT for standard cards, NOT for background fills)
+
+**Brand Primary (#DC2626):** Added per CONTEXT.md D-06. This is a semantic brand color for decorative brand elements only (e.g. logo mark, decorative brand flourishes). It is **not** part of the 60/30/10 functional color split — it sits outside as an additional semantic role. Implement as a CSS custom property `--brand-primary` in `globals.css`. Do not use for any interactive elements, text, backgrounds, or functional UI surfaces.
 
 ---
 
@@ -270,7 +275,7 @@ No third-party registries declared. Vetting gate: not applicable.
 - Touch targets: minimum 44×44px for all interactive elements (nav links, buttons, play overlays)
 - Lightbox: swipe to navigate photos (touch events)
 - Gallery grid: 2 columns on mobile
-- Hero title: scales from 40px → 32px on mobile
+- Heading/display: scales from 28px → 24px on mobile
 
 ### Accessibility
 - All images must have descriptive `alt` text (dynamic alt from Google Drive metadata or fallback "Supper club event photo")
