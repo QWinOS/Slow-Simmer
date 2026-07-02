@@ -28,12 +28,24 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
 **Plans**: 5 plans (4 executed + 1 gap-closure)
 
 Plans:
+**Wave 1**
 
 - [x] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities *(complete 2026-07-02)*
+- [ ] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [x] 01-02-PLAN.md — Layout shell: NavBar, static sections (Hero, About, Form, Footer), page.tsx composition *(complete 2026-07-02)*
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [x] 01-03-PLAN.md — Gallery: Drive API grid with loading/empty/error states + lightbox overlay *(complete 2026-07-02)*
 - [x] 01-04-PLAN.md — Video: thumbnail grid with play overlay, inline YouTube/Instagram embeds *(complete 2026-07-02)*
-- [ ] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
+
+**Cross-cutting constraints:**
+
+- Page loads with Playfair Display SC headings and Karla body text applied globally
+- Warm red/gold color palette (#DC2626/#F87171/#A16207) renders on page
 
 ### Phase 2: Registration Form
 

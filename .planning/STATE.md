@@ -19,7 +19,7 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-07-02)
 
-**Core value:** Guests can register for a supper club event, pay via PhonePe, and have their registration automatically recorded in Google Sheets.
+**Core value:** Guests can register for a Slow Simmer event, pay via GPay UPI, and have their registration automatically recorded in Google Sheets.
 
 ## Workflow State
 
