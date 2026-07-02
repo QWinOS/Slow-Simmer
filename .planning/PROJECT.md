@@ -2,11 +2,11 @@
 
 ## What This Is
 
-A platform for organizing and participating in supper club events — intimate dining experiences where hosts create meals and guests join. Members can host dinners, browse upcoming events, RSVP, and build community around shared meals.
+A single-page, mobile-friendly webapp for a supper club. Guests can browse past event photos/videos, fill out a registration form with their details (name, contact, social links, guest info), pay via PhonePe Business UPI, and have their details recorded in Google Sheets upon successful payment.
 
 ## Core Value
 
-Hosts can create supper club events and guests can discover and join them.
+Guests can register for a supper club event, pay seamlessly via PhonePe, and have their registration automatically recorded.
 
 ## Requirements
 
@@ -16,34 +16,41 @@ Hosts can create supper club events and guests can discover and join them.
 
 ### Active
 
-- [ ] Host can create a supper club event with date, time, location, menu, and capacity
-- [ ] Guest can browse and discover upcoming supper club events
-- [ ] Guest can RSVP to an event (with guest count)
-- [ ] Host can manage RSVPs and communicate with guests
-- [ ] User can create a profile with bio and preferences
-- [ ] User can view event details including menu, location, and host info
+- [ ] Photo gallery of past events (images from Cloudinary free tier or Google Drive embed)
+- [ ] Video section with YouTube/Instagram reel embeds for past event videos
+- [ ] Registration form with: name, contact no, email, guest name & age (if bringing someone), 1-2 lines about yourself, Instagram/LinkedIn, Aadhar no
+- [ ] PhonePe Business UPI payment integration (QR code / payment link)
+- [ ] Google Sheets auto-insert of registration details upon successful payment confirmation
+- [ ] Mobile-responsive single-page layout
+- [ ] Admin view to see registered guests
 
 ### Out of Scope
 
-- Payment processing / ticket sales — deferred until event management is validated
-- Review/rating system — defer to v2
-- Mobile app — web-first, mobile later
+- Multi-event management (single-page, single event at a time)
+- User login/authentication system (form-based registration only)
+- Payment processing beyond PhonePe Business UPI
+- Host can create events through the app (events are curated by admin)
 
 ## Context
 
-Next.js 16 (App Router) project with React 19, TypeScript, and TailwindCSS v4. New scaffold from create-next-app — no business logic yet.
+Next.js 16 (App Router) project with React 19, TypeScript, and TailwindCSS v4. Bootstrapped with create-next-app. Will use Cloudinary free tier for image hosting, Google Sheets API for data storage, and PhonePe Business for payments.
 
 ## Constraints
 
 - **Tech stack**: Next.js 16, React 19, TypeScript, TailwindCSS v4 — already set up
-- **Timeline**: TBD
-- **Budget**: TBD
+- **Payment**: PhonePe Business UPI only (QR code / payment link + webhook/polling for confirmation)
+- **Storage**: Cloudinary free tier for images; Google Drive/YouTube/Instagram for video embeds
+- **Data**: Google Sheets as the database (no traditional DB needed for MVP)
+- **Cost**: Zero additional spend beyond what's free
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Next.js App Router | Chosen by scaffold, good for SSR/SEO for event discovery | — Pending |
+| Single-page app | Simple, focused use case — one event at a time | — Pending |
+| Google Sheets as DB | Free, easy to view/manage registrations, no backend infra | — Pending |
+| PhonePe Business UPI | User's existing payment setup, no payment gateway integration needed | — Pending |
+| Cloudinary free tier | Generous free tier for image hosting with CDN delivery | — Pending |
 
 ## Evolution
 
