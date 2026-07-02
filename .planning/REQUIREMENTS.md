@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Gallery & Media
 
-- [ ] **GALL-01**: Photo gallery displays past event images from Google Drive via Drive API
-- [ ] **GALL-04**: New images added to the Drive folder appear automatically (no code change)
+- [x] **GALL-01**: Photo gallery displays past event images from Google Drive via Drive API
+- [x] **GALL-04**: New images added to the Drive folder appear automatically (no code change)
 - [ ] **GALL-02**: Video section embeds YouTube videos and Instagram reels
-- [ ] **GALL-03**: Gallery is mobile-responsive (swipeable / grid adapts to mobile)
+- [x] **GALL-03**: Gallery is mobile-responsive (swipeable / grid adapts to mobile)
 
 ### Registration Form
 
@@ -71,10 +71,10 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GALL-01 | Phase 1 | Pending |
+| GALL-01 | Phase 1 | Complete |
 | GALL-02 | Phase 1 | Pending |
-| GALL-03 | Phase 1 | Pending |
-| GALL-04 | Phase 1 | Pending |
+| GALL-03 | Phase 1 | Complete |
+| GALL-04 | Phase 1 | Complete |
 | UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 1 | Complete |
