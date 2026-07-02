@@ -47,7 +47,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Layout & Responsiveness
 
 - [x] **UI-01**: Single-page layout with smooth scrolling between sections
-- [ ] **UI-02**: Fully responsive — works on mobile and desktop
+- [x] **UI-02**: Fully responsive — works on mobile and desktop
 - [x] **UI-03**: Clean, elegant design fitting a supper club brand
 
 ## v2 Requirements
@@ -76,7 +76,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | GALL-03 | Phase 1 | Pending |
 | GALL-04 | Phase 1 | Pending |
 | UI-01 | Phase 1 | Complete |
-| UI-02 | Phase 1 | Pending |
+| UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 1 | Complete |
 | FORM-01 | Phase 2 | Pending |
 | FORM-02 | Phase 2 | Pending |
