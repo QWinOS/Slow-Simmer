@@ -6,7 +6,7 @@ A single-page, mobile-friendly webapp for a supper club. Guests browse past even
 
 ## Phases
 
-- [ ] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds
+- [ ] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(1/4 plans complete)*
 - [ ] **Phase 2: Registration Form** - Functional registration form collecting all guest details
 - [ ] **Phase 3: Payment, Sheets & Email** - PhonePe payment, Google Sheets logging, and Brevo confirmation email
 
@@ -24,7 +24,7 @@ A single-page, mobile-friendly webapp for a supper club. Guests browse past even
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities
+- [x] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities *(complete 2026-07-02)*
 - [ ] 01-02-PLAN.md — Layout shell: NavBar, static sections (Hero, About, Form, Footer), page.tsx composition
 - [ ] 01-03-PLAN.md — Gallery: Drive API grid with loading/empty/error states + lightbox overlay
 - [ ] 01-04-PLAN.md — Video: thumbnail grid with play overlay, inline YouTube/Instagram embeds
@@ -54,6 +54,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Layout & Gallery | 0/4 | Not started | - |
+| 1. Foundation, Layout & Gallery | 1/4 | In Progress | 2026-07-02 |
 | 2. Registration Form | 0/0 | Not started | - |
 | 3. Payment, Sheets & Email | 0/0 | Not started | - |

@@ -46,9 +46,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Layout & Responsiveness
 
-- [ ] **UI-01**: Single-page layout with smooth scrolling between sections
+- [x] **UI-01**: Single-page layout with smooth scrolling between sections
 - [ ] **UI-02**: Fully responsive — works on mobile and desktop
-- [ ] **UI-03**: Clean, elegant design fitting a supper club brand
+- [x] **UI-03**: Clean, elegant design fitting a supper club brand
 
 ## v2 Requirements
 
@@ -75,9 +75,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | GALL-02 | Phase 1 | Pending |
 | GALL-03 | Phase 1 | Pending |
 | GALL-04 | Phase 1 | Pending |
-| UI-01 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Pending |
-| UI-03 | Phase 1 | Pending |
+| UI-03 | Phase 1 | Complete |
 | FORM-01 | Phase 2 | Pending |
 | FORM-02 | Phase 2 | Pending |
 | FORM-03 | Phase 2 | Pending |
@@ -98,6 +98,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | NOTF-03 | Phase 3 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 25 total
 - Mapped to phases: 25
 - Unmapped: 0 ✓
