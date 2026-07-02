@@ -25,13 +25,14 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
   4. New images added to the Drive folder appear without code changes
   5. New videos added to the source Google Sheet appear without code changes
 
-**Plans**: 5 plans (4 executed + 1 gap-closure)
+**Plans**: 6 plans (4 executed + 2 gap-closure)
 
 Plans:
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Foundation: theme system, fonts, shadcn components, Drive/video utilities *(complete 2026-07-02)*
 - [ ] 01-05-PLAN.md — Gap closure (UI-03): wire Karla body + Playfair Display SC headings, apply warm red/gold palette tokens
+- [ ] 01-06-PLAN.md — Gap closure (GALL-05): source videos dynamically at runtime from a Google Sheet (fetchVideoLinks), replace hardcoded VIDEOS constant
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
