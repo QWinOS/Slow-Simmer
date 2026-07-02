@@ -107,3 +107,15 @@ None — no external service configuration required.
 
 *Phase: 01-foundation-layout-gallery*
 *Completed: 2026-07-02*
+
+## Self-Check: PASSED
+
+- [x] SUMMARY.md exists: `.planning/phases/01-foundation-layout-gallery/01-05-SUMMARY.md`
+- [x] All 3 commits in git history:
+  - `f266b0a` feat: wire brand typography
+  - `871e6ef` feat: apply warm palette
+  - `7c4f656` docs: complete plan metadata
+- [x] `npm run build` passes (type-check + compile)
+- [x] Compiled CSS shows Playfair Display SC font-heading and Karla font-sans
+- [x] Compiled CSS shows warm hex palette values (#FEF2F2, #1A0A0A, #A16207, etc.)
+- [x] No Inter reference in source or compiled CSS
