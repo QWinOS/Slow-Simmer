@@ -59,7 +59,21 @@ Plans:
   2. Form validates required fields before submission
   3. Form is usable on mobile with proper touch targets
 
-**Plans**: TBD
+**Plans**: 5/5 plans planned
+
+Plans:
+**Wave 1** *(parallel)*
+- [ ] 02-01-PLAN.md — Foundation: npm packages, shadcn components, vitest config, test setup
+- [ ] 02-02-PLAN.md — Provider + Placeholder: RegistrationProvider context, PaymentPlaceholder stub
+
+**Wave 2** *(blocked on 02-01)*
+- [ ] 02-03-PLAN.md — Validation: Zod schema, unit tests, sonner Toaster in layout
+
+**Wave 3** *(blocked on 02-02, 02-03)*
+- [ ] 02-04-PLAN.md — RegistrationForm component + page.tsx integration
+
+**Wave 4** *(blocked on 02-04)*
+- [ ] 02-05-PLAN.md — Integration tests for RegistrationForm
 
 ### Phase 3: Payment, Sheets & Email
 
@@ -80,5 +94,5 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Layout & Gallery | 6/6 | Complete   | 2026-07-02 |
-| 2. Registration Form | 0/0 | Not started | - |
+| 2. Registration Form | 0/5 | Planned | - |
 | 3. Payment, Sheets & Email | 0/0 | Not started | - |
