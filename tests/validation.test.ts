@@ -334,8 +334,7 @@ describe("registrationSchema", () => {
     })
 
     it("accepts about undefined (optional)", () => {
-      const { about, ...withoutAbout } = validBase
-      const result = registrationSchema.safeParse(withoutAbout)
+      const result = registrationSchema.safeParse(validBase)
       expect(result.success).toBe(true)
     })
 
@@ -369,8 +368,7 @@ describe("registrationSchema", () => {
     })
 
     it("accepts undefined (optional)", () => {
-      const { social, ...withoutSocial } = validBase
-      const result = registrationSchema.safeParse(withoutSocial)
+      const result = registrationSchema.safeParse(validBase)
       expect(result.success).toBe(true)
     })
 
