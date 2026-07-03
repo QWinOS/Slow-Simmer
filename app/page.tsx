@@ -3,21 +3,24 @@ import HeroSection from "@/components/HeroSection"
 import AboutSection from "@/components/AboutSection"
 import GallerySection from "@/components/GallerySection"
 import VideoSection from "@/components/VideoSection"
-import FormPlaceholder from "@/components/FormPlaceholder"
+import { RegistrationForm } from "@/components/RegistrationForm"
+import { RegistrationProvider } from "@/components/RegistrationProvider"
+import { PaymentPlaceholder } from "@/components/PaymentPlaceholder"
 import Footer from "@/components/Footer"
 
 export default function HomePage() {
   return (
-    <>
+    <RegistrationProvider>
       <NavBar />
       <main>
         <HeroSection />
         <AboutSection />
         <GallerySection />
         <VideoSection />
-        <FormPlaceholder />
+        <RegistrationForm />
+        <PaymentPlaceholder />
       </main>
       <Footer />
-    </>
+    </RegistrationProvider>
   )
 }
