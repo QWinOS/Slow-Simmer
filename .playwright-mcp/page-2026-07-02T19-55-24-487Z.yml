@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - link "Slow Simmer" [ref=e4] [cursor=pointer]:
+        - /url: "#hero"
+      - list [ref=e5]:
+        - listitem [ref=e6]:
+          - link "Hero" [ref=e7] [cursor=pointer]:
+            - /url: "#hero"
+        - listitem [ref=e8]:
+          - link "About" [ref=e9] [cursor=pointer]:
+            - /url: "#about"
+        - listitem [ref=e10]:
+          - link "Gallery" [ref=e11] [cursor=pointer]:
+            - /url: "#gallery"
+        - listitem [ref=e12]:
+          - link "Videos" [ref=e13] [cursor=pointer]:
+            - /url: "#videos"
+        - listitem [ref=e14]:
+          - link "Register" [ref=e15] [cursor=pointer]:
+            - /url: "#form"
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e28]:
+        - paragraph [ref=e29]: Slow Simmer
+        - heading "An Intimate Dining Experience" [level=1] [ref=e30]:
+          - text: An Intimate
+          - text: Dining Experience
+        - paragraph [ref=e31]: Curated evenings of exceptional food, wine, and conversation.
+        - link "View Our Gallery" [ref=e33] [cursor=pointer]:
+          - /url: "#gallery"
+      - generic [ref=e37]: Scroll
+    - generic [ref=e40]:
+      - heading "About the Club" [level=2] [ref=e43]
+      - generic [ref=e44]:
+        - paragraph [ref=e46]: Slow Simmer is an intimate gathering of friends and strangers united by a love for exceptional food and meaningful conversation. Each evening is carefully curated — from the seasonal menu to the wine pairings and the ambiance — to create a night that feels both exclusive and warmly welcoming.
+        - paragraph [ref=e48]: Our events are hosted in intimate settings, limited to a small number of guests to ensure every person at the table has the space to connect, share stories, and savour the experience. We believe the best meals are the ones shared slowly, with good company and great wine.
+        - paragraph [ref=e50]: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, Slow Simmer offers a space where the table is set for discovery, delight, and genuine connection.
+    - heading "Gallery" [level=2] [ref=e57]
+    - heading "Videos" [level=2] [ref=e71]
+    - generic [ref=e81]:
+      - img [ref=e82]
+      - heading "Join the Club" [level=2] [ref=e84]
+      - paragraph [ref=e85]: Registration form coming soon.
+      - paragraph [ref=e86]: Reserve your spot at our next featured event.
+  - contentinfo [ref=e87]:
+    - generic [ref=e88]:
+      - generic [ref=e89]: Slow Simmer
+      - generic [ref=e91]:
+        - link "Instagram" [ref=e92] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e93]
+        - link "YouTube" [ref=e96] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e97]
+      - paragraph [ref=e101]: © 2026 Slow Simmer. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e107] [cursor=pointer]:
+    - img [ref=e108]

@@ -1,0 +1,57 @@
+- generic [active] [ref=f11e1]:
+  - banner [ref=f11e2]:
+    - navigation [ref=f11e3]:
+      - link "Slow Simmer" [ref=f11e4] [cursor=pointer]:
+        - /url: "#hero"
+      - button "Toggle navigation menu" [ref=f11e5]:
+        - img [ref=f11e6]
+  - main [ref=f11e8]:
+    - generic [ref=f11e10]:
+      - heading "An Intimate Dining Experience" [level=1] [ref=f11e11]
+      - paragraph [ref=f11e12]: Curated evenings of exceptional food, wine, and conversation.
+      - link "View Our Gallery" [ref=f11e14] [cursor=pointer]:
+        - /url: "#gallery"
+    - generic [ref=f11e15]:
+      - heading "About the Club" [level=2] [ref=f11e16]
+      - generic [ref=f11e17]:
+        - paragraph [ref=f11e18]: Slow Simmer is an intimate gathering of friends and strangers united by a love for exceptional food and meaningful conversation. Each evening is carefully curated — from the seasonal menu to the wine pairings and the ambiance — to create a night that feels both exclusive and warmly welcoming.
+        - paragraph [ref=f11e19]: Our events are hosted in intimate settings, limited to a small number of guests to ensure every person at the table has the space to connect, share stories, and savour the experience. We believe the best meals are the ones shared slowly, with good company and great wine.
+        - paragraph [ref=f11e20]: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, Slow Simmer offers a space where the table is set for discovery, delight, and genuine connection.
+    - generic [ref=f11e23]:
+      - heading "Gallery" [level=2] [ref=f11e24]
+      - generic [ref=f11e25]:
+        - img "WhatsApp Image 2026-07-02 at 10.40.31 PM_4.jpeg" [ref=f11e27] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.50 PM_3.jpeg" [ref=f11e29] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.50 PM_2.jpeg" [ref=f11e31] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.50 PM.jpeg" [ref=f11e33] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.18 PM.jpeg" [ref=f11e35] [cursor=pointer]
+    - generic [ref=f11e37]:
+      - heading "Videos" [level=2] [ref=f11e38]
+      - generic [ref=f11e39]:
+        - button "Play Past Event Highlights" [ref=f11e40] [cursor=pointer]:
+          - img "Past Event Highlights" [ref=f11e41]
+          - img [ref=f11e43]
+          - paragraph [ref=f11e46]: Past Event Highlights
+        - button "Play Behind the Scenes" [ref=f11e47] [cursor=pointer]:
+          - img [ref=f11e49]
+          - img [ref=f11e52]
+          - paragraph [ref=f11e55]: Behind the Scenes
+    - generic [ref=f11e57]:
+      - img [ref=f11e58]
+      - heading "Join the Club" [level=2] [ref=f11e60]
+      - paragraph [ref=f11e61]: Registration form coming soon.
+      - paragraph [ref=f11e62]: Reserve your spot at our next featured event.
+  - contentinfo [ref=f11e63]:
+    - generic [ref=f11e64]:
+      - generic [ref=f11e65]: Slow Simmer
+      - generic [ref=f11e66]:
+        - link "Instagram" [ref=f11e67] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f11e68]
+        - link "YouTube" [ref=f11e70] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f11e71]
+      - paragraph [ref=f11e73]: © 2026 Slow Simmer. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=f11e79] [cursor=pointer]:
+    - img [ref=f11e80]
+  - alert [ref=f11e83]

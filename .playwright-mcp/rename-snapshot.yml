@@ -1,0 +1,71 @@
+- generic [active] [ref=f8e1]:
+  - banner [ref=f8e2]:
+    - navigation [ref=f8e3]:
+      - link "Slow Simmer" [ref=f8e4] [cursor=pointer]:
+        - /url: "#hero"
+      - list [ref=f8e5]:
+        - listitem [ref=f8e6]:
+          - link "Hero" [ref=f8e7] [cursor=pointer]:
+            - /url: "#hero"
+        - listitem [ref=f8e8]:
+          - link "About" [ref=f8e9] [cursor=pointer]:
+            - /url: "#about"
+        - listitem [ref=f8e10]:
+          - link "Gallery" [ref=f8e11] [cursor=pointer]:
+            - /url: "#gallery"
+        - listitem [ref=f8e12]:
+          - link "Videos" [ref=f8e13] [cursor=pointer]:
+            - /url: "#videos"
+        - listitem [ref=f8e14]:
+          - link "Register" [ref=f8e15] [cursor=pointer]:
+            - /url: "#form"
+  - main [ref=f8e16]:
+    - generic [ref=f8e18]:
+      - heading "An Intimate Dining Experience" [level=1] [ref=f8e19]
+      - paragraph [ref=f8e20]: Curated evenings of exceptional food, wine, and conversation.
+      - link "View Our Gallery" [ref=f8e22] [cursor=pointer]:
+        - /url: "#gallery"
+    - generic [ref=f8e23]:
+      - heading "About the Club" [level=2] [ref=f8e24]
+      - generic [ref=f8e25]:
+        - paragraph [ref=f8e26]: Slow Simmer is an intimate gathering of friends and strangers united by a love for exceptional food and meaningful conversation. Each evening is carefully curated — from the seasonal menu to the wine pairings and the ambiance — to create a night that feels both exclusive and warmly welcoming.
+        - paragraph [ref=f8e27]: Our events are hosted in intimate settings, limited to a small number of guests to ensure every person at the table has the space to connect, share stories, and savour the experience. We believe the best meals are the ones shared slowly, with good company and great wine.
+        - paragraph [ref=f8e28]: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, Slow Simmer offers a space where the table is set for discovery, delight, and genuine connection.
+    - generic [ref=f8e31]:
+      - heading "Gallery" [level=2] [ref=f8e32]
+      - generic [ref=f8e33]:
+        - img "WhatsApp Image 2026-07-02 at 10.40.31 PM_4.jpeg" [ref=f8e77] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.50 PM_3.jpeg" [ref=f8e79] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.50 PM_2.jpeg" [ref=f8e81] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.50 PM.jpeg" [ref=f8e83] [cursor=pointer]
+        - img "WhatsApp Image 2026-07-02 at 10.37.18 PM.jpeg" [ref=f8e85] [cursor=pointer]
+    - generic [ref=f8e41]:
+      - heading "Videos" [level=2] [ref=f8e42]
+      - generic [ref=f8e43]:
+        - button "Play Past Event Highlights" [ref=f8e86] [cursor=pointer]:
+          - img "Past Event Highlights" [ref=f8e87]
+          - img [ref=f8e89]
+          - paragraph [ref=f8e92]: Past Event Highlights
+        - button "Play Behind the Scenes" [ref=f8e93] [cursor=pointer]:
+          - img [ref=f8e95]
+          - img [ref=f8e98]
+          - paragraph [ref=f8e101]: Behind the Scenes
+    - generic [ref=f8e49]:
+      - img [ref=f8e50]
+      - heading "Join the Club" [level=2] [ref=f8e52]
+      - paragraph [ref=f8e53]: Registration form coming soon.
+      - paragraph [ref=f8e54]: Reserve your spot at our next featured event.
+  - contentinfo [ref=f8e55]:
+    - generic [ref=f8e56]:
+      - generic [ref=f8e57]: Slow Simmer
+      - generic [ref=f8e58]:
+        - link "Instagram" [ref=f8e59] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f8e60]
+        - link "YouTube" [ref=f8e62] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f8e63]
+      - paragraph [ref=f8e65]: © 2026 Slow Simmer. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=f8e71] [cursor=pointer]:
+    - img [ref=f8e72]
+  - alert [ref=f8e75]

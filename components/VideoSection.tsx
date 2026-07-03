@@ -51,6 +51,7 @@ export default function VideoSection() {
             playingId={playingId}
             onPlay={setPlayingId}
             loading={loading}
+            error={error}
           />
         </Reveal>
       </div>

@@ -1,0 +1,81 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - link "Slow Simmer" [ref=e4] [cursor=pointer]:
+        - /url: "#hero"
+      - list [ref=e5]:
+        - listitem [ref=e6]:
+          - link "Hero" [ref=e7] [cursor=pointer]:
+            - /url: "#hero"
+        - listitem [ref=e8]:
+          - link "About" [ref=e9] [cursor=pointer]:
+            - /url: "#about"
+        - listitem [ref=e10]:
+          - link "Gallery" [ref=e11] [cursor=pointer]:
+            - /url: "#gallery"
+        - listitem [ref=e12]:
+          - link "Videos" [ref=e13] [cursor=pointer]:
+            - /url: "#videos"
+        - listitem [ref=e14]:
+          - link "Register" [ref=e15] [cursor=pointer]:
+            - /url: "#form"
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e25]:
+        - paragraph [ref=e26]: Slow Simmer
+        - heading "An Intimate Dining Experience" [level=1] [ref=e27]:
+          - text: An Intimate
+          - text: Dining Experience
+        - paragraph [ref=e28]: Curated evenings of exceptional food, wine, and conversation.
+        - link "View Our Gallery" [ref=e30] [cursor=pointer]:
+          - /url: "#gallery"
+      - generic [ref=e34]: Scroll
+    - generic [ref=e37]:
+      - generic [ref=e40]:
+        - text: Our Story
+        - heading "About the Club" [level=2] [ref=e41]
+        - img [ref=e44]
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - paragraph [ref=e51]: Every great meal tells a story. Slow Simmer is where strangers become friends over carefully crafted menus, thoughtfully paired wines, and conversations that linger long after the last course.
+          - paragraph [ref=e53]: Each evening is hosted in an intimate setting — a private dining room, a hidden terrace, a candlelit loft — limited to just 10–14 guests. No large crowds, no rushed service. Just the pleasure of good company and exceptional food, shared slowly.
+          - paragraph [ref=e55]: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, every table at Slow Simmer is set for discovery, delight, and genuine connection.
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - img [ref=e61]
+            - generic [ref=e63]:
+              - paragraph [ref=e64]: Curated Menus
+              - paragraph [ref=e65]: Seasonal, locally-sourced, expertly paired
+            - img [ref=e66]
+          - generic [ref=e68]:
+            - img [ref=e70]
+            - generic [ref=e75]:
+              - paragraph [ref=e76]: By Invitation
+              - paragraph [ref=e77]: Intimate groups of 10–14 guests per evening
+            - img [ref=e78]
+          - generic [ref=e80]:
+            - img [ref=e82]
+            - generic [ref=e84]:
+              - paragraph [ref=e85]: Meaningful Time
+              - paragraph [ref=e86]: Slow food, deep conversation, lasting memories
+            - img [ref=e87]
+    - heading "Gallery" [level=2] [ref=e93]
+    - heading "Videos" [level=2] [ref=e107]
+    - generic [ref=e117]:
+      - img [ref=e118]
+      - heading "Join the Club" [level=2] [ref=e120]
+      - paragraph [ref=e121]: Registration form coming soon.
+      - paragraph [ref=e122]: Reserve your spot at our next featured event.
+  - contentinfo [ref=e123]:
+    - generic [ref=e124]:
+      - generic [ref=e125]: Slow Simmer
+      - generic [ref=e127]:
+        - link "Instagram" [ref=e128] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e129]
+        - link "YouTube" [ref=e132] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e133]
+      - paragraph [ref=e137]: © 2026 Slow Simmer. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { RiMenuFill, RiCloseFill } from "@remixicon/react"
+import { Menu, X } from "lucide-react"
+import ThemeToggle from "@/components/ThemeToggle"
 
 const NAV_SECTIONS = [
   { id: "hero", label: "Hero" },
@@ -67,7 +68,7 @@ export default function NavBar() {
           href="#hero"
           className="font-heading text-xl font-bold text-foreground"
         >
-          Supper Club
+          Slow Simmer
         </a>
 
         {/* Desktop nav links */}
@@ -89,20 +90,25 @@ export default function NavBar() {
           ))}
         </ul>
 
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          className="sm:hidden inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-foreground"
-          aria-label="Toggle navigation menu"
-          aria-expanded={isMobileMenuOpen}
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-        >
-          {isMobileMenuOpen ? (
-            <RiCloseFill size={24} />
-          ) : (
-            <RiMenuFill size={24} />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Theme toggle */}
+          <ThemeToggle />
+
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            className="sm:hidden inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-foreground"
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          >
+            {isMobileMenuOpen ? (
+              <X size={24} />
+            ) : (
+              <Menu size={24} />
+            )}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu dropdown */}

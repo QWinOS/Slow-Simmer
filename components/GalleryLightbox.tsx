@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useCallback } from "react"
+import { useEffect, useRef, useCallback, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,8 @@ import {
   RiCloseLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
+  RiZoomInLine,
+  RiZoomOutLine,
 } from "@remixicon/react"
 import type { DriveFile } from "@/lib/drive"
 
@@ -30,22 +32,32 @@ export function GalleryLightbox({
   onClose,
   onNavigate,
 }: GalleryLightboxProps) {
+  const [zoomed, setZoomed] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
+  const lastTap = useRef(0)
 
   const prevIndex =
     (currentIndex - 1 + images.length) % images.length
   const nextIndex =
     (currentIndex + 1) % images.length
 
+  const toggleZoom = useCallback(() => {
+    setZoomed((prev) => !prev)
+  }, [])
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") {
         e.preventDefault()
+        setZoomed(false)
         onNavigate(prevIndex)
       } else if (e.key === "ArrowRight") {
         e.preventDefault()
+        setZoomed(false)
         onNavigate(nextIndex)
+      } else if (e.key === "Escape") {
+        setZoomed(false)
       }
     },
     [onNavigate, prevIndex, nextIndex]
@@ -56,17 +68,37 @@ export function GalleryLightbox({
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [handleKeyDown])
 
+  const handleImageClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      toggleZoom()
+    },
+    [toggleZoom]
+  )
+
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
     touchEndX.current = null
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (zoomed) return
     touchEndX.current = e.touches[0].clientX
   }
 
   const handleTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) return
+    const now = Date.now()
+    const dt = now - lastTap.current
+    lastTap.current = now
+
+    if (dt < 300 && dt > 0) {
+      toggleZoom()
+      touchStartX.current = null
+      touchEndX.current = null
+      return
+    }
+
+    if (zoomed || touchStartX.current === null || touchEndX.current === null) return
     const diff = touchEndX.current - touchStartX.current
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
@@ -95,17 +127,28 @@ export function GalleryLightbox({
           Viewing photo {currentIndex + 1} of {images.length}
         </DialogDescription>
 
-        {/* Close button */}
-        <DialogClose asChild>
+        {/* Top toolbar */}
+        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 z-10 text-white/80 hover:text-white hover:bg-white/10"
+            onClick={toggleZoom}
+            className="text-white/80 hover:text-white hover:bg-white/10"
+            aria-label={zoomed ? "Zoom out" : "Zoom in"}
           >
-            <RiCloseLine />
-            <span className="sr-only">Close</span>
+            {zoomed ? <RiZoomOutLine /> : <RiZoomInLine />}
           </Button>
-        </DialogClose>
+          <DialogClose asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white/80 hover:text-white hover:bg-white/10"
+            >
+              <RiCloseLine />
+              <span className="sr-only">Close</span>
+            </Button>
+          </DialogClose>
+        </div>
 
         {/* Navigation arrows - hidden on mobile */}
         <button
@@ -126,15 +169,23 @@ export function GalleryLightbox({
 
         {/* Image */}
         <div
-          className="flex items-center justify-center min-h-[50vh]"
+          className={`flex items-center justify-center select-none ${
+            zoomed ? "h-[80vh] cursor-zoom-out" : "min-h-[50vh] cursor-zoom-in"
+          }`}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           <img
             src={getDriveImageUrl(images[currentIndex].id)}
-            alt={images[currentIndex].name || "Supper club event photo"}
-            className="max-h-[85vh] w-full object-contain transition-opacity duration-300"
+            alt={images[currentIndex].name || "Slow Simmer event photo"}
+            onClick={handleImageClick}
+            className={`transition-all duration-200 ease-in-out ${
+              zoomed
+                ? "h-full w-full object-cover"
+                : "max-h-[85vh] w-full object-contain"
+            }`}
+            draggable={false}
           />
         </div>
 

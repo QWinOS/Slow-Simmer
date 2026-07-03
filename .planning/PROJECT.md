@@ -1,12 +1,12 @@
-# Supper Club
+# Slow Simmer
 
 ## What This Is
 
-A single-page, mobile-friendly webapp for a supper club. Guests can browse past event photos/videos, fill out a registration form with their details (name, contact, social links, guest info), pay via PhonePe Business UPI, and have their details recorded in Google Sheets upon successful payment.
+A single-page, mobile-friendly webapp for Slow Simmer. Guests can browse past event photos/videos, fill out a registration form with their details (name, contact, social links, guest info), pay via GPay UPI, and have their details recorded in Google Sheets upon successful payment.
 
 ## Core Value
 
-Guests can register for a supper club event, pay seamlessly via PhonePe, and have their registration automatically recorded.
+Guests can register for a Slow Simmer event, pay seamlessly via GPay UPI, and have their registration automatically recorded.
 
 ## Requirements
 

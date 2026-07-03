@@ -1,0 +1,53 @@
+- generic [active] [ref=f3e1]:
+  - banner [ref=f3e2]:
+    - navigation [ref=f3e3]:
+      - link "Supper Club" [ref=f3e4] [cursor=pointer]:
+        - /url: "#hero"
+      - list [ref=f3e5]:
+        - listitem [ref=f3e6]:
+          - link "Hero" [ref=f3e7] [cursor=pointer]:
+            - /url: "#hero"
+        - listitem [ref=f3e8]:
+          - link "About" [ref=f3e9] [cursor=pointer]:
+            - /url: "#about"
+        - listitem [ref=f3e10]:
+          - link "Gallery" [ref=f3e11] [cursor=pointer]:
+            - /url: "#gallery"
+        - listitem [ref=f3e12]:
+          - link "Videos" [ref=f3e13] [cursor=pointer]:
+            - /url: "#videos"
+        - listitem [ref=f3e14]:
+          - link "Register" [ref=f3e15] [cursor=pointer]:
+            - /url: "#form"
+  - main [ref=f3e16]:
+    - generic [ref=f3e18]:
+      - heading "An Intimate Dining Experience" [level=1] [ref=f3e19]
+      - paragraph [ref=f3e20]: Curated evenings of exceptional food, wine, and conversation.
+      - link "View Our Gallery" [ref=f3e22] [cursor=pointer]:
+        - /url: "#gallery"
+    - generic [ref=f3e23]:
+      - heading "About the Club" [level=2] [ref=f3e24]
+      - generic [ref=f3e25]:
+        - paragraph [ref=f3e26]: Supper Club is an intimate gathering of friends and strangers united by a love for exceptional food and meaningful conversation. Each evening is carefully curated — from the seasonal menu to the wine pairings and the ambiance — to create a night that feels both exclusive and warmly welcoming.
+        - paragraph [ref=f3e27]: Our events are hosted in intimate settings, limited to a small number of guests to ensure every person at the table has the space to connect, share stories, and savour the experience. We believe the best meals are the ones shared slowly, with good company and great wine.
+        - paragraph [ref=f3e28]: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, Supper Club offers a space where the table is set for discovery, delight, and genuine connection.
+    - heading "Gallery" [level=2] [ref=f3e32]
+    - heading "Videos" [level=2] [ref=f3e42]
+    - generic [ref=f3e49]:
+      - img [ref=f3e50]
+      - heading "Join the Club" [level=2] [ref=f3e52]
+      - paragraph [ref=f3e53]: Registration form coming soon.
+      - paragraph [ref=f3e54]: Reserve your spot at our next featured event.
+  - contentinfo [ref=f3e55]:
+    - generic [ref=f3e56]:
+      - generic [ref=f3e57]: Supper Club
+      - generic [ref=f3e58]:
+        - link "Instagram" [ref=f3e59] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f3e60]
+        - link "YouTube" [ref=f3e62] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f3e63]
+      - paragraph [ref=f3e65]: © 2026 Supper Club. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=f3e71] [cursor=pointer]:
+    - img [ref=f3e72]

@@ -1,0 +1,85 @@
+- generic:
+  - banner:
+    - navigation:
+      - link:
+        - /url: "#hero"
+        - text: Slow Simmer
+      - button:
+        - img
+  - main:
+    - generic:
+      - generic:
+        - heading [level=1]: An Intimate Dining Experience
+        - paragraph: Curated evenings of exceptional food, wine, and conversation.
+        - generic:
+          - link:
+            - /url: "#gallery"
+            - text: View Our Gallery
+    - generic:
+      - heading [level=2]: About the Club
+      - generic:
+        - paragraph: Slow Simmer is an intimate gathering of friends and strangers united by a love for exceptional food and meaningful conversation. Each evening is carefully curated — from the seasonal menu to the wine pairings and the ambiance — to create a night that feels both exclusive and warmly welcoming.
+        - paragraph: Our events are hosted in intimate settings, limited to a small number of guests to ensure every person at the table has the space to connect, share stories, and savour the experience. We believe the best meals are the ones shared slowly, with good company and great wine.
+        - paragraph: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, Slow Simmer offers a space where the table is set for discovery, delight, and genuine connection.
+    - generic:
+      - generic:
+        - heading [level=2]: Gallery
+        - generic:
+          - generic:
+            - img
+          - generic:
+            - img
+          - generic:
+            - img
+          - generic:
+            - img
+          - generic:
+            - img
+    - generic:
+      - generic:
+        - heading [level=2]: Videos
+        - generic:
+          - button:
+            - img
+            - generic:
+              - img
+            - generic:
+              - paragraph: Past Event Highlights
+          - button:
+            - generic:
+              - img
+            - generic:
+              - img
+            - generic:
+              - paragraph: Behind the Scenes
+    - generic:
+      - generic:
+        - img
+        - heading [level=2]: Join the Club
+        - paragraph: Registration form coming soon.
+        - paragraph: Reserve your spot at our next featured event.
+  - contentinfo:
+    - generic:
+      - generic: Slow Simmer
+      - generic:
+        - link:
+          - /url: "#"
+          - img
+        - link:
+          - /url: "#"
+          - img
+      - paragraph: © 2026 Slow Simmer. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=f11e79] [cursor=pointer]:
+    - img [ref=f11e80]
+  - alert
+  - dialog "Photo viewer" [ref=f11e85]:
+    - heading "Photo viewer" [level=2] [ref=f11e86]
+    - paragraph [ref=f11e87]: Viewing photo 1 of 5
+    - generic [ref=f11e88]:
+      - button "Zoom in" [active] [ref=f11e89]:
+        - img
+      - button "Close" [ref=f11e90]:
+        - img
+        - generic [ref=f11e91]: Close
+    - img "WhatsApp Image 2026-07-02 at 10.40.31 PM_4.jpeg" [ref=f11e93]
+    - generic [ref=f11e94]: 1 / 5

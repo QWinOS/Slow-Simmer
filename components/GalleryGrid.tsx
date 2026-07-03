@@ -42,11 +42,18 @@ export function GalleryGrid({
   // Loading state
   if (loading && images.length === 0) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-[4/3] rounded-xl" />
-        ))}
-      </div>
+      <>
+        <div className="flex sm:hidden gap-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-[4/3] min-w-[280px] w-[80vw] flex-shrink-0 rounded-xl" />
+          ))}
+        </div>
+        <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-[4/3] rounded-xl" />
+          ))}
+        </div>
+      </>
     )
   }
 
@@ -85,21 +92,41 @@ export function GalleryGrid({
 
   // Loaded state
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      {images.map((image, index) => (
-        <Card
-          key={image.id}
-          className="aspect-[4/3] overflow-hidden bg-transparent ring-0 cursor-pointer"
-          onClick={() => onImageClick(index)}
-        >
-          <img
-            src={getDriveImageUrl(image.id)}
-            alt={image.name || "Supper club event photo"}
-            loading="lazy"
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          />
-        </Card>
-      ))}
-    </div>
+    <>
+      {/* Mobile: horizontal scroll */}
+      <div className="flex sm:hidden gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 scrollbar-none">
+        {images.map((image, index) => (
+          <Card
+            key={image.id}
+            className="aspect-[4/3] min-w-[280px] w-[80vw] flex-shrink-0 overflow-hidden bg-transparent ring-0 cursor-pointer snap-center"
+            onClick={() => onImageClick(index)}
+          >
+            <img
+              src={getDriveImageUrl(image.id)}
+              alt={image.name || "Slow Simmer event photo"}
+              loading="lazy"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </Card>
+        ))}
+      </div>
+      {/* Desktop: grid */}
+      <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {images.map((image, index) => (
+          <Card
+            key={image.id}
+            className="aspect-[4/3] overflow-hidden bg-transparent ring-0 cursor-pointer"
+            onClick={() => onImageClick(index)}
+          >
+            <img
+              src={getDriveImageUrl(image.id)}
+              alt={image.name || "Slow Simmer event photo"}
+              loading="lazy"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </Card>
+        ))}
+      </div>
+    </>
   )
 }

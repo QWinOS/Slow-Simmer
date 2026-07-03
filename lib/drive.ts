@@ -34,5 +34,5 @@ export async function fetchGalleryImages(): Promise<DriveFile[]> {
 }
 
 export function getDriveImageUrl(fileId: string): string {
-  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+  return `https://lh3.googleusercontent.com/d/${fileId}`;
 }

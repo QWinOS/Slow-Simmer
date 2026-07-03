@@ -10,9 +10,10 @@ interface VideoGridProps {
   playingId: string | null
   onPlay: (id: string | null) => void
   loading?: boolean
+  error?: string | null
 }
 
-export function VideoGrid({ videos, playingId, onPlay, loading = true }: VideoGridProps) {
+export function VideoGrid({ videos, playingId, onPlay, loading = true, error }: VideoGridProps) {
   // Loading state — skeleton cards matching grid layout
   if (loading) {
     return (
@@ -32,6 +33,21 @@ export function VideoGrid({ videos, playingId, onPlay, loading = true }: VideoGr
           ))}
         </div>
       </>
+    )
+  }
+
+  // Error state — show before empty since an error also means no videos
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <RiVideoLine size={48} className="text-destructive mb-4" />
+        <p className="text-lg font-heading font-bold text-destructive mb-1">
+          Failed to load videos
+        </p>
+        <p className="text-muted-foreground max-w-md">
+          {error}. Make sure the Google Sheets API is enabled and the sheet is shared publicly.
+        </p>
+      </div>
     )
   }
 

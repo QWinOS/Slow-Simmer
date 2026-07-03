@@ -1,0 +1,44 @@
+- generic [active] [ref=f3e1]:
+  - banner [ref=f3e2]:
+    - navigation [ref=f3e3]:
+      - link "Slow Simmer" [ref=f3e4] [cursor=pointer]:
+        - /url: "#hero"
+      - button "Toggle navigation menu" [ref=f3e7]:
+        - img [ref=f3e8]
+  - main [ref=f3e9]:
+    - generic [ref=f3e10]:
+      - generic [ref=f3e16]:
+        - paragraph [ref=f3e17]: Slow Simmer
+        - heading "An Intimate Dining Experience" [level=1] [ref=f3e18]:
+          - text: An Intimate
+          - text: Dining Experience
+        - paragraph [ref=f3e19]: Curated evenings of exceptional food, wine, and conversation.
+        - link "View Our Gallery" [ref=f3e21] [cursor=pointer]:
+          - /url: "#gallery"
+      - generic [ref=f3e25]: Scroll
+    - generic [ref=f3e28]:
+      - heading "About the Club" [level=2] [ref=f3e31]
+      - generic [ref=f3e32]:
+        - paragraph [ref=f3e34]: Slow Simmer is an intimate gathering of friends and strangers united by a love for exceptional food and meaningful conversation. Each evening is carefully curated — from the seasonal menu to the wine pairings and the ambiance — to create a night that feels both exclusive and warmly welcoming.
+        - paragraph [ref=f3e36]: Our events are hosted in intimate settings, limited to a small number of guests to ensure every person at the table has the space to connect, share stories, and savour the experience. We believe the best meals are the ones shared slowly, with good company and great wine.
+        - paragraph [ref=f3e38]: Whether you are a seasoned food enthusiast or simply looking for a memorable evening out, Slow Simmer offers a space where the table is set for discovery, delight, and genuine connection.
+    - heading "Gallery" [level=2] [ref=f3e45]
+    - heading "Videos" [level=2] [ref=f3e59]
+    - generic [ref=f3e69]:
+      - img [ref=f3e70]
+      - heading "Join the Club" [level=2] [ref=f3e72]
+      - paragraph [ref=f3e73]: Registration form coming soon.
+      - paragraph [ref=f3e74]: Reserve your spot at our next featured event.
+  - contentinfo [ref=f3e75]:
+    - generic [ref=f3e76]:
+      - generic [ref=f3e77]: Slow Simmer
+      - generic [ref=f3e79]:
+        - link "Instagram" [ref=f3e80] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f3e81]
+        - link "YouTube" [ref=f3e84] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f3e85]
+      - paragraph [ref=f3e89]: © 2026 Slow Simmer. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=f3e95] [cursor=pointer]:
+    - img [ref=f3e96]
