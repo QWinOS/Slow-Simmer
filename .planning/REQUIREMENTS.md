@@ -11,21 +11,21 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **GALL-01**: Photo gallery displays past event images from Google Drive via Drive API
 - [x] **GALL-04**: New images added to the Drive folder appear automatically (no code change)
-- [ ] **GALL-02**: Video section embeds YouTube videos and Instagram reels
+- [x] **GALL-02**: Video section embeds YouTube videos and Instagram reels
 - [x] **GALL-03**: Gallery is mobile-responsive (swipeable / grid adapts to mobile)
 - [x] **GALL-05**: Videos are sourced dynamically at runtime from a Google Sheet of YouTube + Instagram links; new rows appear on the site with no code change or redeploy
 
 ### Registration Form
 
-- [ ] **FORM-01**: Guest can enter full name
-- [ ] **FORM-02**: Guest can enter contact number
-- [ ] **FORM-03**: Guest can enter email address
-- [ ] **FORM-04**: Guest can indicate if bringing someone + provide their name & age
-- [ ] **FORM-05**: Guest can share 1-2 lines about themselves
-- [ ] **FORM-06**: Guest can share Instagram or LinkedIn profile
-- [ ] **FORM-07**: Guest can enter Aadhar number
-- [ ] **FORM-08**: Form validates required fields before submission
-- [ ] **FORM-09**: Form is mobile-friendly with proper touch targets
+- [x] **FORM-01**: Guest can enter full name
+- [x] **FORM-02**: Guest can enter contact number
+- [x] **FORM-03**: Guest can enter email address
+- [x] **FORM-04**: Guest can indicate if bringing someone + provide their name & age
+- [x] **FORM-05**: Guest can share 1-2 lines about themselves
+- [x] **FORM-06**: Guest can share Instagram or LinkedIn profile
+- [x] **FORM-07**: Guest can enter Aadhar number
+- [x] **FORM-08**: Form validates required fields before submission
+- [x] **FORM-09**: Form is mobile-friendly with proper touch targets
 
 ### Payment
 
@@ -73,22 +73,22 @@ Deferred to future release. Tracked but not in current roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | GALL-01 | Phase 1 | Complete |
-| GALL-02 | Phase 1 | Pending |
+| GALL-02 | Phase 1 | Complete |
 | GALL-03 | Phase 1 | Complete |
 | GALL-04 | Phase 1 | Complete |
 | GALL-05 | Phase 1 | Complete |
 | UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 1 | Complete |
-| FORM-01 | Phase 2 | Pending |
-| FORM-02 | Phase 2 | Pending |
-| FORM-03 | Phase 2 | Pending |
-| FORM-04 | Phase 2 | Pending |
-| FORM-05 | Phase 2 | Pending |
-| FORM-06 | Phase 2 | Pending |
-| FORM-07 | Phase 2 | Pending |
-| FORM-08 | Phase 2 | Pending |
-| FORM-09 | Phase 2 | Pending |
+| FORM-01 | Phase 2 | Complete |
+| FORM-02 | Phase 2 | Complete |
+| FORM-03 | Phase 2 | Complete |
+| FORM-04 | Phase 2 | Complete |
+| FORM-05 | Phase 2 | Complete |
+| FORM-06 | Phase 2 | Complete |
+| FORM-07 | Phase 2 | Complete |
+| FORM-08 | Phase 2 | Complete |
+| FORM-09 | Phase 2 | Complete |
 | PAY-01 | Phase 3 | Pending |
 | PAY-02 | Phase 3 | Pending |
 | PAY-03 | Phase 3 | Pending |

@@ -7,7 +7,7 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
 ## Phases
 
 - [x] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(reopened: theme gaps + GALL-05 dynamic video)* (completed 2026-07-02)
-- [ ] **Phase 2: Registration Form** - Functional registration form collecting all guest details
+- [x] **Phase 2: Registration Form** - Functional registration form collecting all guest details (completed 2026-07-04)
 - [ ] **Phase 3: Payment, Sheets & Email** - PhonePe payment, Google Sheets logging, and Brevo confirmation email
 
 ## Phase Details
@@ -59,21 +59,21 @@ Plans:
   2. Form validates required fields before submission
   3. Form is usable on mobile with proper touch targets
 
-**Plans**: 5/5 plans planned
+**Plans**: 5/5 plans complete
 
 Plans:
 **Wave 1** *(parallel)*
-- [ ] 02-01-PLAN.md — Foundation: npm packages, shadcn components, vitest config, test setup
-- [ ] 02-02-PLAN.md — Provider + Placeholder: RegistrationProvider context, PaymentPlaceholder stub
+- [x] 02-01-PLAN.md — Foundation: npm packages, shadcn components, vitest config, test setup *(complete 2026-07-03)*
+- [x] 02-02-PLAN.md — Provider + Placeholder: RegistrationProvider context, PaymentPlaceholder stub *(complete 2026-07-03)*
 
 **Wave 2** *(blocked on 02-01)*
-- [ ] 02-03-PLAN.md — Validation: Zod schema, unit tests, sonner Toaster in layout
+- [x] 02-03-PLAN.md — Validation: Zod schema, unit tests, sonner Toaster in layout *(complete 2026-07-03)*
 
 **Wave 3** *(blocked on 02-02, 02-03)*
-- [ ] 02-04-PLAN.md — RegistrationForm component + page.tsx integration
+- [x] 02-04-PLAN.md — RegistrationForm component + page.tsx integration *(complete 2026-07-04)*
 
 **Wave 4** *(blocked on 02-04)*
-- [ ] 02-05-PLAN.md — Integration tests for RegistrationForm
+- [x] 02-05-PLAN.md — Integration tests for RegistrationForm *(complete 2026-07-04)*
 
 ### Phase 3: Payment, Sheets & Email
 
@@ -94,5 +94,5 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Layout & Gallery | 6/6 | Complete   | 2026-07-02 |
-| 2. Registration Form | 0/5 | Planned | - |
+| 2. Registration Form | 5/5 | Complete | 2026-07-04 |
 | 3. Payment, Sheets & Email | 0/0 | Not started | - |
