@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
+import Image from "next/image"
 import { fetchGalleryImages, getDriveImageUrl } from "@/lib/drive"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { RiErrorWarningLine, RiImageLine, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react"
+import { AlertTriangle, Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import type { DriveFile } from "@/lib/drive"
 
 interface GalleryGridProps {
@@ -72,7 +73,7 @@ export function GalleryGrid({
   if (error !== null) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <RiErrorWarningLine
+        <AlertTriangle
           size={48}
           className="text-muted-foreground mb-4"
         />
@@ -90,7 +91,7 @@ export function GalleryGrid({
   if (images.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <RiImageLine size={48} className="text-muted-foreground mb-4" />
+        <ImageIcon size={48} className="text-muted-foreground mb-4" />
         <p className="text-lg font-heading font-bold text-foreground mb-1">
           No photos yet
         </p>
@@ -112,10 +113,13 @@ export function GalleryGrid({
             className="aspect-[4/3] min-w-[280px] w-[80vw] flex-shrink-0 overflow-hidden bg-transparent ring-0 cursor-pointer snap-center"
             onClick={() => onImageClick(index)}
           >
-            <img
+            <Image
               src={getDriveImageUrl(image.id)}
               alt={image.name || "Slow Simmer event photo"}
-              loading="lazy"
+              width={400}
+              height={300}
+              sizes="80vw"
+              quality={60}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />
           </Card>
@@ -133,10 +137,13 @@ export function GalleryGrid({
               className="aspect-[4/3] min-w-[240px] w-[calc(25%-12px)] flex-shrink-0 overflow-hidden bg-transparent ring-0 cursor-pointer snap-start"
               onClick={() => onImageClick(index)}
             >
-              <img
+              <Image
                 src={getDriveImageUrl(image.id)}
                 alt={image.name || "Slow Simmer event photo"}
-                loading="lazy"
+                width={400}
+                height={300}
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 80vw"
+                quality={60}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </Card>
@@ -149,14 +156,14 @@ export function GalleryGrid({
               className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Previous"
             >
-              <RiArrowLeftSLine className="size-6" />
+              <ChevronLeft className="size-6" />
             </button>
             <button
               onClick={() => scrollSlider("right")}
               className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Next"
             >
-              <RiArrowRightSLine className="size-6" />
+              <ChevronRight className="size-6" />
             </button>
           </>
         )}

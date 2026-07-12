@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.playwright-mcp/
+nav-blur.png
+razorpay-modal.yml
+payment-modal.yml
+page-snapshot.yml
+form-state.yml
+page-*.yml
+page-*.png

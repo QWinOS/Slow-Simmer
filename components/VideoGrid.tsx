@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import { VideoThumbnail } from "./VideoThumbnail"
 import { Skeleton } from "@/components/ui/skeleton"
-import { RiVideoLine, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react"
+import { Video, ChevronLeft, ChevronRight } from "lucide-react"
 import type { VideoItem } from "@/lib/video"
 
 interface VideoGridProps {
@@ -41,7 +41,7 @@ export function VideoGrid({ videos, playingId, onPlay, loading = true, error }: 
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <RiVideoLine size={48} className="text-destructive mb-4" />
+        <Video size={48} className="text-destructive mb-4" />
         <p className="text-lg font-heading font-bold text-destructive mb-1">
           Failed to load videos
         </p>
@@ -56,7 +56,7 @@ export function VideoGrid({ videos, playingId, onPlay, loading = true, error }: 
   if (videos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <RiVideoLine size={48} className="text-muted-foreground mb-4" />
+        <Video size={48} className="text-muted-foreground mb-4" />
         <p className="text-lg font-heading font-bold text-foreground mb-1">
           No videos yet
         </p>
@@ -125,14 +125,14 @@ export function VideoGrid({ videos, playingId, onPlay, loading = true, error }: 
               className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Previous"
             >
-              <RiArrowLeftSLine className="size-6" />
+              <ChevronLeft className="size-6" />
             </button>
             <button
               onClick={() => scrollSlider("right")}
               className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Next"
             >
-              <RiArrowRightSLine className="size-6" />
+              <ChevronRight className="size-6" />
             </button>
           </>
         )}

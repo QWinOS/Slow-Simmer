@@ -39,6 +39,11 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Brand gold ramp — exposed as Tailwind color utilities (text-gold, bg-champagne, …) */
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-deep: var(--gold-deep);
+  --color-champagne: var(--champagne);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,25 +53,33 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * ─────────────────────────────────────────────────────────────
+ * Slow Simmer — Luxury "Liquid Glass" theme
+ * Palette: espresso black · warm ivory · antique gold / champagne
+ * ─────────────────────────────────────────────────────────────
+ */
+
 :root {
-  --background: #FEF2F2;
-  --foreground: #450A0A;
-  --card: #F87171;
-  --card-foreground: #450A0A;
-  --popover: #F87171;
-  --popover-foreground: #450A0A;
-  --primary: #A16207;
-  --primary-foreground: #FEF2F2;
-  --secondary: #FEE2E2;
-  --secondary-foreground: #450A0A;
-  --muted: #FEE2E2;
-  --muted-foreground: rgba(69, 10, 10, 0.8);
-  --accent: rgba(161, 98, 7, 0.15);
-  --accent-foreground: #A16207;
+  /* Ivory & candlelight (light mode) */
+  --background: #F6F2EA;
+  --foreground: #1A1512;
+  --card: #FFFFFF;
+  --card-foreground: #1A1512;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1512;
+  --primary: #8A6D3B;
+  --primary-foreground: #FBF8F1;
+  --secondary: #ECE5D8;
+  --secondary-foreground: #2A2018;
+  --muted: #ECE5D8;
+  --muted-foreground: rgba(26, 21, 18, 0.62);
+  --accent: rgba(138, 109, 59, 0.12);
+  --accent-foreground: #6E5223;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #FECACA;
-  --input: #FECACA;
-  --ring: #A16207;
+  --border: rgba(26, 21, 18, 0.10);
+  --input: rgba(26, 21, 18, 0.14);
+  --ring: #A97F35;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -81,28 +94,47 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --brand-primary: #DC2626;
+
+  /* Brand gold ramp */
+  --gold: #A97F35;
+  --gold-soft: #C9A34E;
+  --gold-deep: #6E5223;
+  --champagne: #E7CE9A;
+
+  /* Liquid-glass surface tokens */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 10px 40px -12px rgba(26, 21, 18, 0.22);
+  --glass-blur: 18px;
+
+  /* Ambient light behind glass */
+  --glow-gold: rgba(201, 163, 78, 0.42);
+  --glow-champagne: rgba(231, 206, 154, 0.55);
+  --grain-opacity: 0.035;
 }
 
 .dark {
-  --background: #1A0A0A;
-  --foreground: #FEF2F2;
-  --card: #2D1414;
-  --card-foreground: #FEF2F2;
-  --popover: #2D1414;
-  --popover-foreground: #FEF2F2;
-  --primary: #A16207;
-  --primary-foreground: #FEF2F2;
-  --secondary: #3D1F1F;
-  --secondary-foreground: #FEF2F2;
-  --muted: #3D1F1F;
-  --muted-foreground: rgba(254, 242, 242, 0.7);
-  --accent: rgba(161, 98, 7, 0.2);
-  --accent-foreground: #B8860B;
+  /* Candlelit espresso (dark mode) */
+  --background: #100C0A;
+  --foreground: #F4EDE1;
+  --card: #1A1310;
+  --card-foreground: #F4EDE1;
+  --popover: #1A1310;
+  --popover-foreground: #F4EDE1;
+  --primary: #C9A34E;
+  --primary-foreground: #17110B;
+  --secondary: #241A13;
+  --secondary-foreground: #F4EDE1;
+  --muted: #241A13;
+  --muted-foreground: rgba(244, 237, 225, 0.64);
+  --accent: rgba(201, 163, 78, 0.16);
+  --accent-foreground: #E7CE9A;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #4A2828;
-  --input: #4A2828;
-  --ring: #A16207;
+  --border: rgba(244, 237, 225, 0.10);
+  --input: rgba(244, 237, 225, 0.14);
+  --ring: #C9A34E;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -117,20 +149,62 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --brand-primary: #DC2626;
+
+  /* Brand gold ramp (brighter on dark) */
+  --gold: #C9A34E;
+  --gold-soft: #E7CE9A;
+  --gold-deep: #8A6D3B;
+  --champagne: #F0DDB4;
+
+  /* Liquid-glass surface tokens */
+  --glass-bg: rgba(255, 255, 255, 0.055);
+  --glass-bg-strong: rgba(255, 255, 255, 0.10);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.6);
+  --glass-blur: 20px;
+
+  /* Ambient light behind glass — kept restrained so the espresso base stays deep */
+  --glow-gold: rgba(201, 163, 78, 0.16);
+  --glow-champagne: rgba(231, 206, 154, 0.10);
+  --grain-opacity: 0.022;
 }
 
-@keyframes heroPulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.2); }
-}
+/* ── Motion ───────────────────────────────────────────────── */
+
 @keyframes fadeUp {
-  0% { opacity: 0; transform: translateY(20px); }
+  0% { opacity: 0; transform: translateY(22px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 @keyframes scrollDot {
   0%, 100% { transform: translateY(0); opacity: 1; }
   50% { transform: translateY(6px); opacity: 0.3; }
+}
+
+/* Slow, organic drift + morph for the liquid-glass ambient blobs */
+@keyframes blobDrift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); border-radius: 42% 58% 63% 37% / 45% 42% 58% 55%; }
+  33%  { transform: translate3d(4%, -5%, 0) scale(1.08); border-radius: 60% 40% 41% 59% / 63% 55% 45% 37%; }
+  66%  { transform: translate3d(-4%, 3%, 0) scale(0.96); border-radius: 38% 62% 55% 45% / 40% 58% 42% 60%; }
+  100% { transform: translate3d(0, 0, 0) scale(1); border-radius: 42% 58% 63% 37% / 45% 42% 58% 55%; }
+}
+
+/* Sweeping gold sheen across text / dividers */
+@keyframes shimmer {
+  0% { background-position: -160% 0; }
+  100% { background-position: 260% 0; }
+}
+
+/* Specular highlight travelling along a glass edge */
+@keyframes glassSheen {
+  0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  22% { opacity: 0.85; }
+  55% { opacity: 0; }
+  100% { transform: translateX(240%) skewX(-18deg); opacity: 0; }
 }
 
 @layer base {
@@ -149,6 +223,104 @@
       scroll-behavior: auto;
     }
   }
+}
+
+@layer components {
+  /* ── Liquid glass surface ──────────────────────────────────
+     Translucent panel with backdrop blur, a bright top edge,
+     and a soft ambient shadow. Falls back to a solid tinted
+     surface where backdrop-filter is unsupported.            */
+  .glass {
+    position: relative;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight);
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  }
+  .glass-strong {
+    background: var(--glass-bg-strong);
+  }
+  /* Navigation / overlay surface — opaque enough that content scrolling
+     beneath it blurs out of legibility, while keeping a hint of the tint. */
+  .glass-nav {
+    background: color-mix(in srgb, var(--background) 96%, transparent);
+    box-shadow: 0 10px 34px -18px rgba(0, 0, 0, 0.4);
+  }
+  /* Faint iridescent top-edge highlight for depth */
+  .glass-edge::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      130deg,
+      var(--glass-highlight),
+      transparent 30%,
+      transparent 70%,
+      color-mix(in srgb, var(--gold-soft) 55%, transparent)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Gold foil text — animated champagne sweep */
+  .text-gold-foil {
+    background: linear-gradient(
+      100deg,
+      var(--gold-deep) 0%,
+      var(--gold) 22%,
+      var(--champagne) 46%,
+      #fff7e6 52%,
+      var(--champagne) 58%,
+      var(--gold) 78%,
+      var(--gold-deep) 100%
+    );
+    background-size: 220% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmer 7s linear infinite;
+  }
+
+  /* Hairline gold rule used as a section flourish */
+  .rule-gold {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--gold) 65%, transparent),
+      transparent
+    );
+  }
+
+  /* Ambient morphing light blob (decorative, aria-hidden) */
+  .blob {
+    position: absolute;
+    filter: blur(60px);
+    will-change: transform, border-radius;
+    animation: blobDrift 22s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+/* Respect reduced-motion: freeze ambient + decorative motion */
+@media (prefers-reduced-motion: reduce) {
+  .blob,
+  .text-gold-foil {
+    animation: none !important;
+  }
+}
+
+/*
+ * Backdrop blur applied outside @layer to avoid Tailwind v4 optimizer stripping
+ * backdrop-filter from layered rules. Unlayered declarations outrank @layer.
+ */
+.glass-nav {
+  backdrop-filter: blur(22px) saturate(155%);
 }
 
 /*

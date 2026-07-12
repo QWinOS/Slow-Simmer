@@ -24,40 +24,50 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-card text-card-foreground">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-12 sm:px-6">
+    <footer className="relative overflow-hidden border-t border-[var(--glass-border)] bg-card text-card-foreground">
+      <div
+        aria-hidden
+        className="blob left-1/2 top-full size-[46vmin] -translate-x-1/2 -translate-y-1/2"
+        style={{ background: "var(--glow-gold)" }}
+      />
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-7 px-4 py-16 sm:px-6">
         <Reveal>
-          <span className="font-heading text-lg font-bold">
-            Slow Simmer
-          </span>
+          <div className="text-center">
+            <span className="font-heading text-2xl font-medium tracking-[0.02em]">
+              Slow Simmer
+            </span>
+            <p className="mt-2 text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">
+              An Unhurried Supper Club
+            </p>
+          </div>
         </Reveal>
 
         <Reveal delay={100}>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <a
               href="#"
-              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-card-foreground hover:text-accent-foreground transition-colors"
+              className="glass glass-edge inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-card-foreground transition-colors hover:text-accent-foreground"
               aria-label="Instagram"
             >
-              <InstagramIcon />
+              <InstagramIcon size={20} />
             </a>
             <a
               href="#"
-              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-card-foreground hover:text-accent-foreground transition-colors"
+              className="glass glass-edge inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-card-foreground transition-colors hover:text-accent-foreground"
               aria-label="YouTube"
             >
-              <YoutubeIcon />
+              <YoutubeIcon size={20} />
             </a>
           </div>
         </Reveal>
 
         <Reveal delay={200}>
-          <Separator />
+          <Separator className="max-w-xs opacity-60" />
         </Reveal>
 
         <Reveal delay={300}>
-          <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} Slow Simmer. All rights reserved.
+          <p className="text-xs font-light tracking-wide text-muted-foreground">
+            &copy; {currentYear} Slow Simmer. Come join us at the table.
           </p>
         </Reveal>
       </div>

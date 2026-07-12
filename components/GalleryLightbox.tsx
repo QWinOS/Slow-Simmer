@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useCallback, useState } from "react"
+import Image from "next/image"
 import {
   Dialog,
   DialogContent,
@@ -10,13 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { getDriveImageUrl } from "@/lib/drive"
-import {
-  RiCloseLine,
-  RiArrowLeftSLine,
-  RiArrowRightSLine,
-  RiZoomInLine,
-  RiZoomOutLine,
-} from "@remixicon/react"
+import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react"
 import type { DriveFile } from "@/lib/drive"
 
 interface GalleryLightboxProps {
@@ -136,7 +131,7 @@ export function GalleryLightbox({
             className="text-white/80 hover:text-white hover:bg-white/10"
             aria-label={zoomed ? "Zoom out" : "Zoom in"}
           >
-            {zoomed ? <RiZoomOutLine /> : <RiZoomInLine />}
+            {zoomed ? <ZoomOut /> : <ZoomIn />}
           </Button>
           <DialogClose asChild>
             <Button
@@ -144,7 +139,7 @@ export function GalleryLightbox({
               size="icon"
               className="text-white/80 hover:text-white hover:bg-white/10"
             >
-              <RiCloseLine />
+              <X />
               <span className="sr-only">Close</span>
             </Button>
           </DialogClose>
@@ -156,7 +151,7 @@ export function GalleryLightbox({
           className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-black/50 text-white/80 hover:bg-black/70 hover:text-white transition-colors"
           aria-label="Previous photo"
         >
-          <RiArrowLeftSLine size={28} />
+          <ChevronLeft size={28} />
         </button>
 
         <button
@@ -164,7 +159,7 @@ export function GalleryLightbox({
           className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-10 items-center justify-center size-10 rounded-full bg-black/50 text-white/80 hover:bg-black/70 hover:text-white transition-colors"
           aria-label="Next photo"
         >
-          <RiArrowRightSLine size={28} />
+          <ChevronRight size={28} />
         </button>
 
         {/* Image */}
@@ -176,16 +171,19 @@ export function GalleryLightbox({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <img
+          <Image
             src={getDriveImageUrl(images[currentIndex].id)}
             alt={images[currentIndex].name || "Slow Simmer event photo"}
-            onClick={handleImageClick}
+            width={1200}
+            height={900}
+            sizes="95vw"
             className={`transition-all duration-200 ease-in-out ${
               zoomed
                 ? "h-full w-full object-cover"
                 : "max-h-[85vh] w-full object-contain"
             }`}
             draggable={false}
+            onClick={handleImageClick}
           />
         </div>
 

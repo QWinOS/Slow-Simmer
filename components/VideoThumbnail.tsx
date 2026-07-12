@@ -1,12 +1,13 @@
 "use client"
 
+import Image from "next/image"
 import { Card } from "@/components/ui/card"
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
   getInstagramEmbedUrl,
 } from "@/lib/video"
-import { RiPlayCircleFill, RiCloseLine, RiVideoLine } from "@remixicon/react"
+import { PlayCircle, X, Video } from "lucide-react"
 import type { VideoItem } from "@/lib/video"
 
 interface VideoThumbnailProps {
@@ -37,7 +38,7 @@ export function VideoThumbnail({ video, isPlaying, onPlay }: VideoThumbnailProps
           className="absolute top-2 right-2 z-10 bg-black/60 rounded-full p-1 text-white hover:bg-black/80"
           aria-label="Close video"
         >
-          <RiCloseLine className="w-5 h-5" />
+          <X className="w-5 h-5" />
         </button>
       </div>
     )
@@ -59,21 +60,22 @@ export function VideoThumbnail({ video, isPlaying, onPlay }: VideoThumbnailProps
     >
       {/* Thumbnail image */}
       {video.platform === "youtube" ? (
-        <img
+        <Image
           src={getYouTubeThumbnailUrl(video.videoId)}
           alt={video.title}
+          width={480}
+          height={360}
           className="w-full h-full object-cover group-hover:brightness-110 transition-all"
-          loading="lazy"
         />
       ) : (
         <div className="w-full h-full bg-gradient-to-br from-purple-900 via-pink-800 to-orange-800 flex items-center justify-center">
-          <RiVideoLine size={48} className="text-white/40" />
+          <Video size={48} className="text-white/40" />
         </div>
       )}
 
       {/* Play overlay icon */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <RiPlayCircleFill
+        <PlayCircle
           size={52}
           className="text-accent z-10 drop-shadow-lg transition-transform duration-200 group-hover:scale-110"
         />
