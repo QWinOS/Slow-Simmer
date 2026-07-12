@@ -2,13 +2,13 @@
 
 ## Overview
 
-A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event photos/videos, fill a registration form, pay via GPay UPI, and get recorded in Google Sheets with a confirmation email. Built in 3 phases: layout+gallery, then form, then payment+sheets+email.
+A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event photos/videos, fill a registration form, pay via RazorPay, and get recorded in Google Sheets with a confirmation email. Built in 3 phases: layout+gallery, then form, then payment+sheets+email.
 
 ## Phases
 
 - [x] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(reopened: theme gaps + GALL-05 dynamic video)* (completed 2026-07-02)
 - [x] **Phase 2: Registration Form** - Functional registration form collecting all guest details (completed 2026-07-04)
-- [ ] **Phase 3: Payment, Sheets & Email** - PhonePe payment, Google Sheets logging, and Brevo confirmation email
+- [ ] **Phase 3: Payment, Sheets & Email** - RazorPay payment, Google Sheets logging, and Brevo confirmation email
 
 ## Phase Details
 
@@ -77,17 +77,33 @@ Plans:
 
 ### Phase 3: Payment, Sheets & Email
 
-**Goal**: PhonePe payment, Google Sheets logging, and Brevo confirmation email
+**Goal**: RazorPay payment, Google Sheets logging, and Brevo confirmation email
 **Depends on**: Phase 2
 **Requirements**: PAY-01, PAY-02, PAY-03, SHEET-01, SHEET-02, SHEET-03, NOTF-01, NOTF-02, NOTF-03
 **Success Criteria** (what must be TRUE):
 
-  1. Guest sees PhonePe QR after successful form submission
-  2. Payment webhook confirms transaction
-  3. Guest details appended to Google Sheets on payment success
-  4. Guest receives thank-you email via Brevo with contact number from env var
+  1. Guest sees summary card with event details after form submission
+  2. RazorPay checkout modal opens on "Pay" click and processes payment
+  3. Payment webhook confirms transaction — signature verified before any write
+  4. Guest details appended to Google Sheets (15-column Registrations tab) on payment success
+  5. Duplicate webhook callbacks are idempotent (checked via Payment ID)
+  6. Guest receives branded thank-you email via Brevo with contact number from env var
+  7. On payment failure, guest sees failure card with link back to form
 
-**Plans**: TBD
+**Plans**: 4/4 plans created
+
+Plans:
+**Wave 1**
+- [ ] 03-01-PLAN.md — Foundation: razorpay package, env vars, lib/razorpay.ts, lib/sheets-write.ts, lib/brevo.ts
+
+**Wave 2** *(blocked on 03-01)*
+- [ ] 03-02-PLAN.md — Server routes: orders/create, orders/verify, webhooks/razorpay
+
+**Wave 3** *(blocked on 03-02)*
+- [ ] 03-03-PLAN.md — PaymentSection component + page.tsx integration
+
+**Wave 4** *(blocked on 03-03)*
+- [ ] 03-04-PLAN.md — Tests: razorpay, sheets, brevo, PaymentSection
 
 ## Progress
 
@@ -95,4 +111,4 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation, Layout & Gallery | 6/6 | Complete   | 2026-07-02 |
 | 2. Registration Form | 5/5 | Complete | 2026-07-04 |
-| 3. Payment, Sheets & Email | 0/0 | Not started | - |
+| 3. Payment, Sheets & Email | 0/4 | Planned | - |
