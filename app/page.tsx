@@ -3,9 +3,8 @@ import HeroSection from "@/components/HeroSection"
 import AboutSection from "@/components/AboutSection"
 import GallerySection from "@/components/GallerySection"
 import VideoSection from "@/components/VideoSection"
-import { RegistrationForm } from "@/components/RegistrationForm"
 import { RegistrationProvider } from "@/components/RegistrationProvider"
-import { PaymentSection } from "@/components/PaymentSection"
+import { RegistrationFlow } from "@/components/RegistrationFlow"
 import Footer from "@/components/Footer"
 
 export default function HomePage() {
@@ -17,8 +16,7 @@ export default function HomePage() {
         <AboutSection />
         <GallerySection />
         <VideoSection />
-        <RegistrationForm />
-        <PaymentSection />
+        <RegistrationFlow />
       </main>
       <Footer />
     </RegistrationProvider>
