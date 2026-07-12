@@ -109,8 +109,8 @@ export async function POST(request: Request) {
       pendingWrites.set(paymentId, { row: registrationRow, emailParams, retries: 0 })
     }
 
-    // 7. Send confirmation email (fire-and-forget — don't block on email failure)
-    sendConfirmationEmail(emailParams).catch((err) => {
+    // 7. Send confirmation email — must await on Vercel serverless
+    await sendConfirmationEmail(emailParams).catch((err) => {
       console.error("Confirmation email failed:", err)
     })
 

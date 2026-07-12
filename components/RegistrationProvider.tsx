@@ -21,15 +21,17 @@ export interface RegistrationData {
 interface RegistrationContextValue {
   data: RegistrationData | null
   setRegistrationData: (data: RegistrationData) => void
+  clearRegistrationData: () => void
 }
 
 const RegistrationContext = createContext<RegistrationContextValue | null>(null)
 
 export function RegistrationProvider({ children }: { children: ReactNode }) {
   const [data, setRegistrationData] = useState<RegistrationData | null>(null)
+  const clearRegistrationData = () => setRegistrationData(null)
 
   return (
-    <RegistrationContext.Provider value={{ data, setRegistrationData }}>
+    <RegistrationContext.Provider value={{ data, setRegistrationData, clearRegistrationData }}>
       {children}
     </RegistrationContext.Provider>
   )

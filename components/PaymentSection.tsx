@@ -128,7 +128,7 @@ async function handlePayment(
 }
 
 export function PaymentSection() {
-  const { data } = useRegistration()
+  const { data, clearRegistrationData } = useRegistration()
   const [status, setStatus] = useState<PaymentStatus>("idle")
   const [paymentId, setPaymentId] = useState<string | null>(null)
 
@@ -206,6 +206,7 @@ export function PaymentSection() {
                   className="mt-6"
                   onClick={() => {
                     setStatus("idle")
+                    clearRegistrationData()
                     document.getElementById("form")?.scrollIntoView({ behavior: "smooth" })
                   }}
                 >

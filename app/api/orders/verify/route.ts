@@ -65,18 +65,14 @@ export async function POST(request: Request) {
       eventTime: notes.eventTime,
     }
 
-    // Fire-and-forget sheets write + email — don't block payment confirmation
-    checkPaymentIdExists(razorpay_payment_id)
-      .then((isDuplicate) => {
-        if (!isDuplicate) {
-          return appendRegistrationRow(registrationRow)
-        }
-      })
-      .catch((err) => {
+    // Sheets write + email — must await on Vercel serverless (fire-and-forget gets killed)
+    const isDuplicate = await checkPaymentIdExists(razorpay_payment_id).catch(() => false)
+    if (!isDuplicate) {
+      await appendRegistrationRow(registrationRow).catch((err) => {
         console.error("Sheets append failed:", err)
       })
-
-    sendConfirmationEmail(emailParams).catch((err) => {
+    }
+    await sendConfirmationEmail(emailParams).catch((err) => {
       console.error("Confirmation email failed:", err)
     })
 
