@@ -1,5 +1,5 @@
-import { Wine, Users, Clock } from "lucide-react"
-import Reveal from "@/components/Reveal"
+import { Wine, Users, Clock } from "lucide-react";
+import Reveal from "@/components/Reveal";
 
 const highlights = [
   {
@@ -17,7 +17,7 @@ const highlights = [
     label: "Unhurried Hours",
     desc: "Slow food, deep conversation, and evenings written to be remembered.",
   },
-]
+];
 
 export default function AboutSection() {
   return (
@@ -38,7 +38,10 @@ export default function AboutSection() {
             Our Story
           </span>
           <h2 className="mt-4 font-heading text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-            An Ode to <span className="italic text-gold-foil">Slowness</span>
+            Home is a feeling.{" "}
+            <span className="italic text-gold-foil">
+              We just happen to serve it.
+            </span>
           </h2>
           <div className="mx-auto mt-6 flex items-center justify-center gap-3">
             <span className="h-px w-16 rule-gold" />
@@ -53,24 +56,41 @@ export default function AboutSection() {
         <div className="space-y-6 text-muted-foreground md:col-span-3">
           <Reveal delay={100}>
             <p className="font-heading text-xl font-light italic leading-relaxed text-foreground sm:text-2xl">
-              “Every great meal tells a story — ours simply refuses to be
-              rushed.”
+              “Slow Simmer started with two sisters from the hills of
+              Darjeeling.”
             </p>
           </Reveal>
           <Reveal delay={180}>
             <p className="text-base font-light leading-relaxed sm:text-lg">
-              Slow Simmer is where strangers become confidants over carefully
-              crafted menus, thoughtfully paired wines, and conversations that
-              linger long after the last course is cleared.
+              We grew up in a family that loved food and hosting people. Our
+              home was always filled with the aroma of food ,laughter around the
+              table, and the quiet joy of making everyone feel at home.Hosting
+              wasn’t something we did occasionally,it was simply part of who we
+              were.
             </p>
           </Reveal>
           <Reveal delay={260}>
             <p className="text-sm font-light leading-relaxed sm:text-base">
-              Each evening is hosted in an intimate setting — a private dining
-              room, a hidden terrace, a candlelit loft — for no more than
-              fourteen guests. No large crowds. No rushed service. Only the
-              quiet luxury of good company, shared slowly, over food worth
-              remembering.
+              As life took us away from home, we found ourselves missing those
+              slow evenings, home-cooked meals, and the feeling of belonging
+              that came with them. So we decided to create it again.
+            </p>
+          </Reveal>
+          <Reveal delay={260}>
+            <p className="text-sm font-light leading-relaxed sm:text-base">
+              Our supper club is an invitation to slow down-to enjoy food made
+              with care, meet people you may not have known before, and leave
+              with memories that last longer than the meal itself.
+            </p>
+          </Reveal>
+          <Reveal delay={260}>
+            <p className="text-sm font-light leading-relaxed sm:text-base">
+              From our table to yours-welcome to Slow Simmer.
+            </p>
+          </Reveal>
+          <Reveal delay={260}>
+            <p className="text-sm font-light leading-relaxed sm:text-base">
+              Currently hosting in Kolkata & Bangalore.
             </p>
           </Reveal>
         </div>
@@ -102,5 +122,5 @@ export default function AboutSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
