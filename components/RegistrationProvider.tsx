@@ -3,6 +3,9 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 
 export interface RegistrationData {
+  location: string
+  eventDate?: string
+  eventTime?: string
   name: string
   contact: string
   email: string

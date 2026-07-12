@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, Controller, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff } from "lucide-react"
@@ -33,6 +33,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Separator } from "@/components/ui/separator"
 import { registrationSchema, type RegistrationFormData } from "@/lib/validations"
+import { fetchLocations, type LocationEvent } from "@/lib/locations"
 import { useRegistration } from "@/components/RegistrationProvider"
 import Reveal from "@/components/Reveal"
 
@@ -44,14 +45,26 @@ function formatAadhar(value: string): string {
 
 export function RegistrationForm() {
   const [showAadhar, setShowAadhar] = useState(false)
+  const [locations, setLocations] = useState<LocationEvent[]>([])
+  const [locationsLoading, setLocationsLoading] = useState(true)
   const { setRegistrationData } = useRegistration()
+
+  useEffect(() => {
+    fetchLocations()
+      .then(setLocations)
+      .catch(() => {
+        toast.error("Failed to load event locations")
+      })
+      .finally(() => setLocationsLoading(false))
+  }, [])
 
   const form = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema) as unknown as Resolver<RegistrationFormData>,
     mode: "onBlur",
     defaultValues: {
-      // Empty until the guest picks a city; the enum makes it required on submit.
-      location: "" as RegistrationFormData["location"],
+      location: "",
+      eventDate: "",
+      eventTime: "",
       name: "",
       contact: "",
       email: "",
@@ -88,7 +101,12 @@ export function RegistrationForm() {
   }
 
   function onSubmit(data: RegistrationFormData) {
-    setRegistrationData(data)
+    const event = locations.find((l) => l.location === data.location)
+    setRegistrationData({
+      ...data,
+      eventDate: event?.date || "",
+      eventTime: event?.time || "",
+    })
     toast.success("Form submitted! Now proceed to payment")
     setTimeout(() => {
       document.getElementById("payment")?.scrollIntoView({ behavior: "smooth" })
@@ -130,11 +148,19 @@ export function RegistrationForm() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
-                      Choose Place <span className="text-destructive">*</span>
+                      Choose Event Location <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Select
                       value={field.value || ""}
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        const event = locations.find((l) => l.location === value)
+                        if (event) {
+                          form.setValue("eventDate", event.date)
+                          form.setValue("eventTime", event.time)
+                        }
+                      }}
+                      disabled={locationsLoading}
                     >
                       <SelectTrigger
                         id={field.name}
@@ -142,13 +168,24 @@ export function RegistrationForm() {
                         aria-invalid={fieldState.invalid}
                         className="w-full"
                       >
-                        <SelectValue placeholder="Select your city" />
+                        <SelectValue placeholder={locationsLoading ? "Loading locations..." : "Select your city"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="kolkata">Kolkata</SelectItem>
-                        <SelectItem value="bangalore" disabled>
-                          Bangalore (Coming soon)
-                        </SelectItem>
+                        {locations.length === 0 && !locationsLoading && (
+                          <SelectItem value="__none" disabled>
+                            No locations available
+                          </SelectItem>
+                        )}
+                        {locations.map((event) => {
+                          const label = event.date
+                            ? `${event.location} — ${event.date}${event.time ? `, ${event.time}` : ""}`
+                            : event.location
+                          return (
+                            <SelectItem key={event.location} value={event.location}>
+                              {label}
+                            </SelectItem>
+                          )
+                        })}
                       </SelectContent>
                     </Select>
                     {fieldState.invalid && (

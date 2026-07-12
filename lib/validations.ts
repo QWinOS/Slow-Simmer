@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-export const LOCATIONS = ["kolkata", "bangalore"] as const
-
 export const registrationSchema = z
   .object({
-    location: z.enum(LOCATIONS, { message: "Please select a location" }),
+    location: z.string().min(1, "Please select a location"),
+    eventDate: z.string().optional(),
+    eventTime: z.string().optional(),
     name: z.string().min(2, "Name must be at least 2 characters"),
     contact: z
       .string()
@@ -25,16 +25,6 @@ export const registrationSchema = z
       .optional(),
   })
   .superRefine((data, ctx) => {
-    // Bangalore is not open for registration yet ("coming soon"). Guard at the
-    // schema level so a tampered/stale client can't submit it.
-    if (data.location === "bangalore") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Bangalore is coming soon — please choose Kolkata",
-        path: ["location"],
-      })
-    }
-
     if (data.bringingGuest) {
       if (!data.guestName || data.guestName.trim().length === 0) {
         ctx.addIssue({

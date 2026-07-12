@@ -35,6 +35,23 @@ vi.mock("sonner", () => ({
   },
 }))
 
+const mockLocations = [
+  { location: "Kolkata", date: "Dec 15, 2024", time: "7:00 PM" },
+  { location: "Delhi", date: "Jan 20, 2025", time: "6:30 PM" },
+]
+
+beforeEach(() => {
+  global.fetch = vi.fn((url: string) => {
+    if (url === "/api/locations") {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockLocations),
+      } as Response)
+    }
+    return Promise.reject(new Error(`unexpected fetch: ${url}`))
+  })
+})
+
 function renderForm() {
   return render(
     <RegistrationProvider>
@@ -43,10 +60,10 @@ function renderForm() {
   )
 }
 
-// Fill the required "Choose Place" dropdown with the only selectable city.
-async function selectKolkata(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByLabelText(/choose place/i))
-  await user.click(await screen.findByRole("option", { name: "Kolkata" }))
+// Fill the required location dropdown with the first available city.
+async function selectLocation(user: ReturnType<typeof userEvent.setup>, name = "Kolkata") {
+  await user.click(screen.getByLabelText(/choose event location/i))
+  await user.click(await screen.findByRole("option", { name: new RegExp(name, "i") }))
 }
 
 describe("RegistrationForm Integration", () => {
@@ -68,7 +85,7 @@ describe("RegistrationForm Integration", () => {
     it("renders all field labels as accessible inputs", () => {
       renderForm()
 
-      expect(screen.getByLabelText(/choose place/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/choose event location/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/full name/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/contact number/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/email address/i)).toBeInTheDocument()
@@ -87,34 +104,35 @@ describe("RegistrationForm Integration", () => {
     })
   })
 
-  /* ── 1b. Choose Place dropdown ── */
-  describe("1b. Choose Place dropdown", () => {
-    it("renders Kolkata as selectable and Bangalore as disabled", async () => {
+  /* ── 1b. Choose Event Location dropdown ── */
+  describe("1b. Choose Event Location dropdown", () => {
+    it("renders locations from API with date and time", async () => {
       const user = userEvent.setup()
       renderForm()
 
-      await user.click(screen.getByLabelText(/choose place/i))
+      await user.click(screen.getByLabelText(/choose event location/i))
 
-      const kolkata = await screen.findByRole("option", { name: "Kolkata" })
-      const bangalore = await screen.findByRole("option", {
-        name: /bangalore/i,
-      })
+      const kolkata = await screen.findByRole("option", { name: /kolkata/i })
+      const delhi = await screen.findByRole("option", { name: /delhi/i })
 
       expect(kolkata).toBeInTheDocument()
-      expect(bangalore).toHaveTextContent(/coming soon/i)
-      expect(bangalore).toHaveAttribute("aria-disabled", "true")
+      expect(kolkata).toHaveTextContent(/dec 15, 2024/i)
+      expect(kolkata).toHaveTextContent(/7:00 pm/i)
+      expect(delhi).toBeInTheDocument()
+      expect(delhi).toHaveTextContent(/jan 20, 2025/i)
+      expect(delhi).toHaveTextContent(/6:30 pm/i)
     })
 
-    it("lets the user select Kolkata", async () => {
+    it("lets the user select a location", async () => {
       const user = userEvent.setup()
       renderForm()
 
-      await selectKolkata(user)
+      await selectLocation(user)
 
-      expect(screen.getByLabelText(/choose place/i)).toHaveTextContent("Kolkata")
+      expect(screen.getByLabelText(/choose event location/i)).toHaveTextContent("Kolkata")
     })
 
-    it("blocks submission when no place is selected", async () => {
+    it("blocks submission when no location is selected", async () => {
       const user = userEvent.setup()
       renderForm()
 
@@ -286,7 +304,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill all required fields
-      await selectKolkata(user)
+      await selectLocation(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
@@ -335,7 +353,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill main required fields to avoid noise from non-guest errors
-      await selectKolkata(user)
+      await selectLocation(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
@@ -364,7 +382,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill main required fields only (no guest)
-      await selectKolkata(user)
+      await selectLocation(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
@@ -391,7 +409,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill main required fields
-      await selectKolkata(user)
+      await selectLocation(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
