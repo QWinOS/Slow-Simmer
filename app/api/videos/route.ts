@@ -1,74 +1,13 @@
-import crypto from "crypto"
 import {
   detectVideoPlatform,
   getYouTubeVideoIdFromUrl,
   getInstagramPostIdFromUrl,
 } from "@/lib/video"
+import { getAccessToken } from "@/lib/google-auth"
 
 export const dynamic = "force-dynamic"
 
-function base64url(str: string): string {
-  return Buffer.from(str).toString("base64url")
-}
-
-function base64urlFromBuffer(buf: Buffer): string {
-  return buf.toString("base64url")
-}
-
-function createJWT(payload: Record<string, unknown>, privateKey: string): string {
-  const header = { alg: "RS256", typ: "JWT" }
-  const encodedHeader = base64url(JSON.stringify(header))
-  const encodedPayload = base64url(JSON.stringify(payload))
-  const data = `${encodedHeader}.${encodedPayload}`
-  const sig = crypto.sign("sha256", Buffer.from(data), privateKey)
-  return `${data}.${base64urlFromBuffer(sig)}`
-}
-
-let cachedToken: { token: string; expiresAt: number } | null = null
-
-async function getAccessToken(): Promise<string> {
-  const now = Math.floor(Date.now() / 1000)
-
-  if (cachedToken && cachedToken.expiresAt > now + 60) {
-    return cachedToken.token
-  }
-
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-  const privateKey = (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n")
-
-  if (!email || !privateKey) {
-    throw new Error("Google service account not configured")
-  }
-
-  const jwt = createJWT(
-    {
-      iss: email,
-      scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
-      aud: "https://oauth2.googleapis.com/token",
-      exp: now + 3600,
-      iat: now,
-    },
-    privateKey,
-  )
-
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt,
-    }),
-  })
-
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Token exchange failed: ${res.status} ${text}`)
-  }
-
-  const data = await res.json()
-  cachedToken = { token: data.access_token, expiresAt: now + data.expires_in }
-  return data.access_token
-}
+const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly"
 
 export async function GET() {
   const sheetId = process.env.VIDEOS_SHEET_ID
@@ -78,7 +17,7 @@ export async function GET() {
   }
 
   try {
-    const token = await getAccessToken()
+    const token = await getAccessToken(SHEETS_SCOPE)
 
     const url = new URL(
       `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A2:B1000`,

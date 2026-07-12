@@ -15,6 +15,13 @@ import {
   FieldGroup,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -43,6 +50,8 @@ export function RegistrationForm() {
     resolver: zodResolver(registrationSchema) as unknown as Resolver<RegistrationFormData>,
     mode: "onBlur",
     defaultValues: {
+      // Empty until the guest picks a city; the enum makes it required on submit.
+      location: "" as RegistrationFormData["location"],
       name: "",
       contact: "",
       email: "",
@@ -115,6 +124,40 @@ export function RegistrationForm() {
             {/* Section 1: Personal Information */}
             <div className="font-heading text-lg font-bold mb-4">Personal Information</div>
             <FieldGroup>
+              <Controller
+                name="location"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Choose Place <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger
+                        id={field.name}
+                        onBlur={field.onBlur}
+                        aria-invalid={fieldState.invalid}
+                        className="w-full"
+                      >
+                        <SelectValue placeholder="Select your city" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="kolkata">Kolkata</SelectItem>
+                        <SelectItem value="bangalore" disabled>
+                          Bangalore (Coming soon)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
               <Controller
                 name="name"
                 control={form.control}

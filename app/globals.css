@@ -150,3 +150,37 @@
     }
   }
 }
+
+/*
+ * Radix overlays (Select, Dialog) lock scrolling via react-remove-scroll, which
+ * sets `overflow: hidden` on <body>. That turns <body> into a clipped scroll
+ * container and breaks the `position: sticky` NavBar — it collapses to the top
+ * of the (scrolled-away) body and disappears. While a scroll lock is active,
+ * promote the sticky header to `fixed` so it stays pinned to the viewport,
+ * immune to the ancestor's overflow.
+ *
+ * This rule is intentionally UNLAYERED: Tailwind's `.sticky` utility lives in
+ * the `utilities` layer, so an `@layer base` rule (whatever its specificity)
+ * would lose to it. Unlayered declarations outrank every @layer in Tailwind v4.
+ */
+body[data-scroll-locked] header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/*
+ * react-remove-scroll adds `margin-right: <scrollbar-width>` to <body> to
+ * offset the scrollbar it removes — but on this page the scrollbar lives on
+ * <html>, not <body>, so it never actually disappears. The compensation is
+ * therefore spurious: it shrinks <body> and shifts the centered content inward,
+ * making the whole UI appear to jump/scale when a Select or Dialog opens.
+ *
+ * Zero it out. The `html` prefix raises specificity above react-remove-scroll's
+ * own `body[data-scroll-locked] { margin-right: … !important }` (equal
+ * specificity would lose on source order, since that rule is injected later).
+ */
+html body[data-scroll-locked] {
+  margin-right: 0 !important;
+}

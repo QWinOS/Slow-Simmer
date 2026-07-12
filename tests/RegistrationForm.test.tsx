@@ -12,8 +12,15 @@ class ResizeObserverMock {
 }
 window.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
 
-// Polyfill scrollIntoView for jsdom (used in onSubmit handler)
+// Polyfill scrollIntoView for jsdom (used in onSubmit handler + Radix Select)
 Element.prototype.scrollIntoView = vi.fn()
+
+// Polyfill Pointer Capture APIs for jsdom (used by Radix Select trigger)
+if (!HTMLElement.prototype.hasPointerCapture) {
+  HTMLElement.prototype.hasPointerCapture = vi.fn(() => false)
+  HTMLElement.prototype.releasePointerCapture = vi.fn()
+  HTMLElement.prototype.setPointerCapture = vi.fn()
+}
 
 // Mock IntersectionObserver for Reveal component (not available in jsdom)
 vi.mock("@/hooks/use-in-view", () => ({
@@ -36,6 +43,12 @@ function renderForm() {
   )
 }
 
+// Fill the required "Choose Place" dropdown with the only selectable city.
+async function selectKolkata(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByLabelText(/choose place/i))
+  await user.click(await screen.findByRole("option", { name: "Kolkata" }))
+}
+
 describe("RegistrationForm Integration", () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -55,6 +68,7 @@ describe("RegistrationForm Integration", () => {
     it("renders all field labels as accessible inputs", () => {
       renderForm()
 
+      expect(screen.getByLabelText(/choose place/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/full name/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/contact number/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/email address/i)).toBeInTheDocument()
@@ -70,6 +84,53 @@ describe("RegistrationForm Integration", () => {
       expect(
         screen.getByRole("button", { name: /submit registration/i })
       ).toBeInTheDocument()
+    })
+  })
+
+  /* ── 1b. Choose Place dropdown ── */
+  describe("1b. Choose Place dropdown", () => {
+    it("renders Kolkata as selectable and Bangalore as disabled", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      await user.click(screen.getByLabelText(/choose place/i))
+
+      const kolkata = await screen.findByRole("option", { name: "Kolkata" })
+      const bangalore = await screen.findByRole("option", {
+        name: /bangalore/i,
+      })
+
+      expect(kolkata).toBeInTheDocument()
+      expect(bangalore).toHaveTextContent(/coming soon/i)
+      expect(bangalore).toHaveAttribute("aria-disabled", "true")
+    })
+
+    it("lets the user select Kolkata", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      await selectKolkata(user)
+
+      expect(screen.getByLabelText(/choose place/i)).toHaveTextContent("Kolkata")
+    })
+
+    it("blocks submission when no place is selected", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      await user.type(screen.getByLabelText(/full name/i), "Test User")
+      await user.type(screen.getByLabelText(/contact number/i), "9876543210")
+      await user.type(screen.getByLabelText(/email address/i), "test@example.com")
+      await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
+
+      await user.click(
+        screen.getByRole("button", { name: /submit registration/i })
+      )
+
+      await waitFor(() => {
+        const errors = screen.getAllByText("Please select a location")
+        expect(errors.length).toBeGreaterThanOrEqual(1)
+      })
     })
   })
 
@@ -225,6 +286,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill all required fields
+      await selectKolkata(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
@@ -273,6 +335,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill main required fields to avoid noise from non-guest errors
+      await selectKolkata(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
@@ -301,6 +364,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill main required fields only (no guest)
+      await selectKolkata(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
@@ -327,6 +391,7 @@ describe("RegistrationForm Integration", () => {
       renderForm()
 
       // Fill main required fields
+      await selectKolkata(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest"
 import { registrationSchema } from "@/lib/validations"
 
 const validBase = {
+  location: "kolkata",
   name: "Test User",
   contact: "9876543210",
   email: "test@example.com",
@@ -13,6 +14,56 @@ describe("registrationSchema", () => {
   it("accepts a valid submission without guest", () => {
     const result = registrationSchema.safeParse(validBase)
     expect(result.success).toBe(true)
+  })
+
+  describe("location", () => {
+    it("accepts kolkata", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        location: "kolkata",
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("rejects bangalore (coming soon)", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        location: "bangalore",
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issue = result.error.issues.find((i) => i.path[0] === "location")
+        expect(issue).toBeDefined()
+        expect(issue!.message).toBe(
+          "Bangalore is coming soon — please choose Kolkata"
+        )
+      }
+    })
+
+    it("rejects empty/unselected location", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        location: "",
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toContain("location")
+      }
+    })
+
+    it("rejects an unknown location", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        location: "mumbai",
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it("rejects a missing location", () => {
+      const { location, ...withoutLocation } = validBase
+      const result = registrationSchema.safeParse(withoutLocation)
+      expect(result.success).toBe(false)
+    })
   })
 
   describe("name", () => {
