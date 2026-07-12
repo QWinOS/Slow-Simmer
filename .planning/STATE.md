@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: milestone_complete
-stopped_at: Milestone v1.0 complete
-last_updated: "2026-07-12T12:00:00.000Z"
+milestone: v1.1
+milestone_name: Env-Driven Site Config
+status: planning
+last_updated: "2026-07-12T21:04:02.834Z"
+last_activity: 2026-07-12
 progress:
-  total_phases: 3
-completed_phases: 3
-total_plans: 15
-completed_plans: 15
-percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State
@@ -56,3 +56,10 @@ Phase 3 complete: Payment, Sheets & Email (4 plans, 11 tasks, ~19 min, 99 tests 
 | Phase 02-registration-form P03 | 1 min | 3 tasks | validation + tests + toaster |
 | Phase 02-registration-form P04 | 3 min | 2 tasks | registration form + page.tsx |
 | Phase 02-registration-form P05 | 12 min | 1 task | integration tests |
+
+## Current Position
+
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-12 — Milestone v1.1 started
