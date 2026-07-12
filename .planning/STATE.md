@@ -40,7 +40,8 @@ Completed Plan 02-05: Integration tests for RegistrationForm (1 task, 12 min)
 ## Session
 
 **Last session:** 2026-07-12
-**Stopped at:** Session resumed, proceeding to discuss/plan Phase 3 (Payment, Sheets & Email)
+**Stopped at:** Phase 3 context gathered and discussed
+**Resume file:** `.planning/phases/03-payment-sheets-email/03-CONTEXT.md`
 
 ## Performance Metrics
 

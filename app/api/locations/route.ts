@@ -15,7 +15,7 @@ export async function GET() {
     const token = await getAccessToken(SHEETS_SCOPE)
 
     const url = new URL(
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Location_Date!A2:C1000`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Location_Date!A2:D1000`,
     )
 
     const response = await fetch(url.toString(), {
@@ -37,10 +37,12 @@ export async function GET() {
       .map((row) => {
         const location = row[0]?.trim()
         if (!location) return null
+        const rawPrice = row[3]?.trim()
         return {
           location,
           date: row[1]?.trim() || "",
           time: row[2]?.trim() || "",
+          price: rawPrice ? parseInt(rawPrice, 10) : 0,
         }
       })
       .filter(Boolean)

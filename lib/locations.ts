@@ -2,6 +2,7 @@ export interface LocationEvent {
   location: string
   date: string
   time: string
+  price: number
 }
 
 export async function fetchLocations(): Promise<LocationEvent[]> {

@@ -36,8 +36,8 @@ vi.mock("sonner", () => ({
 }))
 
 const mockLocations = [
-  { location: "Kolkata", date: "Dec 15, 2024", time: "7:00 PM" },
-  { location: "Delhi", date: "Jan 20, 2025", time: "6:30 PM" },
+  { location: "Kolkata", date: "Dec 15, 2024", time: "7:00 PM", price: 50000 },
+  { location: "Delhi", date: "Jan 20, 2025", time: "6:30 PM", price: 75000 },
 ]
 
 beforeEach(() => {
