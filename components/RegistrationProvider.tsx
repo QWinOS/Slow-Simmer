@@ -6,6 +6,7 @@ export interface RegistrationData {
   location: string
   eventDate?: string
   eventTime?: string
+  price: number  // in paise, from Location_Date Price column
   name: string
   contact: string
   email: string

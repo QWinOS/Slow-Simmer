@@ -106,6 +106,7 @@ export function RegistrationForm() {
       ...data,
       eventDate: event?.date || "",
       eventTime: event?.time || "",
+      price: event?.price || 0,  // in paise, from Location_Date Price column
     })
     toast.success("Form submitted! Now proceed to payment")
     setTimeout(() => {
