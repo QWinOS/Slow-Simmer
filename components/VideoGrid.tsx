@@ -1,8 +1,9 @@
 "use client"
 
+import { useRef } from "react"
 import { VideoThumbnail } from "./VideoThumbnail"
 import { Skeleton } from "@/components/ui/skeleton"
-import { RiVideoLine } from "@remixicon/react"
+import { RiVideoLine, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react"
 import type { VideoItem } from "@/lib/video"
 
 interface VideoGridProps {
@@ -66,32 +67,86 @@ export function VideoGrid({ videos, playingId, onPlay, loading = true, error }: 
     )
   }
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const scrollSlider = (direction: "left" | "right") => {
+    if (!scrollRef.current) return
+    const scrollAmount = scrollRef.current.clientWidth * 0.8
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    })
+  }
+
   // Loaded state
+  const playingVideo = playingId ? videos.find((v) => v.id === playingId) : null
+
   return (
     <>
       {/* Mobile: horizontal scroll */}
       <div className="flex md:hidden gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 scrollbar-none">
-        {videos.map((video) => (
-          <div key={video.id} className="min-w-[280px] w-[80vw] flex-shrink-0 snap-center">
-            <VideoThumbnail
-              video={video}
-              isPlaying={playingId === video.id}
-              onPlay={() => onPlay(playingId === video.id ? null : video.id)}
-            />
-          </div>
-        ))}
+        {videos.map((video) =>
+          video.id === playingId ? null : (
+            <div key={video.id} className="min-w-[280px] w-[80vw] flex-shrink-0 snap-center">
+              <VideoThumbnail
+                video={video}
+                isPlaying={false}
+                onPlay={() => onPlay(video.id)}
+              />
+            </div>
+          ),
+        )}
       </div>
-      {/* Desktop: grid */}
-      <div className="hidden md:grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {videos.map((video) => (
+      {/* Desktop: slider */}
+      <div className="hidden md:block relative group">
+        <div
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory"
+        >
+          {videos.map((video) =>
+            video.id === playingId ? null : (
+              <div
+                key={video.id}
+                className="min-w-[320px] w-[calc(50%-12px)] flex-shrink-0 snap-start"
+              >
+                <VideoThumbnail
+                  video={video}
+                  isPlaying={false}
+                  onPlay={() => onPlay(video.id)}
+                />
+              </div>
+            ),
+          )}
+        </div>
+        {videos.length > 2 && (
+          <>
+            <button
+              onClick={() => scrollSlider("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Previous"
+            >
+              <RiArrowLeftSLine className="size-6" />
+            </button>
+            <button
+              onClick={() => scrollSlider("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Next"
+            >
+              <RiArrowRightSLine className="size-6" />
+            </button>
+          </>
+        )}
+      </div>
+      {/* Playing video iframe — rendered once */}
+      {playingVideo && (
+        <div className="mt-6 max-w-4xl mx-auto">
           <VideoThumbnail
-            key={video.id}
-            video={video}
-            isPlaying={playingId === video.id}
-            onPlay={() => onPlay(playingId === video.id ? null : video.id)}
+            video={playingVideo}
+            isPlaying
+            onPlay={() => onPlay(null)}
           />
-        ))}
-      </div>
+        </div>
+      )}
     </>
   )
 }

@@ -1,6 +1,56 @@
-import { getAccessToken } from "@/lib/google-auth"
+import crypto from "crypto"
 
 const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets"
+
+function base64url(str: string): string {
+  return Buffer.from(str).toString("base64url")
+}
+
+function createJWT(payload: Record<string, unknown>, privateKey: string): string {
+  const header = { alg: "RS256", typ: "JWT" }
+  const encodedHeader = base64url(JSON.stringify(header))
+  const encodedPayload = base64url(JSON.stringify(payload))
+  const data = `${encodedHeader}.${encodedPayload}`
+  const sig = crypto.sign("sha256", Buffer.from(data), privateKey)
+  return `${data}.${sig.toString("base64url")}`
+}
+
+const tokenCache = new Map<string, { token: string; expiresAt: number }>()
+
+async function getSheetsToken(): Promise<string> {
+  const now = Math.floor(Date.now() / 1000)
+  const cached = tokenCache.get("sheets")
+  if (cached && cached.expiresAt > now + 60) return cached.token
+
+  const email = process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_EMAIL
+    || process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
+  const privateKey = (process.env.GOOGLE_SHEETS_PRIVATE_KEY
+    || process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n")
+
+  if (!email || !privateKey) {
+    throw new Error("Google service account not configured for sheets")
+  }
+
+  const jwt = createJWT(
+    { iss: email, scope: SHEETS_SCOPE, aud: "https://oauth2.googleapis.com/token", exp: now + 3600, iat: now },
+    privateKey,
+  )
+
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt }),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Sheets token exchange failed: ${res.status} ${text}`)
+  }
+
+  const data = await res.json()
+  tokenCache.set("sheets", { token: data.access_token, expiresAt: now + data.expires_in })
+  return data.access_token
+}
 
 /**
  * Schema per D-05: Location, Event Date, Event Time, Name, Contact, Email,
@@ -36,7 +86,7 @@ export async function appendRegistrationRow(row: RegistrationRow): Promise<void>
   const sheetId = process.env.VIDEOS_SHEET_ID
   if (!sheetId) throw new Error("VIDEOS_SHEET_ID not configured")
 
-  const token = await getAccessToken(SHEETS_SCOPE)
+  const token = await getSheetsToken()
 
   const values = [[
     row.location,
@@ -88,7 +138,7 @@ export async function checkPaymentIdExists(paymentId: string): Promise<boolean> 
   const sheetId = process.env.VIDEOS_SHEET_ID
   if (!sheetId) throw new Error("VIDEOS_SHEET_ID not configured")
 
-  const token = await getAccessToken(SHEETS_SCOPE)
+  const token = await getSheetsToken()
 
   const url = new URL(
     `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Registrations!N:N`,

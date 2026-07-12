@@ -11,10 +11,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import type { RegistrationRow } from "@/lib/sheets-write"
 
-// ---- Mock google-auth ----
-vi.mock("@/lib/google-auth", () => ({
-  getAccessToken: vi.fn().mockResolvedValue("mock-token"),
-}))
+import crypto from "crypto"
+// Generate a valid RSA key for testing so createJWT doesn't fail
+const testKey = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 }).privateKey.export({ type: "pkcs1", format: "pem" }).toString()
 
 const { appendRegistrationRow, checkPaymentIdExists } = await import("@/lib/sheets-write")
 
@@ -37,34 +36,51 @@ const sampleRow: RegistrationRow = {
   timestamp: "2026-07-20T12:00:00Z",
 }
 
+/** Helpers to set up env for internal getSheetsToken auth */
+function setSheetsEnv() {
+  process.env.VIDEOS_SHEET_ID = "test-sheet-id"
+  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = "test@test.iam.gserviceaccount.com"
+  process.env.GOOGLE_PRIVATE_KEY = testKey
+}
+
+/** Mock fetch that handles OAuth token exchange and Sheets API calls */
+function mockFetchWithAuth(handler: (url: string, options: RequestInit) => any) {
+  return vi.fn((url: string, options?: RequestInit) => {
+    if (url.includes("oauth2")) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ access_token: "mock-token", expires_in: 3600 }),
+      })
+    }
+    return handler(url, options || {})
+  })
+}
+
 describe("appendRegistrationRow", () => {
-  let mockFetch: ReturnType<typeof vi.fn>
+  let mockSheets: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    // Reset process.env to known state
-    process.env.VIDEOS_SHEET_ID = "test-sheet-id"
-
-    // Create a fresh mock for fetch
-    mockFetch = vi.fn()
-    global.fetch = mockFetch
+    setSheetsEnv()
+    mockSheets = vi.fn()
+    global.fetch = mockFetchWithAuth(mockSheets)
   })
 
   it("makes POST request to correct URL", async () => {
-    mockFetch.mockResolvedValue({ ok: true })
+    mockSheets.mockResolvedValue({ ok: true })
 
     await appendRegistrationRow(sampleRow)
 
-    const [url, options] = mockFetch.mock.calls[0]
+    const [url, options] = mockSheets.mock.calls[0]
     expect(url).toContain("values/Registrations!A:O:append")
     expect(options.method).toBe("POST")
   })
 
   it("sends 15 columns in correct order per D-05 schema", async () => {
-    mockFetch.mockResolvedValue({ ok: true })
+    mockSheets.mockResolvedValue({ ok: true })
 
     await appendRegistrationRow(sampleRow)
 
-    const [, options] = mockFetch.mock.calls[0]
+    const [, options] = mockSheets.mock.calls[0]
     const body = JSON.parse(options.body)
     const values = body.values[0]
 
@@ -89,18 +105,18 @@ describe("appendRegistrationRow", () => {
   })
 
   it("includes Authorization header with Bearer token", async () => {
-    mockFetch.mockResolvedValue({ ok: true })
+    mockSheets.mockResolvedValue({ ok: true })
 
     await appendRegistrationRow(sampleRow)
 
-    const [, options] = mockFetch.mock.calls[0]
+    const [, options] = mockSheets.mock.calls[0]
     expect(options.headers).toMatchObject({
       Authorization: "Bearer mock-token",
     })
   })
 
   it("throws on non-ok response", async () => {
-    mockFetch.mockResolvedValue({ ok: false, status: 403, text: () => Promise.resolve("Forbidden") })
+    mockSheets.mockResolvedValue({ ok: false, status: 403, text: () => Promise.resolve("Forbidden") })
 
     await expect(appendRegistrationRow(sampleRow)).rejects.toThrow("Sheets append failed: 403")
   })
@@ -113,16 +129,16 @@ describe("appendRegistrationRow", () => {
 })
 
 describe("checkPaymentIdExists", () => {
-  let mockFetch: ReturnType<typeof vi.fn>
+  let mockSheets: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    process.env.VIDEOS_SHEET_ID = "test-sheet-id"
-    mockFetch = vi.fn()
-    global.fetch = mockFetch
+    setSheetsEnv()
+    mockSheets = vi.fn()
+    global.fetch = mockFetchWithAuth(mockSheets)
   })
 
   it("returns true when Payment ID exists in sheet", async () => {
-    mockFetch.mockResolvedValue({
+    mockSheets.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ values: [["N"], ["pay_123"]] }),
     })
@@ -132,7 +148,7 @@ describe("checkPaymentIdExists", () => {
   })
 
   it("returns false when Payment ID does not exist", async () => {
-    mockFetch.mockResolvedValue({
+    mockSheets.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ values: [["N"], ["pay_456"]] }),
     })
@@ -142,19 +158,19 @@ describe("checkPaymentIdExists", () => {
   })
 
   it("queries column N (Payment ID) only", async () => {
-    mockFetch.mockResolvedValue({
+    mockSheets.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ values: [] }),
     })
 
     await checkPaymentIdExists("pay_123")
 
-    const [url] = mockFetch.mock.calls[0]
+    const [url] = mockSheets.mock.calls[0]
     expect(url).toContain("Registrations!N:N")
   })
 
   it("skips header row when checking", async () => {
-    mockFetch.mockResolvedValue({
+    mockSheets.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ values: [["Payment ID"], ["pay_123"]] }),
     })
@@ -164,7 +180,7 @@ describe("checkPaymentIdExists", () => {
   })
 
   it("returns false on API error (idempotency safe-fail)", async () => {
-    mockFetch.mockResolvedValue({ ok: false, status: 500 })
+    mockSheets.mockResolvedValueOnce({ ok: false, status: 500 })
 
     const result = await checkPaymentIdExists("pay_123")
     expect(result).toBe(false)

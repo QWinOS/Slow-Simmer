@@ -108,10 +108,7 @@ export function RegistrationForm() {
       eventTime: event?.time || "",
       price: event?.price || 0,  // in paise, from Location_Date Price column
     })
-    toast.success("Form submitted! Now proceed to payment")
-    setTimeout(() => {
-      document.getElementById("payment")?.scrollIntoView({ behavior: "smooth" })
-    }, 500)
+    toast.success("Registration submitted!")
   }
 
   return (

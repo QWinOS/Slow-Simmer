@@ -20,7 +20,7 @@ export async function GET() {
     const token = await getAccessToken(SHEETS_SCOPE)
 
     const url = new URL(
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A2:B1000`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Video!A2:B1000`,
     )
 
     const response = await fetch(url.toString(), {

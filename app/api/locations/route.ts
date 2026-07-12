@@ -42,7 +42,7 @@ export async function GET() {
           location,
           date: row[1]?.trim() || "",
           time: row[2]?.trim() || "",
-          price: rawPrice ? parseInt(rawPrice, 10) : 0,
+          price: rawPrice ? parseInt(rawPrice, 10) * 100 : 0,
         }
       })
       .filter(Boolean)

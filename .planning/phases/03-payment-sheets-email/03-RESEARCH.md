@@ -1147,27 +1147,23 @@ export const dynamic = "force-dynamic"
 | A3 | `checkout.js` from `https://checkout.razorpay.com/v1/checkout.js` is the correct CDN URL | Code Examples | Low — this is the standard RazorPay CDN URL documented on razorpay.com. |
 | A4 | The project will add the `Price` column to the `Location_Date` sheet (D-14) | Architecture Patterns | Medium — the locations API currently reads columns A:D (Location, Date, Time, Price). Price is already in the schema according to `lib/locations.ts`. Verify the sheet has this column. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **RazorPay webhook notes payload structure**
+1. **RazorPay webhook notes payload structure** (RESOLVED)
    - What we know: RazorPay webhooks include `payload.payment.entity.notes` which contains the notes passed during order creation
-   - What's unclear: Whether nested objects in notes survive serialization through RazorPay's system
-   - Recommendation: Pass all registration data as flat string key-value pairs in order notes. Test with actual webhook delivery.
+   - Resolution: Pass all registration data as flat string key-value pairs in order notes (no nested objects). This is the standard pattern documented by RazorPay. Test with actual webhook delivery during QA.
 
-2. **Sheets `Registrations` tab existence**
+2. **Sheets `Registrations` tab existence** (RESOLVED)
    - What we know: The spreadsheet has `Location_Date` and `Videos` tabs
-   - What's unclear: Whether a `Registrations` tab already exists or needs to be created
-   - Recommendation: Add PLAN.md task to either create it programmatically (Sheets API `spreadsheets.batchUpdate`) or document as manual setup step.
+   - Resolution: The `Registrations` tab must be created manually by the user as a one-time setup step, documented in Plan 03-01's user_setup. Alternatively, the executor can create it programmatically via Sheets API `spreadsheets.batchUpdate` with `addSheet` request in Plan 03-02 (before the first write). The default approach is manual creation documented in user_setup.
 
-3. **Brevo sender domain verification**
+3. **Brevo sender domain verification** (RESOLVED)
    - What we know: `BREVO_SENDER_EMAIL` must be a verified sender in Brevo
-   - What's unclear: Whether the sender email is already verified in the user's Brevo account
-   - Recommendation: Add a setup note that the sender must be configured in Brevo dashboard before emails work.
+   - Resolution: Documented in Plan 03-01 user_setup that the sender email must be verified in Brevo Dashboard → Senders before emails will deliver. This is standard Brevo account setup.
 
-4. **Price pass-through from location data**
+4. **Price pass-through from location data** (RESOLVED)
    - What we know: `LocationEvent` interface has a `price` field
-   - What's unclear: Whether the price is passed from the RegistrationProvider to PaymentSection, or if PaymentSection needs to fetch it separately
-   - Recommendation: Include price in `RegistrationData` so PaymentSection has it directly. If not already there, store it during form submission.
+   - Resolution: Plan 03-03 adds `price: number` to the `RegistrationData` interface in `RegistrationProvider.tsx` and spreads `price: event?.price || 0` in `RegistrationForm.tsx`'s `onSubmit`. PaymentSection accesses `data.price` directly (typed access, no cast needed).
 
 ## Validation Architecture
 

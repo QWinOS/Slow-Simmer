@@ -29,14 +29,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Payment
 
-- [ ] **PAY-01**: PhonePe Business UPI payment QR code is displayed after form submission
-- [ ] **PAY-02**: Payment confirmation is verified (webhook or polling)
+- [ ] **PAY-01**: RazorPay Order API creates a payment order server-side; RazorPay Checkout modal opens on client
+- [ ] **PAY-02**: Payment webhook (RazorPay) verifies HMAC-SHA256 signature before processing
 - [ ] **PAY-03**: User sees success/failure feedback after payment
 
 ### Google Sheets Integration
 
 - [ ] **SHEET-01**: On successful payment, guest details are inserted into Google Sheets
-- [ ] **SHEET-02**: Google Sheet columns include: name, contact, email, guest name & age, about, social links, aadhar, payment status, timestamp
+- [ ] **SHEET-02**: Google Sheet row includes all registration fields: Location, Event Date, Event Time, Name, Contact, Email, Aadhar, Bringing Guest, Guest Name, Guest Age, About, Social, Payment Status, Payment ID, Timestamp
 - [ ] **SHEET-03**: Duplicate submissions (same email/contact) are handled gracefully
 
 ### Email Notifications
@@ -64,7 +64,7 @@ Deferred to future release. Tracked but not in current roadmap.
 |---------|--------|
 | User login/authentication | Form-based registration only — no account system needed |
 | Multi-event management | Single-page, single event at a time |
-| Payment gateway other than PhonePe | PhonePe Business is the established setup |
+| Payment gateway other than RazorPay | RazorPay Order API is the chosen provider |
 | Traditional database | Google Sheets suffices for MVP scale |
 | Host-side event creation | Events are curated by admin, not created through the app |
 

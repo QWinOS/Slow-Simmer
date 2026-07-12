@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { fetchGalleryImages, getDriveImageUrl } from "@/lib/drive"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { RiErrorWarningLine, RiImageLine } from "@remixicon/react"
+import { RiErrorWarningLine, RiImageLine, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react"
 import type { DriveFile } from "@/lib/drive"
 
 interface GalleryGridProps {
@@ -21,6 +21,17 @@ export function GalleryGrid({
 }: GalleryGridProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const scrollSlider = (direction: "left" | "right") => {
+    if (!scrollRef.current) return
+    const scrollAmount = scrollRef.current.clientWidth * 0.8
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    })
+  }
 
   const fetchImages = useCallback(async () => {
     setLoading(true)
@@ -110,22 +121,45 @@ export function GalleryGrid({
           </Card>
         ))}
       </div>
-      {/* Desktop: grid */}
-      <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {images.map((image, index) => (
-          <Card
-            key={image.id}
-            className="aspect-[4/3] overflow-hidden bg-transparent ring-0 cursor-pointer"
-            onClick={() => onImageClick(index)}
-          >
-            <img
-              src={getDriveImageUrl(image.id)}
-              alt={image.name || "Slow Simmer event photo"}
-              loading="lazy"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
-          </Card>
-        ))}
+      {/* Desktop: slider */}
+      <div className="hidden sm:block relative group">
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto scrollbar-none snap-x snap-mandatory"
+        >
+          {images.map((image, index) => (
+            <Card
+              key={image.id}
+              className="aspect-[4/3] min-w-[240px] w-[calc(25%-12px)] flex-shrink-0 overflow-hidden bg-transparent ring-0 cursor-pointer snap-start"
+              onClick={() => onImageClick(index)}
+            >
+              <img
+                src={getDriveImageUrl(image.id)}
+                alt={image.name || "Slow Simmer event photo"}
+                loading="lazy"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              />
+            </Card>
+          ))}
+        </div>
+        {images.length > 4 && (
+          <>
+            <button
+              onClick={() => scrollSlider("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Previous"
+            >
+              <RiArrowLeftSLine className="size-6" />
+            </button>
+            <button
+              onClick={() => scrollSlider("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 size-10 rounded-full bg-background/80 backdrop-blur-sm border shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Next"
+            >
+              <RiArrowRightSLine className="size-6" />
+            </button>
+          </>
+        )}
       </div>
     </>
   )

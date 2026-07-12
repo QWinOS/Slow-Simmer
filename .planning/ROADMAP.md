@@ -8,7 +8,7 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
 
 - [x] **Phase 1: Foundation, Layout & Gallery** - Single-page responsive shell with Google Drive photo gallery and video embeds *(reopened: theme gaps + GALL-05 dynamic video)* (completed 2026-07-02)
 - [x] **Phase 2: Registration Form** - Functional registration form collecting all guest details (completed 2026-07-04)
-- [ ] **Phase 3: Payment, Sheets & Email** - RazorPay payment, Google Sheets logging, and Brevo confirmation email
+- [x] **Phase 3: Payment, Sheets & Email** - RazorPay payment, Google Sheets logging, and Brevo confirmation email (completed 2026-07-12)
 
 ## Phase Details
 
@@ -63,16 +63,20 @@ Plans:
 
 Plans:
 **Wave 1** *(parallel)*
+
 - [x] 02-01-PLAN.md — Foundation: npm packages, shadcn components, vitest config, test setup *(complete 2026-07-03)*
 - [x] 02-02-PLAN.md — Provider + Placeholder: RegistrationProvider context, PaymentPlaceholder stub *(complete 2026-07-03)*
 
 **Wave 2** *(blocked on 02-01)*
+
 - [x] 02-03-PLAN.md — Validation: Zod schema, unit tests, sonner Toaster in layout *(complete 2026-07-03)*
 
 **Wave 3** *(blocked on 02-02, 02-03)*
+
 - [x] 02-04-PLAN.md — RegistrationForm component + page.tsx integration *(complete 2026-07-04)*
 
 **Wave 4** *(blocked on 02-04)*
+
 - [x] 02-05-PLAN.md — Integration tests for RegistrationForm *(complete 2026-07-04)*
 
 ### Phase 3: Payment, Sheets & Email
@@ -90,20 +94,24 @@ Plans:
   6. Guest receives branded thank-you email via Brevo with contact number from env var
   7. On payment failure, guest sees failure card with link back to form
 
-**Plans**: 4/4 plans created
+**Plans**: 4/4 plans complete
 
 Plans:
 **Wave 1**
-- [ ] 03-01-PLAN.md — Foundation: razorpay package, env vars, lib/razorpay.ts, lib/sheets-write.ts, lib/brevo.ts
+
+- [x] 03-01-PLAN.md — Foundation: razorpay package, env vars, lib/razorpay.ts, lib/sheets-write.ts, lib/brevo.ts
 
 **Wave 2** *(blocked on 03-01)*
-- [ ] 03-02-PLAN.md — Server routes: orders/create, orders/verify, webhooks/razorpay
+
+- [x] 03-02-PLAN.md — Server routes: orders/create, orders/verify, webhooks/razorpay
 
 **Wave 3** *(blocked on 03-02)*
-- [ ] 03-03-PLAN.md — PaymentSection component + page.tsx integration
+
+- [x] 03-03-PLAN.md — PaymentSection component + page.tsx integration
 
 **Wave 4** *(blocked on 03-03)*
-- [ ] 03-04-PLAN.md — Tests: razorpay, sheets, brevo, PaymentSection
+
+- [x] 03-04-PLAN.md — Tests: razorpay, sheets, brevo, PaymentSection
 
 ## Progress
 
@@ -111,4 +119,4 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation, Layout & Gallery | 6/6 | Complete   | 2026-07-02 |
 | 2. Registration Form | 5/5 | Complete | 2026-07-04 |
-| 3. Payment, Sheets & Email | 0/4 | Planned | - |
+| 3. Payment, Sheets & Email | 4/4 | Complete   | 2026-07-12 |
