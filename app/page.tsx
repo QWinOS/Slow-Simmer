@@ -5,7 +5,7 @@ import GallerySection from "@/components/GallerySection"
 import VideoSection from "@/components/VideoSection"
 import { RegistrationForm } from "@/components/RegistrationForm"
 import { RegistrationProvider } from "@/components/RegistrationProvider"
-import { PaymentPlaceholder } from "@/components/PaymentPlaceholder"
+import { PaymentSection } from "@/components/PaymentSection"
 import Footer from "@/components/Footer"
 
 export default function HomePage() {
@@ -18,7 +18,7 @@ export default function HomePage() {
         <GallerySection />
         <VideoSection />
         <RegistrationForm />
-        <PaymentPlaceholder />
+        <PaymentSection />
       </main>
       <Footer />
     </RegistrationProvider>
