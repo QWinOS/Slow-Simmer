@@ -1,65 +1,70 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useForm, Controller, type Resolver } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff } from "lucide-react"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useForm, Controller, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
   FieldLabel,
   FieldDescription,
   FieldGroup,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
-import { Separator } from "@/components/ui/separator"
-import { registrationSchema, type RegistrationFormData } from "@/lib/validations"
-import { fetchLocations, type LocationEvent } from "@/lib/locations"
-import { useRegistration } from "@/components/RegistrationProvider"
-import Reveal from "@/components/Reveal"
+} from "@/components/ui/input-group";
+import { Spinner } from "@/components/ui/spinner";
+import { Separator } from "@/components/ui/separator";
+import {
+  registrationSchema,
+  type RegistrationFormData,
+} from "@/lib/validations";
+import { fetchLocations, type LocationEvent } from "@/lib/locations";
+import { useRegistration } from "@/components/RegistrationProvider";
+import Reveal from "@/components/Reveal";
 
 function formatAadhar(value: string): string {
-  const digits = value.replace(/\D/g, "").slice(0, 12)
-  if (digits.length === 0) return ""
-  return digits.replace(/(\d{4})(?=\d)/g, "$1 ")
+  const digits = value.replace(/\D/g, "").slice(0, 12);
+  if (digits.length === 0) return "";
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
 }
 
 export function RegistrationForm() {
-  const [showAadhar, setShowAadhar] = useState(false)
-  const [locations, setLocations] = useState<LocationEvent[]>([])
-  const [locationsLoading, setLocationsLoading] = useState(true)
-  const { setRegistrationData } = useRegistration()
+  const [showAadhar, setShowAadhar] = useState(false);
+  const [locations, setLocations] = useState<LocationEvent[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const { setRegistrationData } = useRegistration();
 
   useEffect(() => {
     fetchLocations()
       .then(setLocations)
       .catch(() => {
-        toast.error("Failed to load event locations")
+        toast.error("Failed to load event locations");
       })
-      .finally(() => setLocationsLoading(false))
-  }, [])
+      .finally(() => setLocationsLoading(false));
+  }, []);
 
   const form = useForm<RegistrationFormData>({
-    resolver: zodResolver(registrationSchema) as unknown as Resolver<RegistrationFormData>,
+    resolver: zodResolver(
+      registrationSchema,
+    ) as unknown as Resolver<RegistrationFormData>,
     mode: "onBlur",
     defaultValues: {
       location: "",
@@ -75,17 +80,20 @@ export function RegistrationForm() {
       about: "",
       social: "",
     },
-  })
+  });
 
-  const bringingGuest = form.watch("bringingGuest")
+  const bringingGuest = form.watch("bringingGuest");
 
   function ErrorSummary() {
-    const errors = form.formState.errors
-    const errorEntries = Object.entries(errors)
-    if (errorEntries.length === 0) return null
+    const errors = form.formState.errors;
+    const errorEntries = Object.entries(errors);
+    if (errorEntries.length === 0) return null;
 
     return (
-      <div role="alert" className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 mb-6">
+      <div
+        role="alert"
+        className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 mb-6"
+      >
         <p className="font-medium text-destructive mb-2">
           Please fix the following errors:
         </p>
@@ -97,22 +105,25 @@ export function RegistrationForm() {
           ))}
         </ul>
       </div>
-    )
+    );
   }
 
   function onSubmit(data: RegistrationFormData) {
-    const event = locations.find((l) => l.location === data.location)
+    const event = locations.find((l) => l.location === data.location);
     setRegistrationData({
       ...data,
       eventDate: event?.date || "",
       eventTime: event?.time || "",
-      price: event?.price || 0,  // in paise, from Location_Date Price column
-    })
-    toast.success("Registration submitted!")
+      price: event?.price || 0, // in paise, from Location_Date Price column
+    });
+    toast.success("Registration submitted!");
   }
 
   return (
-    <section id="form" className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16">
+    <section
+      id="form"
+      className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16"
+    >
       {/* Backdrop accent */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 size-[50vmin] max-w-[500px] rounded-full bg-gradient-to-t from-amber-100/50 to-transparent dark:from-amber-500/5 blur-3xl -z-10" />
 
@@ -127,9 +138,9 @@ export function RegistrationForm() {
 
           <form
             onSubmit={form.handleSubmit(onSubmit, (errors) => {
-              const firstError = Object.keys(errors)[0]
+              const firstError = Object.keys(errors)[0];
               if (firstError) {
-                form.setFocus(firstError as keyof RegistrationFormData)
+                form.setFocus(firstError as keyof RegistrationFormData);
               }
             })}
             className="rounded-xl bg-card p-6 sm:p-8 shadow-sm ring-1 ring-border"
@@ -138,7 +149,9 @@ export function RegistrationForm() {
             <ErrorSummary />
 
             {/* Section 1: Personal Information */}
-            <div className="font-heading text-lg font-bold mb-4">Personal Information</div>
+            <div className="font-heading text-lg font-bold mb-4">
+              Personal Information
+            </div>
             <FieldGroup>
               <Controller
                 name="location"
@@ -146,16 +159,19 @@ export function RegistrationForm() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
-                      Choose Event Location <span className="text-destructive">*</span>
+                      Choose Event Location{" "}
+                      <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Select
                       value={field.value || ""}
                       onValueChange={(value) => {
-                        field.onChange(value)
-                        const event = locations.find((l) => l.location === value)
+                        field.onChange(value);
+                        const event = locations.find(
+                          (l) => l.location === value,
+                        );
                         if (event) {
-                          form.setValue("eventDate", event.date)
-                          form.setValue("eventTime", event.time)
+                          form.setValue("eventDate", event.date);
+                          form.setValue("eventTime", event.time);
                         }
                       }}
                       disabled={locationsLoading}
@@ -166,7 +182,13 @@ export function RegistrationForm() {
                         aria-invalid={fieldState.invalid}
                         className="w-full"
                       >
-                        <SelectValue placeholder={locationsLoading ? "Loading locations..." : "Select your city"} />
+                        <SelectValue
+                          placeholder={
+                            locationsLoading
+                              ? "Loading locations..."
+                              : "Select your city"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {locations.length === 0 && !locationsLoading && (
@@ -177,12 +199,15 @@ export function RegistrationForm() {
                         {locations.map((event) => {
                           const label = event.date
                             ? `${event.location} — ${event.date}${event.time ? `, ${event.time}` : ""}`
-                            : event.location
+                            : event.location;
                           return (
-                            <SelectItem key={event.location} value={event.location}>
+                            <SelectItem
+                              key={event.location}
+                              value={event.location}
+                            >
                               {label}
                             </SelectItem>
-                          )
+                          );
                         })}
                       </SelectContent>
                     </Select>
@@ -276,8 +301,10 @@ export function RegistrationForm() {
                         type={showAadhar ? "text" : "password"}
                         value={formatAadhar(field.value || "")}
                         onChange={(e) => {
-                          const raw = e.target.value.replace(/\D/g, "").slice(0, 12)
-                          field.onChange(raw)
+                          const raw = e.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 12);
+                          field.onChange(raw);
                         }}
                         onBlur={field.onBlur}
                         name={field.name}
@@ -290,10 +317,16 @@ export function RegistrationForm() {
                           size="icon-xs"
                           variant="ghost"
                           onClick={() => setShowAadhar(!showAadhar)}
-                          aria-label={showAadhar ? "Hide Aadhar" : "Show Aadhar"}
+                          aria-label={
+                            showAadhar ? "Hide Aadhar" : "Show Aadhar"
+                          }
                           type="button"
                         >
-                          {showAadhar ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                          {showAadhar ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
                         </InputGroupButton>
                       </InputGroupAddon>
                     </InputGroup>
@@ -311,7 +344,9 @@ export function RegistrationForm() {
             <Separator className="my-6" />
 
             {/* Section 2: Guest Details */}
-            <div className="font-heading text-lg font-bold mb-4">Guest Details</div>
+            <div className="font-heading text-lg font-bold mb-4">
+              Guest Details
+            </div>
             <Controller
               name="bringingGuest"
               control={form.control}
@@ -320,9 +355,14 @@ export function RegistrationForm() {
                   <Checkbox
                     id={field.name}
                     checked={field.value ?? false}
-                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked === true)
+                    }
                   />
-                  <FieldLabel htmlFor={field.name} className="mb-0 font-normal cursor-pointer">
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="mb-0 font-normal cursor-pointer"
+                  >
                     Bringing a guest?
                   </FieldLabel>
                 </Field>
@@ -332,8 +372,10 @@ export function RegistrationForm() {
             <div
               className={cn(
                 "grid transition-all duration-300 ease-in-out overflow-hidden",
-                bringingGuest ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
-                "motion-reduce:transition-none motion-reduce:!grid-rows-[1fr] motion-reduce:!opacity-100"
+                bringingGuest
+                  ? "grid-rows-[1fr] opacity-100"
+                  : "grid-rows-[0fr] opacity-0",
+                "motion-reduce:transition-none motion-reduce:!grid-rows-[1fr] motion-reduce:!opacity-100",
               )}
             >
               <div className="min-h-0">
@@ -343,9 +385,7 @@ export function RegistrationForm() {
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>
-                          Guest Name
-                        </FieldLabel>
+                        <FieldLabel htmlFor={field.name}>Guest Name</FieldLabel>
                         <Input
                           {...field}
                           id={field.name}
@@ -365,9 +405,7 @@ export function RegistrationForm() {
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>
-                          Guest Age
-                        </FieldLabel>
+                        <FieldLabel htmlFor={field.name}>Guest Age</FieldLabel>
                         <Input
                           {...field}
                           id={field.name}
@@ -389,7 +427,9 @@ export function RegistrationForm() {
             <Separator className="my-6" />
 
             {/* Section 3: Social & About */}
-            <div className="font-heading text-lg font-bold mb-4">Social & About</div>
+            <div className="font-heading text-lg font-bold mb-4">
+              Social & About
+            </div>
             <FieldGroup>
               <Controller
                 name="about"
@@ -397,13 +437,13 @@ export function RegistrationForm() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
-                      About Yourself
+                      About Yourself<span className="text-destructive">*</span>
                     </FieldLabel>
                     <Textarea
                       {...field}
                       id={field.name}
                       aria-invalid={fieldState.invalid}
-                      placeholder="Share 1-2 lines about yourself..."
+                      placeholder="Share 1-2 lines about yourself, like food allergies, preferences, or anything else..."
                       rows={3}
                     />
                     {fieldState.invalid && (
@@ -420,6 +460,7 @@ export function RegistrationForm() {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Instagram or LinkedIn
+                      <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input
                       {...field}
@@ -443,13 +484,15 @@ export function RegistrationForm() {
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting && <Spinner className="size-4" />}
-              {form.formState.isSubmitting ? "Submitting..." : "Submit Registration"}
+              {form.formState.isSubmitting
+                ? "Submitting..."
+                : "Submit Registration"}
             </Button>
           </form>
         </div>
       </Reveal>
     </section>
-  )
+  );
 }
 
-export default RegistrationForm
+export default RegistrationForm;

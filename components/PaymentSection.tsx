@@ -1,34 +1,36 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { useRegistration } from "@/components/RegistrationProvider"
-import { Button } from "@/components/ui/button"
+import { useState, useCallback } from "react";
+import { useRegistration } from "@/components/RegistrationProvider";
+import { site } from "@/lib/site-config";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { CheckCircle2, XCircle, ArrowLeft, Loader2 } from "lucide-react"
-import Reveal from "@/components/Reveal"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/card";
+import { CheckCircle2, XCircle, ArrowLeft, Loader2 } from "lucide-react";
+import Reveal from "@/components/Reveal";
+import { cn } from "@/lib/utils";
 
-type PaymentStatus = "idle" | "awaiting" | "success" | "failure"
+type PaymentStatus = "idle" | "awaiting" | "success" | "failure";
 
 function loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if ((window as any).Razorpay) {
-      resolve()
-      return
+      resolve();
+      return;
     }
-    const script = document.createElement("script")
-    script.src = "https://checkout.razorpay.com/v1/checkout.js"
-    script.async = true
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error("Failed to load RazorPay checkout script"))
-    document.body.appendChild(script)
-  })
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () =>
+      reject(new Error("Failed to load RazorPay checkout script"));
+    document.body.appendChild(script);
+  });
 }
 
 async function handlePayment(
@@ -38,7 +40,7 @@ async function handlePayment(
   setPaymentId: (id: string) => void,
 ) {
   try {
-    setStatus("awaiting")
+    setStatus("awaiting");
 
     // 1. Create order on server
     const notes: Record<string, string> = {
@@ -54,30 +56,30 @@ async function handlePayment(
       guestAge: registration.guestAge || "",
       about: registration.about || "",
       social: registration.social || "",
-    }
+    };
 
     const res = await fetch("/api/orders/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount, notes }),
-    })
+    });
 
     if (!res.ok) {
-      setStatus("failure")
-      return
+      setStatus("failure");
+      return;
     }
 
-    const { orderId } = await res.json()
+    const { orderId } = await res.json();
 
     // 2. Load RazorPay checkout script
-    await loadRazorpayScript()
+    await loadRazorpayScript();
 
     // 3. Open RazorPay checkout modal
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
       amount,
       currency: "INR",
-      name: "Slow Simmer",
+      name: site.brand.name,
       description: `${registration.location} — ${registration.eventDate || ""}`,
       order_id: orderId,
       prefill: {
@@ -87,9 +89,9 @@ async function handlePayment(
       },
       theme: { color: "#A16207" },
       handler: async function (response: {
-        razorpay_payment_id: string
-        razorpay_order_id: string
-        razorpay_signature: string
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        razorpay_signature: string;
       }) {
         // 4. Verify payment on server
         const verifyRes = await fetch("/api/orders/verify", {
@@ -101,41 +103,44 @@ async function handlePayment(
             razorpay_signature: response.razorpay_signature,
             notes,
           }),
-        })
+        });
 
         if (verifyRes.ok) {
-          setStatus("success")
-          setPaymentId(response.razorpay_payment_id)
+          setStatus("success");
+          setPaymentId(response.razorpay_payment_id);
         } else {
-          setStatus("failure")
+          setStatus("failure");
         }
       },
       modal: {
         ondismiss: function () {
-          setStatus("idle")
+          setStatus("idle");
         },
       },
-    }
+    };
 
-    const rzp = new (window as any).Razorpay(options)
+    const rzp = new (window as any).Razorpay(options);
     rzp.on("payment.failed", function () {
-      setStatus("failure")
-    })
-    rzp.open()
+      setStatus("failure");
+    });
+    rzp.open();
   } catch {
-    setStatus("failure")
+    setStatus("failure");
   }
 }
 
 export function PaymentSection() {
-  const { data, clearRegistrationData } = useRegistration()
-  const [status, setStatus] = useState<PaymentStatus>("idle")
-  const [paymentId, setPaymentId] = useState<string | null>(null)
+  const { data, clearRegistrationData } = useRegistration();
+  const [status, setStatus] = useState<PaymentStatus>("idle");
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   // Placeholder state: before form submit (no RegistrationData)
   if (!data) {
     return (
-      <section id="payment" className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16">
+      <section
+        id="payment"
+        className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16"
+      >
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 size-[50vmin] max-w-[500px] rounded-full bg-gradient-to-t from-amber-100/50 to-transparent dark:from-amber-500/5 blur-3xl -z-10" />
         <Reveal>
           <div className="mx-auto max-w-lg text-center">
@@ -152,13 +157,16 @@ export function PaymentSection() {
           </div>
         </Reveal>
       </section>
-    )
+    );
   }
 
   // Success state
   if (status === "success") {
     return (
-      <section id="payment" className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16">
+      <section
+        id="payment"
+        className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16"
+      >
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 size-[50vmin] max-w-[500px] rounded-full bg-gradient-to-t from-amber-100/50 to-transparent dark:from-amber-500/5 blur-3xl -z-10" />
         <Reveal>
           <div className="mx-auto max-w-lg">
@@ -167,7 +175,10 @@ export function PaymentSection() {
             </h2>
             <Card className="border-green-500/50 bg-green-50 dark:bg-green-950/20">
               <CardContent className="py-8 text-center">
-                <CheckCircle2 className="mx-auto size-12 text-green-500" aria-hidden="true" />
+                <CheckCircle2
+                  className="mx-auto size-12 text-green-500"
+                  aria-hidden="true"
+                />
                 <CardTitle className="mt-4 text-green-700 dark:text-green-400">
                   Registration confirmed!
                 </CardTitle>
@@ -179,13 +190,16 @@ export function PaymentSection() {
           </div>
         </Reveal>
       </section>
-    )
+    );
   }
 
   // Failure state
   if (status === "failure") {
     return (
-      <section id="payment" className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16">
+      <section
+        id="payment"
+        className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16"
+      >
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 size-[50vmin] max-w-[500px] rounded-full bg-gradient-to-t from-amber-100/50 to-transparent dark:from-amber-500/5 blur-3xl -z-10" />
         <Reveal>
           <div className="mx-auto max-w-lg">
@@ -194,7 +208,10 @@ export function PaymentSection() {
             </h2>
             <Card className="border-destructive/50 bg-destructive/10">
               <CardContent className="py-8 text-center">
-                <XCircle className="mx-auto size-12 text-destructive" aria-hidden="true" />
+                <XCircle
+                  className="mx-auto size-12 text-destructive"
+                  aria-hidden="true"
+                />
                 <CardTitle className="mt-4 text-destructive">
                   Payment failed
                 </CardTitle>
@@ -205,9 +222,11 @@ export function PaymentSection() {
                   variant="outline"
                   className="mt-6"
                   onClick={() => {
-                    setStatus("idle")
-                    clearRegistrationData()
-                    document.getElementById("form")?.scrollIntoView({ behavior: "smooth" })
+                    setStatus("idle");
+                    clearRegistrationData();
+                    document
+                      .getElementById("form")
+                      ?.scrollIntoView({ behavior: "smooth" });
                   }}
                 >
                   <ArrowLeft className="mr-2 size-4" />
@@ -218,14 +237,17 @@ export function PaymentSection() {
           </div>
         </Reveal>
       </section>
-    )
+    );
   }
 
   // Summary card + Pay button (idle or awaiting)
-  const displayAmount = Math.round(((data as any).price || 50000) / 100)
+  const displayAmount = Math.round(((data as any).price || 50000) / 100);
 
   return (
-    <section id="payment" className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16">
+    <section
+      id="payment"
+      className="relative bg-background px-4 py-16 sm:py-24 scroll-mt-16"
+    >
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 size-[50vmin] max-w-[500px] rounded-full bg-gradient-to-t from-amber-100/50 to-transparent dark:from-amber-500/5 blur-3xl -z-10" />
       <Reveal>
         <div className="mx-auto max-w-lg">
@@ -265,8 +287,8 @@ export function PaymentSection() {
                 className="w-full"
                 disabled={status === "awaiting"}
                 onClick={() => {
-                  const amount = (data as any).price || 50000
-                  handlePayment(amount, data, setStatus, setPaymentId)
+                  const amount = (data as any).price || 50000;
+                  handlePayment(amount, data, setStatus, setPaymentId);
                 }}
               >
                 {status === "awaiting" ? (
@@ -275,7 +297,7 @@ export function PaymentSection() {
                     Processing your payment...
                   </>
                 ) : (
-                  `Pay ₹${displayAmount} via UPI`
+                  `Pay ₹${displayAmount}`
                 )}
               </Button>
             </CardContent>
@@ -283,7 +305,7 @@ export function PaymentSection() {
         </div>
       </Reveal>
     </section>
-  )
+  );
 }
 
-export default PaymentSection
+export default PaymentSection;

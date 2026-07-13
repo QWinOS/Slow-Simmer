@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const registrationSchema = z
   .object({
@@ -17,12 +17,14 @@ export const registrationSchema = z
     bringingGuest: z.boolean().default(false),
     guestName: z.string().optional(),
     guestAge: z.string().optional(),
-    about: z.string().max(200, "Maximum 200 characters").optional(),
-    social: z
+    about: z
       .string()
-      .url("Enter a valid URL")
-      .or(z.literal(""))
-      .optional(),
+      .min(
+        5,
+        "Let me know if you're allergic to any foods, what you love to eat, or if there is anything else we should keep in mind",
+      )
+      .max(200, "Maximum 200 characters"),
+    social: z.string().url("Enter a valid URL"),
   })
   .superRefine((data, ctx) => {
     if (data.bringingGuest) {
@@ -31,16 +33,16 @@ export const registrationSchema = z
           code: z.ZodIssueCode.custom,
           message: "Guest name is required",
           path: ["guestName"],
-        })
+        });
       }
       if (!data.guestAge || data.guestAge.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Guest age is required",
           path: ["guestAge"],
-        })
+        });
       }
     }
-  })
+  });
 
-export type RegistrationFormData = z.infer<typeof registrationSchema>
+export type RegistrationFormData = z.infer<typeof registrationSchema>;

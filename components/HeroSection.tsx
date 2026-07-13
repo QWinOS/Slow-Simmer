@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { site } from "@/lib/site-config";
 
 const DETAILS = [
-  { k: "10–14", v: "Seats an evening" },
+  { k: site.hero.seats, v: "Seats an evening" },
   { k: "Seasonal", v: "Tasting menus" },
-  { k: "Two Cities", v: "Kolkata & Bangalore" },
-]
+  { k: "Two Cities", v: site.hero.cities },
+];
 
 export default function HeroSection() {
   return (
@@ -47,14 +48,14 @@ export default function HeroSection() {
         <div className="animate-[fadeUp_0.8s_ease-out_both] flex justify-center">
           <span className="glass glass-edge inline-flex items-center gap-2.5 rounded-full px-5 py-2 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-foreground/80">
             <span className="size-1.5 rounded-full bg-gold shadow-[0_0_10px_2px_var(--glow-gold)]" />
-            Join Us at the Table
+            {site.hero.badge}
           </span>
         </div>
 
         <h1 className="mt-8 animate-[fadeUp_0.8s_ease-out_both] font-heading text-5xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-          The Art of the
+          <span className="text-gold-foil">Slow Simmer</span>
           <br />
-          <span className="text-gold-foil italic">Unhurried Table</span>
+          <span className="text-white italic">The Supper Club</span>
         </h1>
 
         <p className="mx-auto mt-7 max-w-xl animate-[fadeUp_0.8s_ease-out_0.3s_both] text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
@@ -119,5 +120,5 @@ export default function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

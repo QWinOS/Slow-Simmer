@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import { site } from "@/lib/site-config";
 
 // Bodoni Moda — high-contrast display serif for headings (luxury, editorial)
 const bodoniModa = Bodoni_Moda({
@@ -21,8 +22,11 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Slow Simmer — An Unhurried Supper Club",
+  title:
+    process.env.NEXT_PUBLIC_SEO_TITLE?.trim() ||
+    `${site.brand.name} — ${site.brand.tagline}`,
   description:
+    process.env.NEXT_PUBLIC_SEO_DESCRIPTION?.trim() ||
     "A supper club for good food and better company. Seasonal menus, shared tables, and evenings made to linger. Join us at the next supper.",
 };
 
