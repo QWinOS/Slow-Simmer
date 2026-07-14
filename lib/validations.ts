@@ -29,6 +29,9 @@ export const registrationSchema = z.object({
     )
     .max(200, "Maximum 200 characters"),
   social: z.string().url("Enter a valid URL"),
+  termsAccepted: z.literal(true, {
+    message: "You must agree to the Terms & Conditions",
+  }),
 });
 
 export type GuestData = z.infer<typeof guestSchema>;

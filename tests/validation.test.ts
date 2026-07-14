@@ -10,6 +10,7 @@ const validBase = {
   about: "Love good food and meeting new people",
   social: "https://instagram.com/testuser",
   guests: [],
+  termsAccepted: true as const,
 }
 
 describe("registrationSchema", () => {
@@ -350,6 +351,44 @@ describe("registrationSchema", () => {
       if (!result.success) {
         expect(result.error.issues[0].path).toContain("social")
       }
+    })
+  })
+
+  describe("termsAccepted", () => {
+    it("accepts termsAccepted: true", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        termsAccepted: true as const,
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("rejects termsAccepted: false", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        termsAccepted: false,
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toContain("termsAccepted")
+      }
+    })
+
+    it("rejects missing termsAccepted field", () => {
+      const { termsAccepted: _, ...withoutTermsAccepted } = validBase
+      const result = registrationSchema.safeParse(withoutTermsAccepted)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].path).toContain("termsAccepted")
+      }
+    })
+
+    it("rejects termsAccepted with non-boolean value", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        termsAccepted: "yes",
+      })
+      expect(result.success).toBe(false)
     })
   })
 })
