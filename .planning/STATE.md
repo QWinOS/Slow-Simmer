@@ -5,8 +5,8 @@ milestone_name: — Terms & Conditions
 current_phase: 5
 current_phase_name: Terms & Conditions Page + Agreement
 status: roadmap
-stopped_at: Phase 5 context gathered
-last_updated: "2026-07-14T15:12:51.711Z"
+stopped_at: Phase 5 UI-SPEC approved
+last_updated: "2026-07-14T15:26:51.851Z"
 last_activity: 2026-07-14
 last_activity_desc: Roadmap created for v1.2
 progress:
@@ -43,9 +43,9 @@ Phase 3 complete: Payment, Sheets & Email (4 plans, 11 tasks, ~19 min, 99 tests 
 
 ## Session
 
-**Last session:** 2026-07-14T15:12:51.706Z
-**Stopped at:** Phase 5 context gathered
-**Resume file:** .planning/phases/05-terms-conditions-page-agreement/05-CONTEXT.md
+**Last session:** 2026-07-14T15:26:51.845Z
+**Stopped at:** Phase 5 UI-SPEC approved
+**Resume file:** .planning/phases/05-terms-conditions-page-agreement/05-UI-SPEC.md
 
 ## Performance Metrics
 

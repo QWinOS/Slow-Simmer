@@ -393,7 +393,7 @@ Insert after line 548 (end of Social & About `FieldGroup`), before the `<Button 
 | A3 | Radix `onCheckedChange` returns `boolean \| "indeterminate"` | Code Examples | Verified by `components/ui/checkbox.tsx` type signature — the coercion `checked === true` handles this safely. |
 | A4 | No `@radix-ui/react-checkbox` package exists separately | Package Legitimacy | The `radix-ui` monorepo (1.6.1) already includes Checkbox. `components/ui/checkbox.tsx` imports from `"radix-ui"`, confirming this. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Import path `next/navigation` in Next.js 16**
    - What we know: Standard Next.js App Router exports `usePathname()` from `next/navigation`.
