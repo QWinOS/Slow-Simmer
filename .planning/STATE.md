@@ -1,12 +1,12 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Env-Driven Site Config
-status: planning
-last_updated: "2026-07-12T21:04:02.834Z"
-last_activity: 2026-07-12
+milestone: v1.2
+milestone_name: Terms &amp; Conditions
+status: roadmap
+last_updated: "2026-07-14T15:10:00.000Z"
+last_activity: 2026-07-14
 progress:
-  total_phases: 0
+  total_phases: 1
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-07-02)
 
 - **mode:** yolo
 - **granularity:** fine
-- **current_phase:** 3
+- **current_phase:** 5
 - **completed_phases:** [3]
 - **parallel_execution:** false
 
@@ -59,7 +59,7 @@ Phase 3 complete: Payment, Sheets & Email (4 plans, 11 tasks, ~19 min, 99 tests 
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 5 — Terms & Conditions Page + Agreement
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-12 — Milestone v1.1 started
+Status: Roadmap defined
+Last activity: 2026-07-14 — Roadmap created for v1.2

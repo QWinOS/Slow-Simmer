@@ -14,6 +14,10 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
 
 - [ ] **Phase 4: Env-Driven Site Config** - Central typed config module; social handles, brand identity, email copy, and short marketing strings driven from `.env` as a single source of truth
 
+### Milestone v1.2 — Terms & Conditions
+
+- [ ] **Phase 5: Terms & Conditions Page + Agreement** - Dedicated `/terms` route with full 8-clause T&C content, "I agree" checkbox on registration form with validation
+
 ## Phase Details
 
 ### Phase 1: Foundation, Layout & Gallery
@@ -145,6 +149,24 @@ Plans:
 - No secret ever gets a `NEXT_PUBLIC_` prefix; secrets stay in the `server-only` module
 - Event date/time/price/location stay in the Google Sheet (out of scope — runtime-editable by design)
 
+### Phase 5: Terms & Conditions Page + Agreement
+
+**Goal**: Guests can read the full Terms & Conditions at a dedicated route and must explicitly agree before submitting registration.
+
+**Depends on**: Phase 3 (existing app shipped — Phase 4 deferred)
+
+**Requirements**: TC-01, TC-02, TC-03, TC-04, TC-05
+
+**Success Criteria** (what must be TRUE):
+1. Guest can navigate to `/terms` and read the full 8-clause T&C text (Playfair Display SC heading, Karla body)
+2. Registration form shows a visible link to the T&C page and a required "I agree" checkbox
+3. Submitting without checking the checkbox shows a validation error and blocks submission
+4. Page matches brand styling (warm red/gold palette, consistent layout with main page)
+
+**Plans**: TBD
+
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -153,3 +175,4 @@ Plans:
 | 2. Registration Form | 5/5 | Complete | 2026-07-04 |
 | 3. Payment, Sheets & Email | 4/4 | Complete   | 2026-07-12 |
 | 4. Env-Driven Site Config | 0/5 | Planning | — |
+| 5. Terms & Conditions Page + Agreement | 0/0 | Not started | — |

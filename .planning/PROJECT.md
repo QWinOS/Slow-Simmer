@@ -8,18 +8,15 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests can browse past ev
 
 Guests can register for a Slow Simmer event, pay seamlessly via GPay UPI, and have their registration automatically recorded.
 
-## Current Milestone: v1.1 Env-Driven Site Config
+## Current Milestone: v1.2 Terms & Conditions
 
-**Goal:** Externalize hardcoded site content into environment variables as a single source of truth, read through one central typed config module, so a single `.env` change updates every place a value appears.
+**Goal:** Add a dedicated Terms & Conditions page and require guests to explicitly agree before submitting registration.
 
 **Target features:**
-- Social media handles (Instagram / YouTube / LinkedIn / WhatsApp) driven by env — replacing the current `href="#"` footer placeholders
-- Brand identity (name, tagline, SEO title + meta description) driven by env
-- Confirmation email copy (subject / body / signature) driven by env
-- Marketing copy (hero, About highlights, Membership reasons/steps, cities, seat count) driven by env
-- Central `lib/site-config.ts` with typed accessors + safe fallbacks; browser-facing values use `NEXT_PUBLIC_`; `.env.example` documents every new var
-
-**Out of scope:** Event date/time/price/location (already runtime-editable via the Google Sheet — deliberately left there).
+- New `/terms` route displaying full T&C text
+- Registration form requires "I agree to the Terms & Conditions" checkbox with link to `/terms`
+- Zod schema updated to validate checkbox acceptance
+- Styled to match existing brand
 
 ## Requirements
 
@@ -37,11 +34,10 @@ _Shipped in v1.0 (Phases 1–3):_
 
 ### Active
 
-- [ ] Env-driven social media handles (single source of truth in `.env`)
-- [ ] Env-driven brand identity (name, tagline, SEO metadata)
-- [ ] Env-driven confirmation email copy
-- [ ] Env-driven marketing copy blocks
-- [ ] Central typed site-config module reading `process.env`
+- [ ] Guest can view full Terms & Conditions at `/terms` route
+- [ ] Registration form displays link to T&C page
+- [ ] Guest must check "I agree to the Terms & Conditions" before submitting
+- [ ] Form submission is blocked if checkbox is unchecked
 
 ### Out of Scope
 
@@ -92,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-13 — started milestone v1.1 Env-Driven Site Config*
+*Last updated: 2026-07-14 — started milestone v1.2 Terms & Conditions*
