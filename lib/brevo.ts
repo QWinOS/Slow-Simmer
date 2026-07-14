@@ -20,7 +20,10 @@ export async function sendConfirmationEmail(
 
   const contactNumber = process.env.CONTACT_NUMBER || "";
   const whatsappNumberLink = process.env.NEXT_PUBLIC_WHATSAPP_URL || "";
-  const whatsappDisplay = whatsappNumberLink.replace(/^https?:\/\/wa\.me\//, "");
+  const whatsappDisplay = whatsappNumberLink.replace(
+    /^https?:\/\/wa\.me\//,
+    "",
+  );
   // Email copy — env-driven, falls back to current text. Server-only (no
   // NEXT_PUBLIC_ prefix): this runs in the API route, never the browser.
   const brand = process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Slow Simmer";
@@ -53,33 +56,33 @@ export async function sendConfirmationEmail(
       ],
       subject,
       htmlContent: [
-        '<!DOCTYPE html>',
+        "<!DOCTYPE html>",
         '<html lang="en" style="color-scheme: light dark;">',
-        '<head>',
+        "<head>",
         '  <meta name="color-scheme" content="light dark" />',
         '  <meta name="supported-color-schemes" content="light dark" />',
-        '  <style>',
-        '    @media (prefers-color-scheme: dark) {',
-        '      .e-bg { background: #121212 !important; }',
-        '      .e-card { background: #1e1e1e !important; }',
-        '      .e-card2 { background: #242424 !important; }',
-        '      .e-gold { color: #d4b87a !important; }',
-        '      .e-line { background: #d4b87a !important; }',
-        '      .e-body { color: #c0bfbc !important; }',
-        '      .e-dark { color: #e0dfdc !important; }',
-        '      .e-border { border-color: #333 !important; }',
-        '      .e-sub { color: #999 !important; }',
-        '    }',
-        '    [data-ogsc] .e-bg { background: #121212 !important; }',
-        '    [data-ogsc] .e-card { background: #1e1e1e !important; }',
-        '    [data-ogsc] .e-card2 { background: #242424 !important; }',
-        '    [data-ogsc] .e-gold { color: #d4b87a !important; }',
-        '    [data-ogsc] .e-body { color: #c0bfbc !important; }',
-        '    [data-ogsc] .e-dark { color: #e0dfdc !important; }',
-        '    [data-ogsc] .e-border { border-color: #333 !important; }',
-        '    [data-ogsc] .e-sub { color: #999 !important; }',
-        '  </style>',
-        '</head>',
+        "  <style>",
+        "    @media (prefers-color-scheme: dark) {",
+        "      .e-bg { background: #121212 !important; }",
+        "      .e-card { background: #1e1e1e !important; }",
+        "      .e-card2 { background: #242424 !important; }",
+        "      .e-gold { color: #d4b87a !important; }",
+        "      .e-line { background: #d4b87a !important; }",
+        "      .e-body { color: #c0bfbc !important; }",
+        "      .e-dark { color: #e0dfdc !important; }",
+        "      .e-border { border-color: #333 !important; }",
+        "      .e-sub { color: #999 !important; }",
+        "    }",
+        "    [data-ogsc] .e-bg { background: #121212 !important; }",
+        "    [data-ogsc] .e-card { background: #1e1e1e !important; }",
+        "    [data-ogsc] .e-card2 { background: #242424 !important; }",
+        "    [data-ogsc] .e-gold { color: #d4b87a !important; }",
+        "    [data-ogsc] .e-body { color: #c0bfbc !important; }",
+        "    [data-ogsc] .e-dark { color: #e0dfdc !important; }",
+        "    [data-ogsc] .e-border { border-color: #333 !important; }",
+        "    [data-ogsc] .e-sub { color: #999 !important; }",
+        "  </style>",
+        "</head>",
         '<body class="e-bg" style="margin: 0; padding: 0; background: #f5f3ef; -webkit-font-smoothing: antialiased;">',
         '<table align="center" role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; font-family: Karla, -apple-system, sans-serif; color: #2c2c2c;">',
         `  <tr>`,
@@ -127,19 +130,23 @@ export async function sendConfirmationEmail(
         `          <td style="padding: 24px 44px 36px;">`,
         `            <p class="e-body" style="font-size: 14px; line-height: 1.7; color: #555; margin: 0;">The exact address and final details will arrive 24 hours before. A member of our team will be in touch if anything is needed before then.</p>`,
         contactNumber
-          ? `            <div class="e-border" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e0d8;">`
-            + `              <table role="presentation" style="width: 100%;">`
-            + `                <tr>`
-            + `                  <td class="e-sub" style="font-size: 13px; color: #888; padding: 4px 0; letter-spacing: 0.3px;">call</td>`
-            + `                  <td class="e-dark" style="font-size: 14px; color: #2c2c2c; padding: 4px 0; text-align: right; letter-spacing: 0.3px;">${contactNumber}</td>`
-            + `                </tr>`
-            + `                <tr>`
-            + `                  <td class="e-sub" style="font-size: 13px; color: #888; padding: 4px 0; letter-spacing: 0.3px;">whatsapp</td>`
-            + `                  <td style="font-size: 14px; padding: 4px 0; text-align: right; letter-spacing: 0.3px;"><a href="${whatsappNumberLink}" class="e-gold" style="color: #c9a96e; text-decoration: none; border-bottom: 1px solid #e0d5c2;">${whatsappDisplay}</a></td>`
-            + `                </tr>`
-            + `              </table>`
-            + `            </div>`
+          ? `            <div class="e-border" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e0d8;">` +
+            `              <table role="presentation" style="width: 100%;">` +
+            `                <tr>` +
+            `                  <td class="e-sub" style="font-size: 13px; color: #888; padding: 4px 0; letter-spacing: 0.3px;">Call</td>` +
+            `                  <td class="e-dark" style="font-size: 14px; color: #2c2c2c; padding: 4px 0; text-align: right; letter-spacing: 0.3px;">${contactNumber}</td>` +
+            `                </tr>` +
+            `                <tr>` +
+            `                  <td class="e-sub" style="font-size: 13px; color: #888; padding: 4px 0; letter-spacing: 0.3px;">Whatsapp</td>` +
+            `                  <td style="font-size: 14px; padding: 4px 0; text-align: right; letter-spacing: 0.3px;"><a href="${whatsappNumberLink}" class="e-gold" style="color: #c9a96e; text-decoration: none; border-bottom: 1px solid #e0d5c2;">${whatsappDisplay}</a></td>` +
+            `                </tr>` +
+            `              </table>` +
+            `            </div>`
           : "",
+        `            <div class="e-card2 e-border" style="margin-top: 28px; background: #faf8f4; border: 1px solid #e8e0d4; padding: 18px 22px;">`,
+        `              <p class="e-sub" style="font-size: 10px; color: #c9a96e; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 6px;">security check</p>`,
+        `              <p class="e-body" style="font-size: 13px; line-height: 1.7; color: #555; margin: 0;">To ensure the safety and privacy of all guests, please <strong> Reply To </strong>this email with a clear photo of your Aadhaar Card. If you are attending with a guest, kindly include a clear photo of their Aadhaar Card as well. Identity verification is mandatory for entry. </p>`,
+        `            </div>`,
         `            <div class="e-line" style="width: 24px; height: 1px; background: #ddd; margin: 28px auto 0;"></div>`,
         `            <p class="e-sub" style="font-size: 11px; color: #bbb; margin: 16px 0 0; text-align: center; letter-spacing: 1.2px;">${signature}</p>`,
         `          </td>`,
