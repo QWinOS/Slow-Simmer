@@ -48,9 +48,7 @@ const mockRegistrationData = {
   contact: "9876543210",
   email: "guest@test.com",
   aadhar: "123456789012",
-  bringingGuest: false,
-  guestName: "",
-  guestAge: "",
+  guests: [],
   about: "Love good food!",
   social: "https://instagram.com/test",
   price: 50000,
@@ -94,7 +92,7 @@ describe("PaymentSection", () => {
   /* ── 2. Summary card state (idle) ── */
   describe("2. Summary card state", () => {
     it("renders summary card when registration data exists", () => {
-      mockUseRegistration.mockReturnValue({ data: mockRegistrationData })
+      mockUseRegistration.mockReturnValue({ data: mockRegistrationData, clearRegistrationData: vi.fn() })
       renderSection()
 
       expect(screen.getByText("The Grand Hall")).toBeInTheDocument()
@@ -104,7 +102,7 @@ describe("PaymentSection", () => {
     })
 
     it("renders Pay button with correct amount", () => {
-      mockUseRegistration.mockReturnValue({ data: mockRegistrationData })
+      mockUseRegistration.mockReturnValue({ data: mockRegistrationData, clearRegistrationData: vi.fn() })
       renderSection()
 
       const payButton = screen.getByRole("button", { name: /pay/i })
@@ -151,7 +149,7 @@ describe("PaymentSection", () => {
     it("transitions to success state after successful payment", async () => {
       const user = userEvent.setup()
       setupSuccessfulRazorpay()
-      mockUseRegistration.mockReturnValue({ data: mockRegistrationData })
+      mockUseRegistration.mockReturnValue({ data: mockRegistrationData, clearRegistrationData: vi.fn() })
       renderSection()
 
       await user.click(screen.getByRole("button", { name: /pay/i }))
@@ -165,7 +163,7 @@ describe("PaymentSection", () => {
     it("shows success card content and description", async () => {
       const user = userEvent.setup()
       setupSuccessfulRazorpay()
-      mockUseRegistration.mockReturnValue({ data: mockRegistrationData })
+      mockUseRegistration.mockReturnValue({ data: mockRegistrationData, clearRegistrationData: vi.fn() })
       renderSection()
 
       await user.click(screen.getByRole("button", { name: /pay/i }))
@@ -210,7 +208,7 @@ describe("PaymentSection", () => {
         })
 
       setupFailedVerificationRazorpay()
-      mockUseRegistration.mockReturnValue({ data: mockRegistrationData })
+      mockUseRegistration.mockReturnValue({ data: mockRegistrationData, clearRegistrationData: vi.fn() })
       renderSection()
 
       await user.click(screen.getByRole("button", { name: /pay/i }))
@@ -235,7 +233,7 @@ describe("PaymentSection", () => {
         })
 
       setupFailedVerificationRazorpay()
-      mockUseRegistration.mockReturnValue({ data: mockRegistrationData })
+      mockUseRegistration.mockReturnValue({ data: mockRegistrationData, clearRegistrationData: vi.fn() })
       renderSection()
 
       await user.click(screen.getByRole("button", { name: /pay/i }))

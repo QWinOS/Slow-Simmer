@@ -6,14 +6,12 @@ export interface RegistrationData {
   location: string
   eventDate?: string
   eventTime?: string
-  price: number  // in paise, from Location_Date Price column
+  price: number  // per-seat, in paise, from Location_Date Price column
   name: string
   contact: string
   email: string
   aadhar: string
-  bringingGuest: boolean
-  guestName?: string
-  guestAge?: string
+  guests: { name: string; age: string }[]  // additional guests beyond registrant
   about?: string
   social?: string
 }

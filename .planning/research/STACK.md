@@ -1,154 +1,174 @@
 # Stack Research
 
-**Domain:** Supper club / event-hosting platform
-**Researched:** 2026-07-02
+**Domain:** Env-driven centralized site config for Next.js 16 App Router + TypeScript
+**Milestone:** v1.1 Env-Driven Site Config (subsequent milestone; v1.0 stack already shipped)
+**Researched:** 2026-07-13
 **Confidence:** HIGH
+
+> Note: This file was regenerated for milestone v1.1. The prior v1.0 ecosystem stack research (Neon/Drizzle/Better Auth/Clerk/Resend etc.) described a proposed greenfield stack that was NOT the stack ultimately shipped — the app shipped on Google Sheets + Drive + Razorpay + Brevo with no DB/ORM/auth. This v1.1 research is scoped only to the new env-config capability and reflects the real, shipped codebase.
+
+## TL;DR Recommendation
+
+**Build a plain typed config module (`lib/site-config.ts`) using the `zod` v4 you already have installed. Do NOT add `@t3-oss/env-nextjs` or any new dependency.**
+
+For a single-maintainer, single-page marketing site whose new config is non-secret display copy with sensible fallbacks, a validation *library* buys almost nothing a ~40-line typed module doesn't, while adding a dependency, a build-time failure surface, and destructuring boilerplate. Zod is already a dependency (`^4.4.3`, used in `lib/validations.ts`), so you get schema-backed parsing, coercion, and full type inference at **zero new cost**. The one non-negotiable is the **`NEXT_PUBLIC_` static-access rule**, which dictates the module's shape regardless of approach.
 
 ## Recommended Stack
 
 ### Core Technologies
 
 | Technology | Version | Purpose | Why Recommended |
-|---|---|---|---|
-| **Next.js** | 16.x (already set) | Full-stack React framework | App Router, Server Components, Server Actions, Route Handlers — all the primitives this platform needs. SSR for event discovery (SEO). Already scaffolded. |
-| **React** | 19.x (already set) | UI runtime | Server Components, Server Actions, `use()`, `action()` — the React 19 feature set that Next.js 16 relies on. Already in the project. |
-| **TypeScript** | 5.x (already set) | Type safety | Non-negotiable for a multi-model domain (events, users, RSVPs, menus). Catches schema drift between DB and UI. Already set up. |
-| **TailwindCSS** | v4 (already set) | Styling | Utility-first CSS with CSS-first configuration in v4 (no `tailwind.config.js` needed). Already in the project. Already scaffolded. |
-| **Neon** | Latest (serverless) | PostgreSQL database | Serverless Postgres with scale-to-zero billing, instant branching (each PR gets its own DB), native Vercel integration. Free tier: 0.5 GB storage. Launch: $19/mo. Best pure Postgres option for a platform that handles auth separately. No vendor lock-in beyond Postgres itself. |
-| **Drizzle ORM** | ^0.42.x | TypeScript ORM / query builder | SQL-shaped query builder with zero runtime overhead (~7kb). First-class edge runtime support (no native binaries). Type-safe schema from a single TS file. Best fit for Neon + Next.js 16 serverless. Migrations via `drizzle-kit`. |
-| **Better Auth** | ^1.x | Authentication framework | The 2026 consensus pick for new Next.js projects. Self-hosted, full data ownership, no per-user pricing. Supports email/password, OAuth (Google, GitHub), magic links, and database sessions. Framework-agnostic, works with Drizzle adapter. Auth.js (NextAuth) v5 is still maintained but active development has moved to Better Auth — this is where the ecosystem is going. |
-| **shadcn/ui** | Latest (^4.x) | UI component library | The de facto component library for Next.js + TailwindCSS. Copy-paste components (no npm dependency), fully customizable with TailwindCSS v4. Provides accessible dialog, form, card, toast, and dropdown primitives needed for event CRUD, RSVP flows, and profile pages. |
-| **Vercel** | Pro ($20/mo) | Hosting / deployment | Purpose-built for Next.js. Zero-config deploy, preview deploys per PR, Edge Functions, ISR, Image Optimization. The one platform where every Next.js 16 feature works before anywhere else. Hobby tier is free for MVP; Pro tier ($20/user/mo) covers production traffic for a supper club platform. |
+|------------|---------|---------|-----------------|
+| Next.js (App Router) | 16.2.10 (installed) | Env loading + `NEXT_PUBLIC_` build-time inlining | Its built-in `.env*` loader + inliner IS your env system — nothing to add. |
+| TypeScript | ^5 (installed) | Static typing of config accessors | Delivers the "typed accessors" the milestone asks for via `export const siteConfig = {...} as const` or `z.infer`. |
+| zod | 4.4.3 (installed) | Optional runtime shape/coercion + type inference for the config object | **Already installed** (used in `lib/validations.ts`). Reuse it: one schema → `z.infer` types + coercion (seat count → number) + fallbacks, at zero new dependency cost. |
+
+**No new packages are required for this milestone.**
 
 ### Supporting Libraries
 
 | Library | Version | Purpose | When to Use |
-|---|---|---|---|
-| **UploadThing** | Latest | File uploads (menu images) | Menu image uploads in event creation flow. Pre-built React dropzone component, 5-minute integration. Free tier: 2 GB storage (more than enough for menu photos). Handles auth middleware, file type validation, CDN delivery. |
-| **Resend** | Latest | Transactional email API | RSVP confirmations, host notifications, event reminders. Developer-first API with React Email template support. Free tier: 3,000 emails/month. For a supper club platform at MVP scale, this is free. Verifies domain with SPF/DKIM/DMARC. |
-| **React Email** | Latest (`@react-email/components`) | Email templates | Author RSVP confirmations, host notifications, and event reminders as typed React components. Preview in browser during development. Share design tokens with the app. Renders to battle-tested email HTML (tables + inline styles) that works in Outlook, Gmail, and Apple Mail. |
-| **`ics`** | ^3.12.0 | Calendar file generation | Generate `.ics` files for "Add to Calendar" buttons on event detail pages. v3.12.0 (Apr 2026) is current, 552K weekly downloads. Creates iCalendar-compliant VCALENDAR strings. Users download or auto-open in their calendar app (Apple/Google/Outlook). |
-| **date-fns** | ^4.x | Date/time utilities | Format event dates, calculate "starts in X days", handle timezone display. Tree-shakeable, functional, no Moment.js baggage. Needed everywhere in an event platform. |
-| **react-hook-form** | ^7.x | Form state management | Event creation/edit forms (multi-field, validation-heavy). Reduces re-renders via uncontrolled inputs. Pairs with Zod for schema validation. |
-| **zod** | ^3.x | Schema validation | Validate form inputs, API request bodies, environment variables. Single source of truth for types shared between client and server. Used by Better Auth internally as well (consistent validation stack). |
-| **sonner** | Latest | Toast notifications | RSVP success, event created, errors. Standard toast library in the shadcn/ui ecosystem. Lightweight, accessible, works with Server Actions. |
-| **lucide-react** | Latest | Icons | Icon library used by shadcn/ui. Calendar, users, food, location, clock icons — all needed for event cards, detail pages, and nav. |
-| **nuqs** | ^2.x | URL query state management | Search/filter state in URL params for event discovery. "What events are this weekend?" → `?date=weekend&location=...` in the URL. Type-safe, pairs with Next.js App Router. |
+|---------|---------|---------|-------------|
+| _(none)_ | — | — | This milestone needs no new library. |
 
 ### Development Tools
 
 | Tool | Purpose | Notes |
-|---|---|---|
-| **drizzle-kit** | Database migrations | `drizzle-kit generate` / `drizzle-kit migrate` / `drizzle-kit push`. Schema drift detection via `drizzle-kit studio` for visual DB inspection. |
-| **Neon CLI / Dashboard** | Database management | Branch databases per PR (Neon's killer feature). View query logs, monitor compute usage. |
-| **Resend Dashboard** | Email analytics | Track delivery, opens, bounces. Configure domain verification, webhooks for bounce/complaint events. |
-| **UploadThing Dashboard** | File management | View uploaded files, monitor storage usage. |
-| **@next/bundle-analyzer** | Bundle analysis | Catch accidental large dependencies during development (especially important with Drizzle's tiny core). |
+|------|---------|-------|
+| `.env.example` (existing convention) | Documents every new var | Milestone requires documenting each new var here. Group `NEXT_PUBLIC_*` separately from server-only vars. Existing keys (confirmed from source): `RAZORPAY_KEY_ID/SECRET/WEBHOOK_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`, `BREVO_API_KEY/SENDER_EMAIL/SENDER_NAME`, `CONTACT_NUMBER`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SHEETS_*`, `VIDEOS_SHEET_ID`, `DRIVE_FOLDER_ID`. (Agent could not read `.env.example` directly — permission denied — keys derived from `grep process.env` across `lib/` + `app/`.) |
+| Existing `process.env` pattern | Current baseline | Codebase already reads `process.env.X!` and `process.env.X \|\| "fallback"` (see `lib/brevo.ts`, `lib/razorpay.ts`). The new module formalizes this in one place. |
 
 ## Installation
 
 ```bash
-# Database & ORM
-npm install drizzle-orm @neondatabase/serverless
-npm install -D drizzle-kit
-
-# Authentication
-npm install better-auth @better-auth/drizzle
-
-# UI
-npx shadcn@latest init
-npx shadcn@latest add button card form dialog toast dropdown-menu input label select textarea calendar popover
-
-# File uploads
-npm install uploadthing @uploadthing/react
-
-# Email
-npm install resend @react-email/components
-
-# Forms & validation
-npm install react-hook-form @hookform/resolvers zod
-
-# Date handling
-npm install date-fns
-
-# Calendar / ICS
-npm install ics
-
-# Utilities
-npm install sonner lucide-react nuqs
+# Nothing to install. zod@4.4.3 is already a dependency.
 ```
+
+## The Decision: Validation Library vs Plain Typed Module
+
+### Decision matrix
+
+| Criterion | Plain typed module (fallbacks) | Plain module + zod (RECOMMENDED) | `@t3-oss/env-nextjs` |
+|-----------|-------------------------------|----------------------------------|----------------------|
+| New dependencies | 0 | 0 (zod already present) | +1 (`@t3-oss/env-nextjs@0.13.11`) |
+| Cost | Free | Free | Free, but extra maintenance surface |
+| Type safety | Manual `as const` / interface | `z.infer` — automatic | Automatic |
+| Server/client split enforcement | Manual discipline | Manual discipline | **Enforced** (throws if a server var is read on client) |
+| Coercion (seat count→number, bool flags) | Manual `Number()` | `z.coerce.number()` | via zod schema |
+| Fail-fast on missing var | Only if coded | Only if coded (fallbacks make most vars optional) | **Yes, at build/boot** |
+| `NEXT_PUBLIC_` destructuring boilerplate | Write once | Write once | **Mandated** (`experimental__runtimeEnv`) — same boilerplate |
+| Fit for THIS project | Good | **Best** | Over-engineered |
+
+### Why plain-module-plus-zod wins for Slow Simmer
+
+1. **The new config is display copy with fallbacks, not fail-fast secrets.** Social handles, brand name, tagline, marketing blocks, email copy — each has a sensible default and the site must render even if a var is missing. `@t3-oss/env-nextjs`'s headline feature is *throwing at build/boot when a required var is absent* — the wrong behavior for optional cosmetic copy. You'd mark everything `.optional()` and defeat the library's main value.
+
+2. **Secrets are already handled and out of scope.** Razorpay/Brevo/Google secrets already use `process.env.X!` inline and are validated implicitly by the APIs consuming them. This milestone targets *content*, not secrets. No new "must-not-boot-without-it" variable exists.
+
+3. **Zero-cost, single-maintainer.** Zod already ships. Adding t3-env means one more package kept in lockstep with Next.js majors (`next` + validator peer deps; historically needs bumps across Next versions). For a solo maintainer optimizing for "zero additional spend and simplicity," fewer moving parts wins.
+
+4. **t3-env's enforced server/client split is nice, but file discipline gets ~90% of it** (see Integration Points). Its runtime "you accessed a server var on the client" guard matters for teams; one person authoring one file does not need a runtime tripwire.
+
+**When to reconsider t3-env:** if this app later gains required-at-boot integrations (real DB URL, auth secret) that should hard-fail the deploy when unset, adopt `@t3-oss/env-nextjs@0.13.11` then. Clean drop-in; pairs with installed zod v4 (peer `^3.24.0 || ^4.0.0` ✓).
+
+## Next.js 16 App Router Specifics (critical constraints)
+
+From `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md` (bundled with installed next@16.2.10). Behavior is unchanged from prior versions but is **load-bearing** for `lib/site-config.ts`:
+
+1. **`NEXT_PUBLIC_` vars are inlined at BUILD time, only via static literal access.**
+   `process.env.NEXT_PUBLIC_BRAND_NAME` is replaced with a hard-coded string during `next build`. **Dynamic access is NOT inlined:**
+   ```ts
+   // ✅ inlined — safe in client components
+   const brand = process.env.NEXT_PUBLIC_BRAND_NAME
+   // ❌ NOT inlined — becomes undefined in the browser
+   const key = "NEXT_PUBLIC_BRAND_NAME"; const brand = process.env[key]
+   const env = process.env; const brand = env.NEXT_PUBLIC_BRAND_NAME
+   ```
+   **Consequence:** each `NEXT_PUBLIC_` var must appear as an explicit `process.env.NEXT_PUBLIC_XXX` literal in source. No looping over keys, no spreading `process.env`, to build the client-facing config. (This is the exact rule that forces t3-env's manual `experimental__runtimeEnv` destructuring — you pay the boilerplate either way; a plain module just makes it visible.)
+
+2. **`NEXT_PUBLIC_` values are frozen at build time** — no response to env changes without a rebuild. Matches the milestone's "Out of Scope: live-editable browser config" note: anything needing no-redeploy edits stays in the Google Sheet. Brand/social/marketing copy changing on redeploy is intended.
+
+3. **Non-prefixed vars are server-only** and never reach the browser bundle. Confirmation *email copy* is consumed server-side (Brevo send path: `lib/brevo.ts` + webhook route), so email copy vars should be **server-only (no prefix)**, keeping them out of the client bundle. Only values rendered in client components need `NEXT_PUBLIC_`.
+
+4. **Server env reads during dynamic rendering are fine.** In Server Components/route handlers, `process.env.X` reads at request time (`await connection()` to force request-time evaluation). Static marketing copy read at build needs no special handling.
+
+## Recommended `NEXT_PUBLIC_` vs Server-Only Split
+
+| Config group | Consumed where | Prefix | Rationale |
+|--------------|----------------|--------|-----------|
+| Brand name, tagline | Client (navbar/hero) AND `metadata` (server) | `NEXT_PUBLIC_` | Rendered in client UI; also usable server-side. Public anyway. |
+| SEO title / meta description | `generateMetadata` / `metadata` export (server) | **Prefer no prefix** | Metadata runs server-side; no need to bloat client bundle. Use `NEXT_PUBLIC_` only if the same string also shows in client UI. |
+| Social handles (IG/YouTube/LinkedIn/WhatsApp) | Footer (currently client `href="#"`) | `NEXT_PUBLIC_` | Rendered directly in browser markup. Public by definition. |
+| Marketing copy (hero, about, membership, cities, seat count) | Mix of client + server components | `NEXT_PUBLIC_` for client-rendered; no prefix if server-only | Split per component. Seat count → coerce to number. |
+| Confirmation email copy (subject/body/signature) | Server only (Brevo send in webhook / `lib/brevo.ts`) | **No prefix** | Never rendered client-side. Keep out of the client bundle. |
+
+**Rule of thumb:** prefix a var `NEXT_PUBLIC_` **only if a Client Component renders it.** Everything else stays server-only.
+
+## Integration Points
+
+1. **New file `lib/site-config.ts`** — the single source of truth. Two clearly separated sections:
+   ```ts
+   import { z } from "zod"  // already a dep
+
+   // --- CLIENT (NEXT_PUBLIC_, must be static literal access) ---
+   const clientRaw = {
+     brandName: process.env.NEXT_PUBLIC_BRAND_NAME,
+     tagline: process.env.NEXT_PUBLIC_TAGLINE,
+     instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL,
+     youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL,
+     // ...one explicit literal per NEXT_PUBLIC_ var
+   }
+
+   const schema = z.object({
+     brandName: z.string().default("Slow Simmer"),
+     seatCount: z.coerce.number().default(20),
+     // ...
+   })
+   export const siteConfig = schema.parse(clientRaw)
+   export type SiteConfig = z.infer<typeof schema>
+   ```
+   Use `.default(...)` (or `.catch(...)`) on every field so missing vars degrade gracefully instead of throwing — matches the "safe fallbacks" requirement.
+
+2. **Replace inline reads** in the Footer (`href="#"` → `siteConfig.instagram`), hero/about/membership components, `app/layout.tsx` `metadata`, and `lib/brevo.ts` email copy.
+
+3. **`.env.example`** — add every new var with a comment + example value; group `NEXT_PUBLIC_*` separately from server-only vars.
+
+4. **Server/client boundary discipline:** to make a bundler-level leak impossible, split into `lib/site-config.ts` (client-safe, `NEXT_PUBLIC_` only) + `lib/site-config.server.ts` (server-only, e.g. email copy) so client components can never import server-only fields. This is the poor-man's version of t3-env's runtime guard — recommended for peace of mind, still zero deps.
+
+## What NOT to Use / What NOT to Add
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| `@t3-oss/env-nextjs` (this milestone) | Core value is fail-fast on missing *required* vars; new vars are optional display copy with fallbacks. Adds a dep + Next-version-coupled maintenance for a solo maintainer. | Plain module + already-installed zod. Revisit only if a future required-at-boot secret appears. |
+| `valibot` (1.4.2) | Smaller bundle than zod, but you already ship zod v4 for forms. Adding valibot = two validation libs, no benefit here. | Reuse zod v4. |
+| `dotenv` / `@next/env` at runtime | Next.js already auto-loads `.env*` into `process.env`. `@next/env` is only for *outside* the Next runtime (ORM config, test bootstrap) — not app code. | Built-in Next.js env loading. |
+| Looping/spreading to build client config (`Object.entries(process.env)`, `{...process.env}`) | Breaks `NEXT_PUBLIC_` inlining → `undefined` in the browser. | Explicit `process.env.NEXT_PUBLIC_X` literal per var. |
+| Email copy behind `NEXT_PUBLIC_` | Ships server-only copy into the client bundle unnecessarily. | Keep email copy server-only (no prefix). |
+| A runtime config API / no-redeploy editing | Out of scope per PROJECT.md; that role is filled by the Google Sheet. | Google Sheet for anything needing live edits. |
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
-|---|---|---|
-| **Better Auth** | **Clerk** | If you need auth shipped in a week with pre-built login UI, social OAuth, and multi-tenant orgs — and you accept the vendor relationship and per-user pricing. Clerk is faster to prototype but locks you into their platform. Better Auth gives full data ownership. For a supper club platform that may want to self-host eventually, Better Auth's self-hosted model is the right call. |
-| **Neon** | **Supabase** | If you want auth + storage + realtime bundled in one platform, Supabase is compelling. But since we're handling auth separately with Better Auth and uploads with UploadThing, Supabase's extras are unused overhead. Neon gives cleaner Postgres with branching. |
-| **Drizzle ORM** | **Prisma** | If your team has mixed seniority and prefers a schema-first approach with the deepest migration tooling. Prisma 7 narrowed the edge-runtime gap via driver adapters. Drizzle wins for bundle size (~7kb vs Prisma's larger footprint) and SQL fidelity. For a new project with Neon, Drizzle is the 2026 default. |
-| **UploadThing** | **Vercel Blob** | If already on Vercel Pro and want the simplest possible integration for small files (<4MB). Vercel Blob's SDK bypasses the 4.5MB serverless body limit with signed URLs. UploadThing's pre-built dropzone is faster for MVP; both are fine — pick one and commit. |
-| **Resend** | **SendGrid / AWS SES** | If you're already on SendGrid or need marketing campaign features. For purely transactional email (RSVPs, notifications), Resend's API + React Email is cleaner and the free tier covers MVP scale. |
-| **Vercel** | **Railway** | If you need persistent background workers or long-running websocket processes alongside the app. Railway is cheaper at scale ($30-60/mo vs Vercel's $150-400+ at production). But for a standard Next.js app with occasional CRUD and email sending, Vercel's Next.js integration is unmatched. |
-
-## What NOT to Use
-
-| Avoid | Why | Use Instead |
-|---|---|---|
-| **Mongoose / MongoDB** | No joins for event RSVPs means application-level joins and consistency headaches. An event platform with users, events, RSVPs, and menus is fundamentally relational. Postgres + Drizzle handles this naturally. | Neon (Postgres) + Drizzle ORM |
-| **Auth.js v5 / NextAuth** | Auth.js has handed off active development to Better Auth. The official migration page recommends Better Auth for new projects. Auth.js v5 still receives security patches but the ecosystem momentum has shifted. Starting a new project on Auth.js in 2026 means accepting a deprecated trajectory. | Better Auth |
-| **Prisma (for this project)** | Prisma's Rust binary engine creates cold-start issues on serverless, the bundle is larger, and the higher abstraction level hides SQL — which matters for event queries (RSVP counts, date-range filters, location proximity). Drizzle's SQL-shaped API gives more control with less overhead. | Drizzle ORM |
-| **Moment.js** | Deprecated, large bundle, not tree-shakeable. date-fns is the modern replacement with functional API and tree-shaking. Every event platform does date math — don't start with Moment. | date-fns |
-| **Nodemailer** | SMTP-based, no React Email support, no built-in deliverability tooling. Requires manual SPF/DKIM/DMARC setup and server SMTP credentials. Resend's HTTPS API eliminates socket management. | Resend + React Email |
-| **PlanetScale (MySQL)** | Eliminated free tier in 2024. Minimum $39/mo. For a Postgres-native stack (Drizzle + Neon), MySQL compatibility is an unnecessary constraint. | Neon |
-| **Redux / Zustand (client state)** | This is an event platform, not a stateful SPA. Next.js Server Components handle most data fetching. URL params handle filter/search state. Any component-level state (form inputs) is local. Adding a client state library is premature. | React Server Components + Server Actions + URL search params |
-| **tRPC** | Adds a layer of abstraction between Server Actions and the client. Next.js 16 Server Actions are already typed RPC — `"use server"` functions called directly from forms/buttons with full type safety. tRPC is redundant in the App Router era. | Server Actions |
-
-## Stack Patterns by Variant
-
-**If deploying self-hosted (not Vercel):**
-- Swap UploadThing → Cloudflare R2 with presigned URLs (cheaper at scale, zero egress fees)
-- Keep everything else the same
-- Hosting: Railway ($5-30/mo for a full Postgres + Next.js setup) or Coolify on a $6/mo VPS
-- Because: Vercel's pricing is great for MVP but can scale faster than revenue at production levels
-
-**If shipping MVP in <2 weeks:**
-- Use Clerk instead of Better Auth (pre-built login UI saves days)
-- Keep everything else the same
-- Because: The tradeoff of vendor lock-in is worth it for speed-to-validation. Plan a migration to Better Auth post-MVP if needed.
-
-**If payments become needed later (Phase 2+):**
-- Add Stripe (latest SDK)
-- Add Stripe webhooks → Resend for receipt emails
-- No database migration needed — Drizzle schema extends with `orders` and `payments` tables
-- Because: Payment processing was explicitly deferred in PROJECT.md. When it arrives, the stack handles it cleanly.
+|-------------|-------------|-------------------------|
+| Plain module + zod | `@t3-oss/env-nextjs@0.13.11` | You add a *required* var that must hard-fail build/deploy when unset (DB URL, auth secret), or a team wanting a runtime server-var-leak guard worth a dependency. |
+| zod v4 (installed) | valibot 1.4.2 | Greenfield project with no existing validation lib and a strict client-bundle-size budget. Not applicable — zod already present. |
+| zod schema with `.default()` | Hand-rolled `?? "fallback"` + TS `interface` | You want the absolute minimum, are fine writing fallbacks + types by hand, and skip coercion. Valid; saves ~15 lines but loses inferred types + coercion. Zod is the better free option since it's already there. |
 
 ## Version Compatibility
 
-| Package | Compatible With | Notes |
-|---|---|---|
-| Next.js 16.x + React 19.x | Drizzle ORM ^0.42.x | Drizzle has first-class edge/Server Component support. No native dependencies. Verified working in production. |
-| Next.js 16.x + React 19.x | Better Auth ^1.x | Better Auth uses standard Request/Response — works in both Node.js runtime and edge. Pair with `@better-auth/drizzle` adapter. |
-| Drizzle ORM + Neon | `@neondatabase/serverless` (latest) | Drizzle's `neon` HTTP driver adapter or the WebSocket driver. Both work. HTTP is faster for serverless (fewer connections). |
-| shadcn/ui + TailwindCSS v4 | Latest (shadcn 4.12.0+) | shadcn/ui v4 supports TailwindCSS v4 natively. Run `npx shadcn@latest init` to set up. |
-| Resend + React Email | `resend` SDK + `@react-email/components` | Render email templates to HTML with `render()` on the server only. Never import React Email components in client bundles. |
-| `ics` ^3.12.0 + Node.js | ESM and CJS | ESM import: `import * as ics from 'ics'`. Works in Route Handlers and Server Actions. No native dependencies. |
+| Package A | Compatible With | Notes |
+|-----------|-----------------|-------|
+| next@16.2.10 | zod@4.4.3 | No coupling — zod is runtime-agnostic. ✓ |
+| @t3-oss/env-nextjs@0.13.11 (if ever added) | zod@^3.24.0 \|\| ^4.0.0 | Peer range covers installed zod 4.4.3. Also peers `next`. ✓ but not recommended now. |
 
 ## Sources
 
-- [Better Auth docs](https://better-auth.com/) — Library docs and installation guide. Confidence: HIGH (official docs)
-- [Drizzle ORM docs](https://orm.drizzle.team/) — Current version and API reference. Confidence: HIGH (official docs)
-- [Neon docs](https://neon.tech/docs) — Serverless Postgres configuration. Confidence: HIGH (official docs)
-- [LogRocket — Best auth library for Next.js 2026](https://blog.logrocket.com/best-auth-library-nextjs-2026/) — Comparison of Auth.js, Clerk, WorkOS, Better Auth. Published Apr 2026. Confidence: MEDIUM (blog, but well-researched)
-- [Shubhra Dev — Next.js 16 Auth 2026](https://shubhra.dev/blog/nextjs-16-auth-better-auth-vs-clerk-vs-authjs) — Direct comparison with Auth.js → Better Auth migration context. Published Jun 2026. Confidence: MEDIUM (personal blog, but cites official migration docs)
-- [Cadence blog — File uploads Next.js 2026](https://cadence.withremote.ai/blog/file-uploads-nextjs) — UploadThing vs Vercel Blob vs R2 comparison. Published May 2026. Confidence: MEDIUM
-- [Cadence blog — Drizzle vs Prisma 2026](https://cadence.withremote.ai/blog/drizzle-vs-prisma) — ORM comparison. Published May 2026. Confidence: MEDIUM
-- [DesignRevision — Neon vs Supabase vs PlanetScale 2026](https://designrevision.com/blog/supabase-vs-neon) — Database comparison. Published Feb 2026. Confidence: MEDIUM
-- [Resend docs — Send with Next.js](https://resend.com/docs/send-with-nextjs) — Official integration guide. Confidence: HIGH (official docs)
-- [Next.js Launchpad — Resend + React Email 2026](https://nextjslaunchpad.com/article/nextjs-transactional-emails-resend-react-email) — Transactional email patterns. Published May 2026. Confidence: MEDIUM
-- [Causo Hub — Vercel vs alternatives 2026](https://hub.causo.ai/guides/vercel-vs-alternatives-founders-2026) — Hosting comparison for founders. Published May 2026. Confidence: MEDIUM
-- [DEV Community — Managed Postgres for Next.js 2026](https://dev.to/whoffagents/neon-vs-supabase-vs-planetscale-managed-postgres-for-nextjs-in-2026-2el4) — Database provider comparison. Published Apr 2026. Confidence: MEDIUM
-- [ics npm package](https://www.npmjs.com/package/ics) — v3.12.0 released Apr 2026. Confidence: HIGH (package registry)
-- [shadcn/ui GitHub](https://github.com/shadcn-ui/ui) — Latest v4.12.0 (Jun 2026), Next.js 16.2.6 support. Confidence: HIGH (official repo)
+- `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md` (bundled with installed next@16.2.10) — HIGH: `NEXT_PUBLIC_` build-time inlining, no-dynamic-lookup rule, server-only default, runtime env via `connection()`, load order. Authoritative for this exact Next version.
+- Codebase inspection (`lib/brevo.ts`, `lib/razorpay.ts`, `components/PaymentSection.tsx`, `lib/validations.ts`, `package.json`) — HIGH: existing `process.env` patterns; zod@4.4.3 already installed and used for validation.
+- `npm view` — HIGH: `@t3-oss/env-nextjs@0.13.11` (peers: zod `^3.24.0 || ^4.0.0`, valibot, arktype, typescript ≥5), `zod@4.4.3`, `valibot@1.4.2`.
+- [T3 Env — Next.js docs](https://env.t3.gg/docs/nextjs) & [t3-oss/t3-env GitHub](https://github.com/t3-oss/t3-env) — MEDIUM/HIGH: `runtimeEnv` vs `experimental__runtimeEnv` manual destructuring stems from the same Next inlining rule.
+- [Next.js Guides: Environment Variables](https://nextjs.org/docs/pages/guides/environment-variables) — HIGH: corroborates bundled docs.
 
 ---
-*Stack research for: Supper club / event-hosting platform*
-*Researched: 2026-07-02*
+*Stack research for: env-driven centralized site config (Next.js 16 App Router + TypeScript)*
+*Researched: 2026-07-13*

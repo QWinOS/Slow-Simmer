@@ -1,8 +1,25 @@
 # Architecture Research
 
-**Domain:** Community dining / supper club event hosting platform
-**Researched:** 2026-07-02
-**Confidence:** HIGH
+**Domain:** Env-driven site configuration for an existing Next.js 16 App Router app ("Slow Simmer")
+**Researched:** 2026-07-13
+**Confidence:** HIGH (grounded in the actual codebase + Next.js 16 env docs at `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md`)
+
+> **Milestone note (v1.1):** This file was previously the v1.0 platform-architecture research (a hypothetical Prisma/NextAuth design that did not match the shipped app). It has been replaced with architecture research scoped to the v1.1 goal: integrating a central env-driven config module into the *existing* codebase. The prior content is preserved in git history.
+
+## The Decisive Decision (read this first)
+
+**Split the config into two modules. Do NOT ship a single `lib/site-config.ts` imported by both server and client.**
+
+- `lib/site-config.ts` — **PUBLIC** config. Only `NEXT_PUBLIC_*` values (brand, tagline, SEO, social links, marketing copy). Safe to import from Server Components AND Client Components.
+- `lib/site-config.server.ts` — **SERVER-ONLY** config. Non-public secrets/copy (email subject/body/signature, contact number, sender). Imported only by `lib/*` server modules and route handlers. Guarded with `import "server-only"` at the top.
+
+**Why a split is mandatory here, not just tidy:**
+
+1. **Inlining requires *static* `process.env.NEXT_PUBLIC_X` references.** The Next.js 16 doc is explicit: dynamic lookups are *not* inlined (`environment-variables.md` lines 182–191 — "This will NOT be inlined, because it uses a variable"). If you build a config object by iterating keys, destructuring `process.env`, or indexing `process.env[name]`, the browser bundle gets `undefined`. So the public module must reference each `process.env.NEXT_PUBLIC_*` var *by its literal name*, one line each.
+2. **Non-public vars are `undefined` in the browser.** "By default, environment variables are only available on the server" (line 198); "Non-`NEXT_PUBLIC_` environment variables are only available in the Node.js environment... they aren't accessible to the browser" (line 156). A single shared module that reads `process.env.BREVO_...` *and* `process.env.NEXT_PUBLIC_...` in the same file is tempting to import from a client component; the moment someone does, the server values silently become `undefined` client-side — or worse, a maintainer "fixes" it by adding a `NEXT_PUBLIC_` prefix and leaks a secret. The physical split makes the boundary unbypassable: the client literally cannot import the server module (`server-only` throws at build).
+3. **The codebase already uses the correct pattern.** `components/PaymentSection.tsx:77` reads `process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!` as a direct static reference inside a `"use client"` file. The new public config module simply generalizes this existing, proven pattern. Server modules (`lib/brevo.ts`, `lib/sheets-write.ts`, `lib/google-auth.ts`, `lib/razorpay.ts`) already read bare `process.env.*` directly.
+
+> Single most load-bearing constraint: **the public module is a flat list of literal `process.env.NEXT_PUBLIC_*` reads with fallbacks; the server module holds everything else and is fenced with `import "server-only"`.**
 
 ## Standard Architecture
 
@@ -10,470 +27,258 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                     PRESENTATION LAYER                            │
-│  (Next.js App Router — React Server Components)                   │
-├──────────────────────────────────────────────────────────────────┤
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐         │
-│  │  Public  │  │  Host    │  │  Guest   │  │  Auth    │         │
-│  │  Pages   │  │ Dashboard│  │ Dashboard│  │  (Login) │         │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘         │
-│       │              │             │             │                │
-├───────┴──────────────┴─────────────┴─────────────┴────────────────┤
-│                      APPLICATION LAYER                              │
-│  (Server Actions / Route Handlers / Services)                      │
-├──────────────────────────────────────────────────────────────────┤
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐ │
-│  │  Event   │  │  RSVP    │  │  Profile │  │  Notification    │ │
-│  │  Service │  │  Service │  │  Service │  │  Service         │ │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────┬──────────┘ │
-│       │              │             │                 │            │
-├───────┴──────────────┴─────────────┴─────────────────┴────────────┤
-│                       DATA LAYER                                    │
-│  ┌─────────────────────────────────────────────────────────────┐  │
-│  │         Prisma ORM + PostgreSQL (Supabase / Neon)           │  │
-│  └─────────────────────────────────────────────────────────────┘  │
-│  ┌─────────────────────────────────────────────────────────────┐  │
-│  │              File Storage (Uploadthing / R2)                 │  │
-│  └─────────────────────────────────────────────────────────────┘  │
+│                       BROWSER BUNDLE (client)                     │
+│  ┌────────────┐ ┌──────────────┐ ┌──────────┐ ┌───────────────┐  │
+│  │HeroSection │ │MembershipSec.│ │ NavBar   │ │PaymentSection │  │
+│  │"use client"│ │ "use client" │ │"use clnt"│ │ "use client"  │  │
+│  └─────┬──────┘ └──────┬───────┘ └────┬─────┘ └───────┬───────┘  │
+│        └───────────────┴──────────────┴───────────────┘          │
+│                            imports ▼                              │
+│              ┌───────────────────────────────────┐               │
+│              │  lib/site-config.ts  (PUBLIC)      │  ← inlined at │
+│              │  siteConfig = { name, tagline,     │    build time │
+│              │    seo, social{ig,yt,li,wa}, copy } │               │
+│              └───────────────────────────────────┘               │
 └──────────────────────────────────────────────────────────────────┘
+                             ▲ same module ▲
+┌──────────────────────────────────────────────────────────────────┐
+│                    SERVER (RSC + route handlers)                  │
+│  ┌────────────┐ ┌──────────┐ ┌─────────────┐ ┌────────────────┐  │
+│  │ layout.tsx │ │AboutSect.│ │  Footer.tsx │ │ api/* handlers │  │
+│  │ (metadata) │ │ (RSC)    │ │   (RSC)     │ │                │  │
+│  └─────┬──────┘ └────┬─────┘ └──────┬──────┘ └───────┬────────┘  │
+│        │ imports     │ imports      │ imports        │ imports    │
+│        ▼ site-config ▼ site-config  ▼ site-config    ▼ BOTH       │
+│                                                        │           │
+│              ┌────────────────────────────────────────┴───────┐  │
+│              │  lib/site-config.server.ts (SERVER-ONLY)        │  │
+│              │  import "server-only"                           │  │
+│              │  serverConfig{ email{subject,body,sig},        │  │
+│              │    contact, sender } — reads bare process.env.* │  │
+│              └────────────────────┬───────────────────────────┘  │
+│                                   │ consumed by                   │
+│                            ┌──────▼───────┐                       │
+│                            │ lib/brevo.ts │                       │
+│                            └──────────────┘                       │
+└──────────────────────────────────────────────────────────────────┘
+
+Event date/time/price/location — NOT here. Stays in Google Sheet,
+fetched at runtime via /api/locations (unchanged, out of scope).
 ```
 
 ### Component Responsibilities
 
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| Auth System | User registration, login, session management, role-based access | NextAuth.js v5 with credentials + OAuth (Google), JWT sessions |
-| Public Pages | Event discovery, browsing, search, landing page | Server Components with RSC data fetching, ISR for public event list |
-| Host Dashboard | Event CRUD, guest list view, RSVP management, event editing | Server Components + Server Actions (mutations), client components for interactive parts |
-| Guest Dashboard | RSVP management, upcoming events, profile editing | Server Components + Server Actions |
-| Event Service | Event creation, validation, capacity checks, scheduling | Server Actions with Prisma transactions |
-| RSVP Service | RSVP create/update/cancel, capacity enforcement, waitlist | Server Actions with DB transaction (atomic capacity check) |
-| Profile Service | User profile CRUD, preferences, dietary restrictions | Server Actions |
-| Notification Service | Email reminders, in-app notifications | Background job via Vercel Cron / Bull with Redis (if needed) |
-| File Upload | Event images, host profile photos | Uploadthing / direct S3-compatible upload with presigned URLs |
+| Module | Responsibility | Import boundary |
+|--------|----------------|-----------------|
+| `lib/site-config.ts` (NEW) | Public brand/SEO/social/marketing copy. Flat object of literal `process.env.NEXT_PUBLIC_*` reads, each with a fallback default. | Server + Client (universal) |
+| `lib/site-config.server.ts` (NEW) | Email subject/body/signature, contact number, sender name/email. Reads bare `process.env.*`. First line `import "server-only"`. | Server only (build error if imported client-side) |
+| `app/layout.tsx` (MODIFIED) | Pulls `metadata.title` / `description` from `site-config.ts`. | Server (RSC) |
+| `lib/brevo.ts` (MODIFIED) | Reads email copy from `site-config.server.ts` instead of hardcoded strings. | Server |
+| Client components (MODIFIED) | Read brand/social/copy from `site-config.ts`. | Client |
+| Google Sheet + `/api/locations` (UNCHANGED) | Event date/time/price/location at runtime. | out of scope |
 
 ## Recommended Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── (public)/           # Public routes (no auth required)
-│   │   ├── page.tsx        # Landing page / event discovery
-│   │   ├── events/         # Event browsing and search
-│   │   │   ├── page.tsx    # Event list (server component, search params)
-│   │   │   └── [id]/       # Event detail page
-│   │   │       └── page.tsx
-│   │   └── auth/           # Auth pages (login, register)
-│   │       ├── login/page.tsx
-│   │       └── register/page.tsx
-│   ├── (authenticated)/    # Authenticated routes layout
-│   │   ├── layout.tsx      # Auth check wrapper
-│   │   ├── dashboard/      # User dashboard
-│   │   │   └── page.tsx
-│   │   └── profile/        # Profile editing
-│   │       └── page.tsx
-│   ├── host/               # Host-specific routes
-│   │   ├── layout.tsx      # Host role gate
-│   │   ├── events/         # Host's event management
-│   │   │   ├── new/page.tsx
-│   │   │   └── [id]/       # Manage specific event
-│   │   │       ├── page.tsx          # Event detail + guest list
-│   │   │       └── edit/page.tsx
-│   │   └── dashboard/page.tsx
-│   └── api/                # API routes (if needed beyond Server Actions)
-│       └── [[...route]]/route.ts  # Optional tRPC/hono handler
-│
-├── components/             # Shared UI components
-│   ├── ui/                 # Base UI primitives (Button, Card, Modal, etc.)
-│   ├── events/             # Event-specific components
-│   │   ├── EventCard.tsx
-│   │   ├── EventForm.tsx
-│   │   ├── EventDetail.tsx
-│   │   └── RSVPButton.tsx
-│   ├── profile/            # Profile components
-│   └── layout/             # Layout components (Nav, Footer)
-│
-├── lib/                    # Business logic and shared utilities
-│   ├── db/                 # Database layer
-│   │   ├── prisma.ts       # Prisma client singleton
-│   │   └── schema.prisma   # Prisma schema (or in /prisma/)
-│   ├── auth/               # Auth configuration
-│   │   ├── auth.ts         # NextAuth config
-│   │   └── roles.ts        # Role definitions and guards
-│   ├── services/           # Domain services
-│   │   ├── event-service.ts      # Event CRUD + validation
-│   │   ├── rsvp-service.ts       # RSVP logic + capacity
-│   │   ├── profile-service.ts    # User profiles
-│   │   ├── notification-service.ts # Notification dispatch
-│   │   └── search-service.ts     # Event search/filter logic
-│   ├── validations/        # Zod schemas for input validation
-│   │   ├── event.ts
-│   │   ├── rsvp.ts
-│   │   └── profile.ts
-│   └── utils/              # Shared helpers
-│       ├── dates.ts
-│       └── formatters.ts
-│
-├── types/                  # TypeScript type definitions
-│   ├── index.ts
-│   └── prisma.ts           # Prisma-generated types (re-exported)
-│
-├── config/                 # Configuration
-│   ├── site.ts             # Site-wide config
-│   └── constants.ts        # App constants
-│
-├── hooks/                  # Client-side hooks
-│   └── use-debounce.ts     # Search debouncing
-│
-└── styles/                 # Global styles
-    └── globals.css         # TailwindCSS v4 entry
+lib/
+├── site-config.ts          # NEW — PUBLIC (NEXT_PUBLIC_*), universal import
+├── site-config.server.ts   # NEW — SERVER-ONLY (import "server-only")
+├── brevo.ts                # MODIFIED — consumes site-config.server.ts
+├── razorpay.ts             # unchanged
+├── sheets-write.ts         # unchanged
+├── google-auth.ts          # unchanged
+└── locations.ts            # unchanged (event data stays in Sheet)
+app/
+└── layout.tsx              # MODIFIED — metadata from site-config.ts
+components/
+├── Footer.tsx              # MODIFIED — brand + social hrefs from site-config.ts  (RSC)
+├── AboutSection.tsx        # MODIFIED — story highlights + cities              (RSC)
+├── NavBar.tsx              # MODIFIED — brand name                          (client)
+├── HeroSection.tsx         # MODIFIED — hero copy, seat count, cities       (client)
+├── MembershipSection.tsx   # MODIFIED — reasons/steps copy                  (client)
+└── PaymentSection.tsx      # (optional) — "Slow Simmer" strings → config    (client)
+.env.example                # MODIFIED — document every new NEXT_PUBLIC_* + server var
+package.json                # MODIFIED — add `server-only` dependency
 ```
 
 ### Structure Rationale
 
-- **`app/` with route groups:** Group routing by auth status (`(public)`, `(authenticated)`) keeps the route tree clean and makes middleware rules obvious. Host-only routes live in a separate `host/` segment for clear role boundaries.
-- **`lib/services/`:** Domain services encapsulate all business logic in pure functions. Server Actions call services, not the database directly. This makes logic testable independently of the framework.
-- **`lib/validations/`:** Zod schemas live separate from services so they can be shared between Server Actions and client-side forms (progressive enhancement).
-- **`components/events/` and `components/profile/`:** Feature-colocated components split from generic UI primitives. Primitives can be extracted to an external library later (e.g., shadcn/ui).
+- **Two files, not a folder.** The surface is a few dozen strings. A `config/` directory is overkill; two sibling `lib/` files sit naturally next to the existing server modules and are easy to find.
+- **`.server.ts` naming is the boundary signal.** The filename declares intent before a reviewer opens it; the `import "server-only"` line enforces it mechanically at build.
+- **Do NOT use `next.config.ts` `env:`.** The existing `next.config.ts` has no `env` block and shouldn't gain one — it's the legacy mechanism, supports no fallbacks/typing, and scatters config away from the typed module. Read `process.env.NEXT_PUBLIC_*` directly inside `site-config.ts`.
 
 ## Architectural Patterns
 
-### Pattern 1: RSC-First Data Fetching with Server Actions
+### Pattern 1: Public config as a flat object of literal env reads
 
-**What:** Event data and page content are fetched in Server Components. Mutations (RSVP, create event) are handled via Server Actions — HTML form actions that POST to the server without a separate API layer.
-
-**When to use:** For all page-level data fetching and mutations in the supper club app. This is the recommended Next.js App Router pattern.
-
-**Trade-offs:**
-- (+) No client-state library needed for most data — RSC handles freshness
-- (+) Server Actions work without JavaScript (progressive enhancement)
-- (+) No manual API route boilerplate for internal operations
-- (-) Server Actions post to the same origin — not designed for third-party API consumption
-- (-) Need `"use server"` directives carefully scoped to avoid bundling server code on the client
-
-**Example:**
-```typescript
-// app/(public)/events/[id]/page.tsx — Server Component
-import { getEventById } from "@/lib/services/event-service";
-import { notFound } from "next/navigation";
-import { EventDetail } from "@/components/events/EventDetail";
-import { RSVPForm } from "@/components/events/RSVPForm";
-
-export default async function EventPage({ params }: { params: { id: string } }) {
-  const event = await getEventById(params.id);
-  if (!event) notFound();
-  return (
-    <div>
-      <EventDetail event={event} />
-      {/* RSVPForm will use a Server Action for the mutation */}
-      <RSVPForm eventId={event.id} capacity={event.capacity}
-        currentRsvps={event._count.rsvps} />
-    </div>
-  );
-}
-```
+**What:** Every public value is a hand-written line so Next's compiler can statically inline it.
+**When to use:** Any value a Client Component or `<head>` metadata needs.
+**Trade-offs:** Verbose (one line per var), but the verbosity is *required* for inlining — not optional boilerplate.
 
 ```typescript
-// components/events/RSVPForm.tsx — Client Component with Server Action
-"use client";
-import { rsvpForEvent } from "@/lib/services/rsvp-service";
-
-export function RSVPForm({ eventId, capacity, currentRsvps }: Props) {
-  const isFull = currentRsvps >= capacity;
-  return (
-    <form action={rsvpForEvent.bind(null, eventId)}>
-      <input type="number" name="guestCount" min={1} max={5} defaultValue={1} />
-      <button type="submit" disabled={isFull}>
-        {isFull ? "Event Full" : "RSVP"}
-      </button>
-    </form>
-  );
-}
+// lib/site-config.ts  — NO "use client", NO "server-only": universal
+// Each process.env.NEXT_PUBLIC_* is referenced by literal name so it inlines.
+export const siteConfig = {
+  name: process.env.NEXT_PUBLIC_SITE_NAME ?? "Slow Simmer",
+  tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE ?? "An Unhurried Supper Club",
+  seo: {
+    title:
+      process.env.NEXT_PUBLIC_SEO_TITLE ??
+      "Slow Simmer — An Unhurried Supper Club",
+    description:
+      process.env.NEXT_PUBLIC_SEO_DESCRIPTION ??
+      "A supper club for good food and better company. Seasonal menus, shared tables, and evenings made to linger. Join us at the next supper.",
+  },
+  social: {
+    instagram: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM ?? "",
+    youtube: process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE ?? "",
+    linkedin: process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN ?? "",
+    whatsapp: process.env.NEXT_PUBLIC_SOCIAL_WHATSAPP ?? "",
+  },
+} as const;
 ```
+
+### Pattern 2: `server-only` fence for secret-adjacent config
+
+**What:** A poison-pill import that fails the build if the module ever reaches a Client Component graph.
+**When to use:** Email copy, contact number, sender — anything not `NEXT_PUBLIC_`.
+**Trade-offs:** Adds the tiny `server-only` package (see note below), for build-enforced safety.
 
 ```typescript
-// lib/services/rsvp-service.ts — Server Action
-"use server";
-import { prisma } from "@/lib/db/prisma";
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
+// lib/site-config.server.ts
+import "server-only"; // build error if imported from a client component
 
-const rsvpSchema = z.object({
-  guestCount: z.number().int().min(1).max(5),
-});
-
-export async function rsvpForEvent(eventId: string, formData: FormData) {
-  const session = await auth(); // NextAuth session
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
-  const data = rsvpSchema.parse({
-    guestCount: Number(formData.get("guestCount")),
-  });
-
-  // Transaction: check capacity atomically
-  await prisma.$transaction(async (tx) => {
-    const event = await tx.event.findUniqueOrThrow({
-      where: { id: eventId },
-      select: { capacity: true },
-    });
-    const currentRsvps = await tx.rSVP.count({
-      where: { eventId, status: "GOING" },
-    });
-    if (currentRsvps + data.guestCount > event.capacity) {
-      throw new Error("Event is full");
-    }
-    await tx.rSVP.create({
-      data: {
-        userId: session.user.id,
-        eventId,
-        guestCount: data.guestCount,
-        status: "GOING",
-      },
-    });
-  });
-
-  revalidatePath(`/events/${eventId}`);
-}
+export const serverConfig = {
+  email: {
+    subject:
+      process.env.EMAIL_SUBJECT ?? "You're registered for Slow Simmer!",
+    signature: process.env.EMAIL_SIGNATURE ?? "— Slow Simmer Team",
+    // body template pieces as needed...
+  },
+  contactNumber: process.env.CONTACT_NUMBER ?? "",
+  sender: {
+    email: process.env.BREVO_SENDER_EMAIL,
+    name: process.env.BREVO_SENDER_NAME ?? "Slow Simmer",
+  },
+} as const;
 ```
 
-### Pattern 2: Repository-Service Boundary
+> **Dependency note:** `client-only` is already installed in `node_modules`, but `server-only` is **NOT**. Add it: `npm i server-only`. (If the team prefers zero new deps, an alternative fence is a runtime `if (typeof window !== "undefined") throw` at module top — weaker, runtime-only, and does not stop bundling; `server-only` is strongly recommended.)
 
-**What:** Domain services never call Prisma directly. A thin repository layer wraps Prisma queries, and services orchestrate repositories + validation + auth checks. For an MVP this can be simplified — services call Prisma directly — but the logical separation (query logic vs. business logic) should be maintained.
+### Pattern 3: Fallback-to-current-string (behavior-preserving refactor)
 
-**When to use:** As soon as there are 3+ services that need to share query logic. Start with services calling Prisma directly; extract a repository when a query appears in multiple services.
+**What:** Every accessor's default value is *the exact string currently hardcoded* in the component.
+**When to use:** During the refactor of each existing component.
+**Trade-offs:** None — this is the mechanism that guarantees "zero behavior change." With no env var set, the app renders byte-identically to today.
 
-**Trade-offs:**
-- (+) Clear separation: services own business rules, repositories own data access
-- (+) Testing: services can be tested with mock repositories
-- (-) Extra indirection for simple CRUD — over-engineering if applied too early
-
-### Pattern 3: Atomic Capacity Enforcement
-
-**What:** RSVP creation must atomically check and decrement available capacity to prevent overbooking. Use a Prisma `$transaction` to check and write in a single operation.
-
-**When to use:** Every mutation that modifies a count-based resource (RSVP count, ticket sales, seat reservations).
-
-**Trade-offs:**
-- (+) Prevents race conditions on concurrent RSVPs
-- (-) Slightly higher latency per RSVP (transaction overhead)
-- (-) Can become a bottleneck at very high concurrency — premature optimization concern for this scale
-
-```typescript
-// The canonical pattern — see the RSVP Server Action above for full example
-await prisma.$transaction(async (tx) => {
-  const event = await tx.event.findUniqueOrThrow({
-    where: { id: eventId },
-    select: { capacity: true, _count: { select: { rsvps: true } } },
-  });
-  if (event._count.rsvps >= event.capacity) throw new Error("Full");
-  await tx.rSVP.create({ data: { userId, eventId, status: "GOING" } });
-});
-```
+**Example:** `NavBar.tsx` brand `"Slow Simmer"` → `{siteConfig.name}` with fallback `"Slow Simmer"`. Unset env ⇒ identical output.
 
 ## Data Flow
 
-### Request Flow
+### Build-time flow (public config)
 
 ```
-[BROWSE EVENTS]
-  Guest visits /events
-      ↓
-  Server Component `EventListPage`
-      ↓
-  Calls `getEvents(searchParams)` service
-      ↓
-  Prisma query to PostgreSQL (filtered, paginated)
-      ↓
-  Returns serialized event list (RSC payload)
-      ↓
-  Client renders EventCard components
-
-[RSVP TO EVENT]
-  Guest submits RSVP form
-      ↓
-  Server Action `rsvpForEvent(eventId, formData)`
-      ↓
-  Auth check → Zod validation → Prisma $transaction
-      ↓
-  Check capacity → Create RSVP → Send notification
-      ↓
-  revalidatePath(`/events/${eventId}`)
-      ↓
-  Server re-renders updated data
-      ↓
-  Client receives fresh RSC payload
-
-[CREATE EVENT]
-  Host submits event creation form
-      ↓
-  Server Action `createEvent(formData)`
-      ↓
-  Auth check (host role) → Zod validation
-      ↓
-  Geocode location → Create event in DB
-      ↓
-  revalidatePath(`/host/dashboard`) + redirect to /host/events/[id]
+next build
+   ↓ reads NEXT_PUBLIC_* from build environment
+process.env.NEXT_PUBLIC_SITE_NAME  →  inlined literal "Slow Simmer"
+   ↓
+lib/site-config.ts  →  bundled into every client chunk that imports it
+   ↓
+Hero / Membership / NavBar / Footer / About / layout metadata
 ```
 
-### State Management
+### Runtime flow (server config — email)
 
 ```
-PERSISTENT STATE   TEMPORARY STATE (Client-side only)
-┌──────────────┐   ┌─────────────────────────────┐
-│  PostgreSQL   │   │  Search filters (URL params) │
-│  (source of   │   │  Form state (controlled)     │
-│   truth)      │   │  Debounced search input      │
-└──────┬───────┘   │  Toast notifications          │
-       │           └─────────────────────────────┘
-       │
-┌──────▼───────┐
-│  Prisma ORM   │
-│  (type-safe)  │
-└──────┬───────┘
-       │
-┌──────▼───────┐
-│  RSC Cache    │
-│  (Next.js)    │  ← revalidatePath() / revalidateTag()
-└──────────────┘
+Razorpay webhook  →  app/api/webhooks/razorpay/route.ts
+   ↓
+lib/sheets-write.ts (writes registration)
+   ↓
+lib/brevo.ts  →  reads serverConfig from site-config.server.ts (runtime process.env)
+   ↓
+Brevo REST API  →  confirmation email
 ```
 
-**Rule:** No client-side state library (Zustand, Redux) for MVP. The RSC model eliminates the need for a global client store. The few client-interactive elements (search debouncing, form state) use React's built-in `useState`/`useReducer` scoped to the component.
-
-### Key Data Flows
-
-1. **Event Discovery Flow:** Guest → Server Component `/events` → Prisma query with search/filter params → Event cards rendered in RSC payload. Filters managed via URL search params, not client state.
-
-2. **RSVP Flow:** Guest → RSVP Server Action → transaction-based capacity check → RSVP created → notification dispatched → cache revalidated → page refreshes with updated count.
-
-3. **Event Creation Flow:** Host → EventForm Server Action → Zod validation → Prisma event create → redirect to event management page → host sees guest list placeholder.
-
-4. **Notification Flow:** Event trigger (RSVP, event edit, reminder) → Notification service → email via Resend / in-app notification stored in DB → delivered to recipient.
-
-## Database Schema
-
-### Core Tables
+### Runtime flow (event data — UNCHANGED, out of scope)
 
 ```
-users
-├── id          UUID (PK)
-├── name        String
-├── email       String (unique)
-├── image       String? (avatar URL)
-├── bio         String?
-├── role        Enum (USER, HOST)     ← host requires additional setup
-├── createdAt   DateTime
-└── updatedAt   DateTime
-
-events
-├── id          UUID (PK)
-├── hostId      UUID (FK → users)
-├── title       String
-├── description String
-├── date        DateTime
-├── location    String (address text)
-├── lat         Float? (geocoded)
-├── lng         Float? (geocoded)
-├── menu        String (menu description)
-├── capacity    Int
-├── status      Enum (DRAFT, PUBLISHED, CANCELLED, COMPLETED)
-├── createdAt   DateTime
-├── updatedAt   DateTime
-└── images      EventImage[] (relation)
-
-event_images
-├── id          UUID (PK)
-├── eventId     UUID (FK → events)
-├── url         String
-└── order       Int
-
-rsvps
-├── id          UUID (PK)
-├── eventId     UUID (FK → events)
-├── userId      UUID (FK → users)
-├── status      Enum (GOING, MAYBE, NOT_GOING)
-├── guestCount  Int (default: 1)
-├── createdAt   DateTime
-└── updatedAt   DateTime
-└── UNIQUE(eventId, userId)  ← one RSVP per user per event
-
-notifications
-├── id          UUID (PK)
-├── userId      UUID (FK → users)
-├── type        Enum (RSVP_CONFIRMED, EVENT_REMINDER, EVENT_CANCELLED, GUEST_JOINED)
-├── title       String
-├── body        String
-├── read        Boolean (default: false)
-├── link        String? (deep link to resource)
-├── createdAt   DateTime
-└── deliveredAt DateTime?
+Client mount  →  fetch("/api/locations")  →  Google Sheet
+   ↓
+location / date / time / price  →  RegistrationProvider → PaymentSection
 ```
 
-### Key Indexes
+### Key data flows
 
-| Table | Index | Purpose |
-|-------|-------|---------|
-| events | `(date, status)` | Filter upcoming published events |
-| events | `hostId, status` | Host dashboard queries |
-| events | `title` (GIN trgm) | Full-text search on event titles |
-| rsvps | `(eventId, status)` | Count RSVPs by event |
-| rsvps | `(userId, status)` | Guest's upcoming events |
-| notifications | `(userId, read, createdAt)` | Unread notification count |
+1. **Public copy:** frozen at `next build` — "After being built, your app will no longer respond to changes to these environment variables" (`environment-variables.md` line 166). Acceptable and explicitly in-scope per PROJECT.md ("Out of Scope: Live-editable browser config — `NEXT_PUBLIC_` env vars are build-time").
+2. **Email copy:** read at request time on the server, so a `.env` change picks it up on redeploy without depending on build-time inlining semantics.
+3. **Event details:** never touch the config module — they remain a runtime Sheet fetch via `/api/locations`.
 
-### Schema Design Decisions
+## Suggested Build Order (dependency-aware; each step shippable & behavior-neutral)
 
-- **One RSVP per user per event** via unique constraint on `(eventId, userId)`. This prevents duplicate RSVPs. The `status` field handles changes (switching from GOING to NOT_GOING), not deletion.
-- **`guestCount` on RSVP** rather than creating individual guest records. For an MVP, tracking "party size" is sufficient. If per-guest details become needed later, normalize into a `guests` table.
-- **Event coordinates** (`lat`/`lng`) for map-based discovery. Geocode on event creation using a lightweight service (Google Maps API / Nominatim). Deferred if not in MVP.
-- **`status` on events** (DRAFT → PUBLISHED → CANCELLED) handles the lifecycle. DRAFT allows hosts to prepare before going live.
-- **Role system** is simple: `USER` vs `HOST`. A user creates a host profile (with additional fields like cuisine style, host bio) but the `role` flag gates host-only routes. No admin role needed for MVP.
+Ordered so every commit is independently deployable with **no visual/behavior change** (fallbacks = current strings):
 
-## Scaling Considerations
+1. **Scaffold both config modules + `.env.example` + dep.** Create `lib/site-config.ts` and `lib/site-config.server.ts` with every key defaulting to today's hardcoded string. `npm i server-only`. Document every var in `.env.example`. *No component imports yet → zero runtime change, fully shippable.*
+2. **Footer social links (highest user value, lowest risk).** Replace the two `href="#"` placeholders (`Footer.tsx:48,55`) + brand text with `siteConfig.social.*` / `siteConfig.name`. Footer is a Server Component — trivial, no client-boundary concern. *Delivers the headline v1.1 feature first.*
+3. **Brand identity + SEO metadata.** Wire `app/layout.tsx` metadata (`title`, `description`) and `NavBar.tsx` brand to `siteConfig`. Simple string swaps. *SEO title/desc now env-driven.*
+4. **Email copy (server side, isolated).** Refactor `lib/brevo.ts` to read from `serverConfig` (subject/signature/contact/sender/body). Only step touching the server-only module and the only one exercising the `server-only` fence. Keep existing `CONTACT_NUMBER`/`BREVO_*` var names to avoid touching deploy config. *Verify email still sends identically.*
+5. **Marketing copy blocks.** Move hero (`HeroSection` — copy + `DETAILS` seat/cities bar), about highlights + cities (`AboutSection`), membership reasons/steps (`MembershipSection`) into `siteConfig`. Largest string volume, purely public client/RSC reads. One component per commit. *Each commit independently visually-verifiable.*
+6. **(Optional) PaymentSection brand strings.** Swap `"Slow Simmer"` occurrences to `siteConfig.name`; leave the `NEXT_PUBLIC_RAZORPAY_KEY_ID` read exactly as-is (already correct).
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0-1k users | Monolith Next.js on Vercel. Single PostgreSQL instance (Neon free tier). Server Actions for everything. No background job infrastructure. |
-| 1k-100k users | Add Vercel Postgres / Neon scale-to-zero. Introduce Redis for rate limiting and cache hot queries (event detail pages). Add Vercel Cron for reminder jobs. Consider extracting notification dispatch to a Queue. |
-| 100k+ users | Split notification service into dedicated worker. Read replicas for event discovery queries. Consider materialized view for event search. CDN for event images. |
+**Ordering rationale:**
+- Step 1 must precede all others (the modules are the dependency for every later step).
+- Steps 2–3 are pure Server / simple client swaps — de-risk the pattern before the trickier server-only step.
+- Step 4 is isolated so the `server-only` build behavior is validated on its own; a fence misfire can't be confused with a copy change.
+- Step 5 is last because it's high-volume but low-risk; splitting per-component keeps each diff reviewable.
 
-### Scaling Priorities
+## Integration Points (enumerated by file)
 
-1. **First bottleneck: Capacity check concurrency on popular events.** At ~100 concurrent RSVPs on the same event, the `$transaction` with row lock will be the contention point. Mitigation: add a Redis counter for `remaining_spots` as a pre-check before the DB transaction; use optimistic locking.
+### New files
 
-2. **Second bottleneck: Event discovery queries.** Full-text search on `events` table with a GIN index works to ~50k rows. After that, consider pg_search (trgm) or external search (Typesense/MeiliSearch).
+| File | Kind | Reads |
+|------|------|-------|
+| `lib/site-config.ts` | Universal | `process.env.NEXT_PUBLIC_*` (literal reads) |
+| `lib/site-config.server.ts` | Server-only (`import "server-only"`) | bare `process.env.*` |
+
+### Modified files
+
+| File | Boundary | Change | Imports |
+|------|----------|--------|---------|
+| `app/layout.tsx` | RSC | `metadata.title`/`description` from config | `site-config.ts` |
+| `components/Footer.tsx` | RSC | social hrefs (`#`→env) + brand/tagline | `site-config.ts` |
+| `components/AboutSection.tsx` | RSC | story highlights, cities | `site-config.ts` |
+| `components/NavBar.tsx` | client | brand name | `site-config.ts` |
+| `components/HeroSection.tsx` | client | hero copy, seat count, cities (`DETAILS`) | `site-config.ts` |
+| `components/MembershipSection.tsx` | client | reasons/steps copy | `site-config.ts` |
+| `components/PaymentSection.tsx` | client (optional) | `"Slow Simmer"` strings | `site-config.ts` |
+| `lib/brevo.ts` | server | email subject/body/signature/contact/sender | `site-config.server.ts` |
+| `.env.example` | — | document all new vars | — |
+| `package.json` | — | add `server-only` dep | — |
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Client-Side Global State for Server Data
+### Anti-Pattern 1: One universal `site-config.ts` holding both public and secret values
 
-**What people do:** Fetch events in a client component, store in Zustand/Redux, dispatch actions to update, re-fetch on mount.
+**What people do:** Put `NEXT_PUBLIC_SITE_NAME` and `BREVO_SENDER_EMAIL` in the same importable module.
+**Why it's wrong:** A client import silently yields `undefined` for the server values; the "fix" (prefixing `NEXT_PUBLIC_`) leaks the secret into the browser bundle. No compiler warning.
+**Do this instead:** Two modules; fence the server one with `import "server-only"`.
 
-**Why it's wrong:** With RSC, the server is the source of truth. Client-side stores duplicate state, add complexity, and go stale. Next.js already handles caching, deduplication, and revalidation via RSC.
+### Anti-Pattern 2: Building the public config dynamically
 
-**Do this instead:** Fetch data in Server Components. Use `revalidatePath()` / `revalidateTag()` after mutations. Keep client state only for UI concerns (open/closed modals, form input values).
+**What people do:** `Object.fromEntries(...)`, `process.env[key]`, or `const { NEXT_PUBLIC_X } = process.env`.
+**Why it's wrong:** Next only inlines *static, literal* `process.env.NEXT_PUBLIC_X` references (`environment-variables.md` 182–191). Dynamic forms compile to `undefined` in the browser — the config silently blanks out in production.
+**Do this instead:** One literal `process.env.NEXT_PUBLIC_*` line per value, each with `?? "fallback"`.
 
-### Anti-Pattern 2: Over-Booking Due to Non-Atomic RSVP
+### Anti-Pattern 3: Moving event date/time/price/location into the config module
 
-**What people do:** Check `count(rsvps) < capacity` in application code, then `create(rsvp)` in a separate query. Between the check and the insert, another request sneaks in.
+**What people do:** "While we're at it, let's env-ify the event details too."
+**Why it's wrong:** Those are deliberately runtime-editable via the Google Sheet (PROJECT.md Out of Scope). Baking them into build-time `NEXT_PUBLIC_*` would freeze them and break the no-redeploy editing the client relies on.
+**Do this instead:** Leave `/api/locations` + Sheet flow untouched.
 
-**Why it's wrong:** Race condition — two guests both see 9/10 capacity and both RSVP, resulting in 11/10.
+### Anti-Pattern 4: Using `next.config.ts` `env:` for the new vars
 
-**Do this instead:** Wrap the capacity check and RSVP insert in a database transaction (Prisma `$transaction`). Even better: use a `SELECT ... FOR UPDATE` row lock on the event row within the transaction.
-
-### Anti-Pattern 3: Notification Logic Scattered in Services
-
-**What people do:** Call `sendEmail()` directly inside `rsvp-service.ts`, then again inside `event-service.ts` for cancellations, etc.
-
-**Why it's wrong:** Tight coupling between business logic and notification channels. Hard to change providers, add new channels, or debug delivery failures.
-
-**Do this instead:** Have services emit typed events (or return domain events) and let a dedicated notification handler react. At MVP scale, this can simply be a post-mutation call to a notification service, but keep the notification logic centralized.
-
-### Anti-Pattern 4: Direct Database Access in Client Components
-
-**What people do:** Import Prisma client in a client component to fetch data with `useEffect`.
-
-**Why it's wrong:** Exposes database credentials to the client bundle (if not using RSC boundaries). Bypasses Next.js data cache. Prevents progressive enhancement.
-
-**Do this instead:** Fetch in Server Components. If you need client interactivity, pass data as props from a parent Server Component. Use Server Actions for mutations.
+**What people do:** Add an `env` block to `next.config.ts`.
+**Why it's wrong:** No fallbacks, no typing, splits config across two places; `.env.local` already works with `NEXT_PUBLIC_` directly.
+**Do this instead:** Read `process.env` inside the typed config module.
 
 ## Integration Points
 
@@ -481,78 +286,24 @@ notifications
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Auth (NextAuth.js) | Server-side session via `auth()` helper in RSC | Supports OAuth (Google, GitHub) + credentials. JWT strategy for stateless sessions. |
-| Email (Resend / SendGrid) | Server Action → Notification service → Email API | For RSVP confirmations, reminders (24h before event). Template-based emails. |
-| Image Upload (Uploadthing) | Client-side upload with callback URL → Server Action saves URL to DB | Free tier supports most MVP needs. Server-only upload keys. |
-| Geocoding (optional) | Server Action → Nominatim / Google Geocoding API → store lat/lng | For map-based event discovery. Can be deferred. |
-| Map Display (optional) | Client component with leaflet/react-leaflet | Loads events from Server Component data. Deferred feature. |
+| Google Sheet (event data) | Runtime fetch via `/api/locations` | **Unchanged** — out of scope for v1.1 |
+| Brevo | Server `fetch` in `lib/brevo.ts` | Now sources copy from `site-config.server.ts`; keep existing `BREVO_*`/`CONTACT_NUMBER` var names |
+| Razorpay | `NEXT_PUBLIC_RAZORPAY_KEY_ID` in client | Already the correct pattern; the new public module mirrors it |
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Server Components ↔ Services | Direct function call (server-side) | Services imported directly in RSC — no overhead |
-| Client Components ↔ Server Actions | HTML form POST → Server Function | Progressive enhancement: works without JS |
-| Client Components ↔ Server Data | Props from parent Server Component | Data flows down; mutations flow up via Server Actions |
-| Services ↔ Database | Prisma ORM | All DB access goes through Prisma — no raw SQL except for migrations |
-| Services → Notifications | Direct function call (MVP) → extract to queue later | Centralized Notification service keeps it manageable |
-
-## Build Order (Component Dependencies)
-
-### Phase 1: Auth + User Profiles (Foundation)
-```
-Dependencies: None — everything else depends on knowing who the user is
-Delivers: Registration, login, session, basic profile
-Unlocks: All authenticated features
-```
-
-### Phase 2: Event Creation (Host Flow)
-```
-Depends on: Auth (Phase 1)
-Delivers: Event CRUD, draft/publish, image upload
-Unlocks: Events exist in the system to discover and RSVP to
-```
-
-### Phase 3: Event Discovery + RSVP (Guest Flow)
-```
-Depends on: Auth (Phase 1), Events (Phase 2)
-Delivers: Public event list, search/filter, event detail page, RSVP flow
-Unlocks: Core loop — host creates, guest discovers and joins
-```
-
-### Phase 4: Host Dashboard + Guest Management
-```
-Depends on: Events (Phase 2), RSVP (Phase 3)
-Delivers: Host sees who RSVPed, can manage guests, communicate
-Unlocks: Host can actually host — knows who is coming
-```
-
-### Phase 5: Notifications + Reminders
-```
-Depends on: RSVP (Phase 3) — notifications are responses to RSVP actions
-Delivers: Email confirmations, reminders, cancellation notices
-Unlocks: Reliability — guests don't miss events
-```
-
-### Phase 6: Polish + Maps + Discovery Enhancements
-```
-Depends on: All above
-Delivers: Map view, advanced search, host profiles, event categories
-Unlocks: Platform feels complete
-```
-
----
+| Client components ↔ `site-config.ts` | direct import, build-time inline | must use literal env reads |
+| Server modules ↔ `site-config.server.ts` | direct import, runtime `process.env` | `server-only` fence prevents client leakage |
+| `site-config.ts` ↔ `site-config.server.ts` | **no import between them** | keep fully separate; server may re-export public if ever needed, never the reverse |
 
 ## Sources
 
-- JoynaTable case study (peer-to-peer dining platform) — gocodeable.com
-- Cohosted platform architecture (collaborative event planning) — github.com/elenav24/cohosted
-- Event RSVP Platform system design — systemforces.com
-- Shishi-Shitufi community potluck app — github.com/Chagai33/Shishi-Shitufi_v3
-- Event Guest Management System Architecture — scribd.com (AWS microservices reference)
-- Event Planning and RSVP App database schema — databasesample.com
-- Next.js App Router documentation — nextjs.org/docs
+- `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md` (Next.js 16, App Router) — inlining semantics, dynamic-lookup exclusion (182–191), build-time freeze note (166), server-only default (156, 198). **HIGH confidence** (curated official docs shipped with the installed version).
+- Codebase inspection: `components/PaymentSection.tsx:77` (existing `NEXT_PUBLIC` client pattern), `lib/brevo.ts` (hardcoded email copy), `components/Footer.tsx:48,55` (`href="#"` placeholders), `app/layout.tsx:23-27` (metadata), `app/page.tsx` (component tree), server/client `"use client"` grep. **HIGH confidence** (direct source read).
+- `.planning/PROJECT.md` — v1.1 scope; out-of-scope event-data-in-Sheet constraint.
 
 ---
-*Architecture research for: Supper Club platform*
-*Researched: 2026-07-02*
+*Architecture research for: env-driven site config integration (Next.js 16 App Router)*
+*Researched: 2026-07-13*

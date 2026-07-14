@@ -7,7 +7,9 @@ const validBase = {
   contact: "9876543210",
   email: "test@example.com",
   aadhar: "123456789012",
-  bringingGuest: false,
+  about: "Love good food and meeting new people",
+  social: "https://instagram.com/testuser",
+  guests: [],
 }
 
 describe("registrationSchema", () => {
@@ -242,115 +244,64 @@ describe("registrationSchema", () => {
     })
   })
 
-  describe("bringingGuest", () => {
-    it("accepts bringingGuest as true", () => {
-      const result = registrationSchema.safeParse({
-        ...validBase,
-        bringingGuest: true,
-        guestName: "Guest Name",
-        guestAge: "25",
-      })
+  describe("guests array", () => {
+    it("accepts an empty guests array", () => {
+      const result = registrationSchema.safeParse({ ...validBase, guests: [] })
       expect(result.success).toBe(true)
     })
 
-    it("accepts bringingGuest as false", () => {
-      const result = registrationSchema.safeParse({
-        ...validBase,
-        bringingGuest: false,
-      })
-      expect(result.success).toBe(true)
-    })
-
-    it("defaults bringingGuest to false when omitted", () => {
-      const { bringingGuest, ...withoutGuestField } = validBase
-      const result = registrationSchema.safeParse(withoutGuestField)
+    it("defaults guests to [] when omitted", () => {
+      const { guests, ...withoutGuests } = validBase
+      const result = registrationSchema.safeParse(withoutGuests)
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.bringingGuest).toBe(false)
+        expect(result.data.guests).toEqual([])
       }
     })
-  })
 
-  describe("guest conditional validation", () => {
-    it("requires guest name when bringingGuest is true", () => {
+    it("accepts fully-filled guest rows", () => {
       const result = registrationSchema.safeParse({
         ...validBase,
-        bringingGuest: true,
-        guestName: "",
-        guestAge: "25",
+        guests: [
+          { name: "John", age: "30" },
+          { name: "Asha", age: "29" },
+        ],
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("rejects a guest row with empty name", () => {
+      const result = registrationSchema.safeParse({
+        ...validBase,
+        guests: [{ name: "", age: "25" }],
       })
       expect(result.success).toBe(false)
       if (!result.success) {
-        const guestNameIssue = result.error.issues.find(
-          (issue) => issue.path[0] === "guestName"
-        )
-        expect(guestNameIssue).toBeDefined()
-        expect(guestNameIssue!.message).toBe("Guest name is required")
+        const issue = result.error.issues.find((i) => i.path.includes("name"))
+        expect(issue?.message).toBe("Guest name is required")
       }
     })
 
-    it("requires guest age when bringingGuest is true", () => {
+    it("rejects a guest row with empty age", () => {
       const result = registrationSchema.safeParse({
         ...validBase,
-        bringingGuest: true,
-        guestName: "Guest Name",
-        guestAge: "",
+        guests: [{ name: "John", age: "" }],
       })
       expect(result.success).toBe(false)
       if (!result.success) {
-        const guestAgeIssue = result.error.issues.find(
-          (issue) => issue.path[0] === "guestAge"
-        )
-        expect(guestAgeIssue).toBeDefined()
-        expect(guestAgeIssue!.message).toBe("Guest age is required")
+        const issue = result.error.issues.find((i) => i.path.includes("age"))
+        expect(issue?.message).toBe("Guest age is required")
       }
-    })
-
-    it("rejects when bringingGuest is true and both guest fields are empty", () => {
-      const result = registrationSchema.safeParse({
-        ...validBase,
-        bringingGuest: true,
-        guestName: "",
-        guestAge: "",
-      })
-      expect(result.success).toBe(false)
-    })
-
-    it("does not require guest fields when bringingGuest is false", () => {
-      const result = registrationSchema.safeParse({
-        ...validBase,
-        bringingGuest: false,
-        guestName: "",
-        guestAge: "",
-      })
-      expect(result.success).toBe(true)
-    })
-
-    it("does not require guest fields when bringingGuest is omitted", () => {
-      const result = registrationSchema.safeParse({
-        ...validBase,
-      })
-      expect(result.success).toBe(true)
-    })
-
-    it("accepts guest name and age when bringingGuest is true", () => {
-      const result = registrationSchema.safeParse({
-        ...validBase,
-        bringingGuest: true,
-        guestName: "John",
-        guestAge: "30",
-      })
-      expect(result.success).toBe(true)
     })
   })
 
   describe("about", () => {
-    it("accepts empty about (optional)", () => {
+    it("rejects empty about (required, min 5)", () => {
       const result = registrationSchema.safeParse({
         ...validBase,
         about: "",
       })
-      expect(result.success).toBe(true)
+      expect(result.success).toBe(false)
     })
 
     it("accepts about within 200 characters", () => {
@@ -358,11 +309,6 @@ describe("registrationSchema", () => {
         ...validBase,
         about: "I love cooking and hosting dinner parties!",
       })
-      expect(result.success).toBe(true)
-    })
-
-    it("accepts about undefined (optional)", () => {
-      const result = registrationSchema.safeParse(validBase)
       expect(result.success).toBe(true)
     })
 
@@ -387,17 +333,12 @@ describe("registrationSchema", () => {
       expect(result.success).toBe(true)
     })
 
-    it("accepts empty string", () => {
+    it("rejects empty string (required URL)", () => {
       const result = registrationSchema.safeParse({
         ...validBase,
         social: "",
       })
-      expect(result.success).toBe(true)
-    })
-
-    it("accepts undefined (optional)", () => {
-      const result = registrationSchema.safeParse(validBase)
-      expect(result.success).toBe(true)
+      expect(result.success).toBe(false)
     })
 
     it("rejects malformed URL", () => {

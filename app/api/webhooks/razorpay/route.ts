@@ -1,6 +1,7 @@
 import { verifyWebhookSignature } from "@/lib/razorpay"
 import { appendRegistrationRow, checkPaymentIdExists } from "@/lib/sheets-write"
 import { sendConfirmationEmail } from "@/lib/brevo"
+import { parseGuests, decrementCapacity } from "@/lib/registration-write"
 import { NextResponse } from "next/server"
 
 export const dynamic = "force-dynamic"
@@ -75,6 +76,7 @@ export async function POST(request: Request) {
     }
 
     // 5. Prepare registration row data from order notes
+    const guests = parseGuests(notes.guests)
     const registrationRow = {
       location: notes.location || "",
       eventDate: notes.eventDate || "",
@@ -83,14 +85,13 @@ export async function POST(request: Request) {
       contact: notes.contact || "",
       email: notes.email || "",
       aadhar: notes.aadhar || "",
-      bringingGuest: notes.bringingGuest === "true" ? "Yes" : "No",
-      guestName: notes.guestName || "",
-      guestAge: notes.guestAge || "",
+      bringingGuest: guests.length > 0 ? "Yes" : "No",
       about: notes.about || "",
       social: notes.social || "",
       paymentStatus: "captured",
       paymentId,
       timestamp: new Date().toISOString(),
+      guestDetails: guests.length > 0 ? JSON.stringify(guests) : "",
     }
 
     const emailParams = {
@@ -104,6 +105,8 @@ export async function POST(request: Request) {
     // 6. Write to Sheets — if it fails, queue for retry (D-07)
     try {
       await appendRegistrationRow(registrationRow)
+      // Decrement remaining seats by party size (registrant + guests), once.
+      await decrementCapacity(notes.location || "", guests.length)
     } catch (sheetsErr) {
       console.error("Sheets append failed, queuing for retry:", sheetsErr)
       pendingWrites.set(paymentId, { row: registrationRow, emailParams, retries: 0 })

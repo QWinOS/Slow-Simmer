@@ -55,7 +55,9 @@ export default function HeroSection() {
         <h1 className="mt-8 animate-[fadeUp_0.8s_ease-out_both] font-heading text-5xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
           <span className="text-gold-foil">Slow Simmer</span>
           <br />
-          <span className="text-white italic">The Supper Club</span>
+          <span className="text-black dark:text-white italic">
+            The Supper Club
+          </span>
         </h1>
 
         <p className="mx-auto mt-7 max-w-xl animate-[fadeUp_0.8s_ease-out_0.3s_both] text-base font-light leading-relaxed text-muted-foreground sm:text-lg">

@@ -17,7 +17,7 @@ function createJWT(payload: Record<string, unknown>, privateKey: string): string
 
 const tokenCache = new Map<string, { token: string; expiresAt: number }>()
 
-async function getSheetsToken(): Promise<string> {
+export async function getSheetsToken(): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const cached = tokenCache.get("sheets")
   if (cached && cached.expiresAt > now + 60) return cached.token
@@ -53,9 +53,9 @@ async function getSheetsToken(): Promise<string> {
 }
 
 /**
- * Schema per D-05: Location, Event Date, Event Time, Name, Contact, Email,
- * Aadhar, Bringing Guest, Guest Name, Guest Age, About, Social, Payment Status,
- * Payment ID, Timestamp.
+ * Schema: Location, Event Date, Event Time, Name, Contact, Email, Aadhar,
+ * Bringing Guest, About, Social, Payment Status, Payment ID, Timestamp,
+ * Guest Details.
  */
 export interface RegistrationRow {
   location: string
@@ -66,13 +66,12 @@ export interface RegistrationRow {
   email: string
   aadhar: string
   bringingGuest: string  // "Yes" or "No"
-  guestName: string
-  guestAge: string
   about: string
   social: string
   paymentStatus: string
   paymentId: string
   timestamp: string
+  guestDetails: string   // JSON array of { name, age }
 }
 
 /**
@@ -97,17 +96,16 @@ export async function appendRegistrationRow(row: RegistrationRow): Promise<void>
     row.email,
     row.aadhar,
     row.bringingGuest,
-    row.guestName,
-    row.guestAge,
     row.about,
     row.social,
     row.paymentStatus,
     row.paymentId,
     row.timestamp,
+    row.guestDetails,
   ]]
 
   const url = new URL(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Registrations!A:O:append`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Registrations!A:N:append`,
   )
   url.searchParams.set("valueInputOption", "USER_ENTERED")
   url.searchParams.set("insertDataOption", "INSERT_ROWS")

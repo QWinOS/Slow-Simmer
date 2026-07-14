@@ -10,6 +10,10 @@ A single-page, mobile-friendly webapp for Slow Simmer. Guests browse past event 
 - [x] **Phase 2: Registration Form** - Functional registration form collecting all guest details (completed 2026-07-04)
 - [x] **Phase 3: Payment, Sheets & Email** - RazorPay payment, Google Sheets logging, and Brevo confirmation email (completed 2026-07-12)
 
+### Milestone v1.1 — Env-Driven Site Config
+
+- [ ] **Phase 4: Env-Driven Site Config** - Central typed config module; social handles, brand identity, email copy, and short marketing strings driven from `.env` as a single source of truth
+
 ## Phase Details
 
 ### Phase 1: Foundation, Layout & Gallery
@@ -113,6 +117,34 @@ Plans:
 
 - [x] 03-04-PLAN.md — Tests: razorpay, sheets, brevo, PaymentSection
 
+### Phase 4: Env-Driven Site Config
+
+**Goal**: Externalize hardcoded site content into `.env` as a single source of truth, read through one central typed config module — a behavior-neutral refactor (empty `.env` renders identically to today).
+**Depends on**: Phase 3 (existing app shipped)
+**Requirements**: CFG-01, CFG-02, CFG-03, CFG-04, CFG-05, SOC-01, SOC-02, SOC-03, SOC-04, BRND-01, BRND-02, BRND-03, ECPY-01, ECPY-02, MKTG-01, MKTG-02, MKTG-03
+**Success Criteria** (what must be TRUE):
+
+  1. With an empty `.env` (no v1.1 vars set), the site renders byte-identically to the current production site — every copy value falls back to its current hardcoded string
+  2. Setting a social URL in `.env` makes that icon appear/link correctly; leaving it unset hides the icon entirely (no `href="#"` dead links); WhatsApp is a newly added icon
+  3. Changing the brand name in `.env` updates every place it appears (page title, footer, payment UI, confirmation email) from that one value
+  4. SEO title/description and confirmation email copy are driven by server-only env (never shipped in the client bundle); a client import of the server config module fails the build
+  5. No component reads `process.env` directly — all reads go through `lib/site-config.ts` (public) or `lib/site-config.server.ts` (server-only), and `.env.example` documents every new var with required/optional + `NEXT_PUBLIC_` (⚠redeploy) annotations
+
+**Suggested build order** (plan-level; each step a shippable, behavior-neutral commit):
+
+- **4-01** — Scaffold config modules: `lib/site-config.ts` (public) + `lib/site-config.server.ts` (`import "server-only"`), add `server-only` dep, empty-string-as-missing helpers backed by existing zod, required/optional contract, seed `.env.example` (CFG-01…05)
+- **4-02** — Social handles: wire Footer to config, conditional-hide when unset, add WhatsApp icon (SOC-01…04)
+- **4-03** — Brand identity + SEO: name + tagline + `app/layout.tsx` metadata via config (BRND-01…03)
+- **4-04** — Email copy: `lib/brevo.ts` subject/body/signature via server config module — exercises the `server-only` fence (ECPY-01, ECPY-02)
+- **4-05** — Short marketing strings: cities, seat count, hero heading/badge; close out `.env.example` as canonical contract (MKTG-01…03)
+
+**Cross-cutting constraints:**
+
+- Empty string (`""`) is treated as unset everywhere — the v1.0 email incident was a present-but-empty env var
+- Each `NEXT_PUBLIC_` var referenced as a single static literal (no computed keys / destructuring — those break browser inlining)
+- No secret ever gets a `NEXT_PUBLIC_` prefix; secrets stay in the `server-only` module
+- Event date/time/price/location stay in the Google Sheet (out of scope — runtime-editable by design)
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -120,3 +152,4 @@ Plans:
 | 1. Foundation, Layout & Gallery | 6/6 | Complete   | 2026-07-02 |
 | 2. Registration Form | 5/5 | Complete | 2026-07-04 |
 | 3. Payment, Sheets & Email | 4/4 | Complete   | 2026-07-12 |
+| 4. Env-Driven Site Config | 0/5 | Planning | — |

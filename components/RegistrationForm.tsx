@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, Controller, type Resolver } from "react-hook-form";
+import { useForm, Controller, useFieldArray, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
   InputGroup,
@@ -74,15 +73,23 @@ export function RegistrationForm() {
       contact: "",
       email: "",
       aadhar: "",
-      bringingGuest: false,
-      guestName: "",
-      guestAge: "",
+      guests: [],
       about: "",
       social: "",
     },
   });
 
-  const bringingGuest = form.watch("bringingGuest");
+  const { fields: guestFields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "guests",
+  });
+
+  const selectedLocation = form.watch("location");
+  const guestCount = guestFields.length;
+  // Max Member includes the registrant, so extra guests cap at maxMember - 1.
+  const selectedEvent = locations.find((l) => l.location === selectedLocation);
+  const maxGuests = selectedEvent ? Math.max(0, selectedEvent.maxMember - 1) : 0;
+  const soldOut = Boolean(selectedEvent) && selectedEvent!.maxMember <= 0;
 
   function ErrorSummary() {
     const errors = form.formState.errors;
@@ -110,13 +117,28 @@ export function RegistrationForm() {
 
   function onSubmit(data: RegistrationFormData) {
     const event = locations.find((l) => l.location === data.location);
+    // Guard: party (registrant + guests) must fit remaining capacity.
+    if (event && 1 + data.guests.length > event.maxMember) {
+      toast.error(
+        event.maxMember <= 0
+          ? "This event is sold out."
+          : `Only ${event.maxMember} seat(s) left — reduce your guest count.`,
+      );
+      return;
+    }
     setRegistrationData({
-      ...data,
+      location: data.location,
+      name: data.name,
+      contact: data.contact,
+      email: data.email,
+      aadhar: data.aadhar,
+      about: data.about,
+      social: data.social,
+      guests: data.guests,
       eventDate: event?.date || "",
       eventTime: event?.time || "",
-      price: event?.price || 0, // in paise, from Location_Date Price column
+      price: event?.price || 0, // per-seat, in paise, from Location_Date Price column
     });
-    toast.success("Registration submitted!");
   }
 
   return (
@@ -172,6 +194,12 @@ export function RegistrationForm() {
                         if (event) {
                           form.setValue("eventDate", event.date);
                           form.setValue("eventTime", event.time);
+                          // New location may allow fewer guests — trim overflow.
+                          const allowed = Math.max(0, event.maxMember - 1);
+                          const current = form.getValues("guests");
+                          if (current.length > allowed) {
+                            form.setValue("guests", current.slice(0, allowed));
+                          }
                         }
                       }}
                       disabled={locationsLoading}
@@ -218,6 +246,20 @@ export function RegistrationForm() {
                 )}
               />
 
+              {soldOut && (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-5 text-center ring-1 ring-destructive/10">
+                  <p className="flex items-center justify-center gap-2 text-base font-bold text-destructive mb-1">
+                    <span aria-hidden="true" className="text-lg">×</span>
+                    Sold Out
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    No seats left for this event. Please select another location.
+                  </p>
+                </div>
+              )}
+
+              {!soldOut && (
+              <>
               <Controller
                 name="name"
                 control={form.control}
@@ -339,90 +381,117 @@ export function RegistrationForm() {
                   </Field>
                 )}
               />
+              </>
+              )}
             </FieldGroup>
 
+            {!soldOut && (
+            <>
             <Separator className="my-6" />
 
             {/* Section 2: Guest Details */}
             <div className="font-heading text-lg font-bold mb-4">
               Guest Details
             </div>
-            <Controller
-              name="bringingGuest"
-              control={form.control}
-              render={({ field }) => (
-                <Field orientation="horizontal" className="gap-3">
-                  <Checkbox
-                    id={field.name}
-                    checked={field.value ?? false}
-                    onCheckedChange={(checked) =>
-                      field.onChange(checked === true)
-                    }
-                  />
-                  <FieldLabel
-                    htmlFor={field.name}
-                    className="mb-0 font-normal cursor-pointer"
-                  >
-                    Bringing a guest?
-                  </FieldLabel>
-                </Field>
-              )}
-            />
 
-            <div
-              className={cn(
-                "grid transition-all duration-300 ease-in-out overflow-hidden",
-                bringingGuest
-                  ? "grid-rows-[1fr] opacity-100"
-                  : "grid-rows-[0fr] opacity-0",
-                "motion-reduce:transition-none motion-reduce:!grid-rows-[1fr] motion-reduce:!opacity-100",
-              )}
-            >
-              <div className="min-h-0">
-                <div className="flex flex-col gap-4 pt-4">
-                  <Controller
-                    name="guestName"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>Guest Name</FieldLabel>
-                        <Input
-                          {...field}
-                          id={field.name}
-                          aria-invalid={fieldState.invalid}
-                          placeholder="Guest's full name"
-                          autoComplete="name"
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-
-                  <Controller
-                    name="guestAge"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>Guest Age</FieldLabel>
-                        <Input
-                          {...field}
-                          id={field.name}
-                          aria-invalid={fieldState.invalid}
-                          placeholder="Guest's age"
-                          inputMode="numeric"
-                          autoComplete="off"
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-                </div>
+            <Field orientation="horizontal" className="items-center justify-between gap-3">
+              <div>
+                <FieldLabel className="mb-0 font-normal">
+                  Additional guests
+                </FieldLabel>
+                <FieldDescription className="text-xs text-muted-foreground">
+                  {!selectedLocation
+                    ? "Select a location to add guests"
+                    : `Up to ${maxGuests} guest${maxGuests === 1 ? "" : "s"} (incl. you: ${selectedEvent?.maxMember} seats)`}
+                </FieldDescription>
               </div>
-            </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Remove guest"
+                  disabled={guestCount === 0}
+                  onClick={() => remove(guestCount - 1)}
+                >
+                  <Minus className="size-4" />
+                </Button>
+                <span
+                  className="w-6 text-center font-medium tabular-nums"
+                  aria-live="polite"
+                  aria-label="Guest count"
+                >
+                  {guestCount}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Add guest"
+                  disabled={!selectedLocation || guestCount >= maxGuests}
+                  onClick={() => append({ name: "", age: "" })}
+                >
+                  <Plus className="size-4" />
+                </Button>
+              </div>
+            </Field>
+
+            {guestFields.length > 0 && (
+              <div className="flex flex-col gap-4 pt-4">
+                {guestFields.map((guestField, index) => (
+                  <div
+                    key={guestField.id}
+                    className="grid grid-cols-1 gap-4 rounded-lg border border-border p-4 sm:grid-cols-2"
+                  >
+                    <Controller
+                      name={`guests.${index}.name`}
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor={field.name}>
+                            Guest {index + 1} Name
+                            <span className="text-destructive">*</span>
+                          </FieldLabel>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Guest's full name"
+                            autoComplete="name"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      name={`guests.${index}.age`}
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor={field.name}>
+                            Guest {index + 1} Age
+                            <span className="text-destructive">*</span>
+                          </FieldLabel>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Guest's age"
+                            inputMode="numeric"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
             <Separator className="my-6" />
 
@@ -488,6 +557,8 @@ export function RegistrationForm() {
                 ? "Submitting..."
                 : "Submit Registration"}
             </Button>
+            </>
+            )}
           </form>
         </div>
       </Reveal>

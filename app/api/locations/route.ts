@@ -14,8 +14,10 @@ export async function GET() {
   try {
     const token = await getAccessToken(SHEETS_SCOPE)
 
+    // Read from row 1 so we can locate the "Max Member" capacity column by its
+    // header name rather than a fixed position (sheet columns may be reordered).
     const url = new URL(
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Location_Date!A2:D1000`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Location_Date!A1:Z1000`,
     )
 
     const response = await fetch(url.toString(), {
@@ -32,17 +34,26 @@ export async function GET() {
 
     const data = await response.json()
     const rows: string[][] = data.values || []
+    const header = (rows[0] || []).map((h) => h?.trim().toLowerCase())
+    // Location/Date/Time/Price stay positional (A-D) as before; only capacity
+    // is looked up by header. Match any "max ..." header (Max Guest / Max
+    // Member / Max Guests) — Location_Date only has one such column.
+    const maxCol = header.findIndex((h) => h?.includes("max"))
 
     const locations = rows
+      .slice(1)
       .map((row) => {
         const location = row[0]?.trim()
         if (!location) return null
         const rawPrice = row[3]?.trim()
+        const rawMax = maxCol >= 0 ? row[maxCol]?.trim() : undefined
+        const maxMember = rawMax ? parseInt(rawMax, 10) : 0
         return {
           location,
           date: row[1]?.trim() || "",
           time: row[2]?.trim() || "",
           price: rawPrice ? parseInt(rawPrice, 10) * 100 : 0,
+          maxMember: Number.isFinite(maxMember) ? maxMember : 0,
         }
       })
       .filter(Boolean)

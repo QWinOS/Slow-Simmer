@@ -17,7 +17,7 @@ const testKey = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 }).priva
 
 const { appendRegistrationRow, checkPaymentIdExists } = await import("@/lib/sheets-write")
 
-/** A valid full RegistrationRow matching the D-05 schema order */
+/** A valid full RegistrationRow matching the schema order (16 cols, A:P) */
 const sampleRow: RegistrationRow = {
   location: "Kolkata",
   eventDate: "2026-07-20",
@@ -27,13 +27,12 @@ const sampleRow: RegistrationRow = {
   email: "guest@test.com",
   aadhar: "123456789012",
   bringingGuest: "No",
-  guestName: "",
-  guestAge: "",
   about: "Love good food!",
   social: "https://instagram.com/test",
   paymentStatus: "Success",
   paymentId: "pay_abc123",
   timestamp: "2026-07-20T12:00:00Z",
+  guestDetails: "",
 }
 
 /** Helpers to set up env for internal getSheetsToken auth */
@@ -71,20 +70,23 @@ describe("appendRegistrationRow", () => {
     await appendRegistrationRow(sampleRow)
 
     const [url, options] = mockSheets.mock.calls[0]
-    expect(url).toContain("values/Registrations!A:O:append")
+    expect(url).toContain("values/Registrations!A:P:append")
     expect(options.method).toBe("POST")
   })
 
-  it("sends 15 columns in correct order per D-05 schema", async () => {
+  it("sends 16 columns in correct order (A:P, Guest Details last)", async () => {
     mockSheets.mockResolvedValue({ ok: true })
 
-    await appendRegistrationRow(sampleRow)
+    await appendRegistrationRow({
+      ...sampleRow,
+      guestDetails: '[{"name":"Asha","age":"29"}]',
+    })
 
     const [, options] = mockSheets.mock.calls[0]
     const body = JSON.parse(options.body)
     const values = body.values[0]
 
-    expect(values).toHaveLength(15)
+    expect(values).toHaveLength(16)
     expect(values).toEqual([
       "Kolkata",
       "2026-07-20",
@@ -101,6 +103,7 @@ describe("appendRegistrationRow", () => {
       "Success",
       "pay_abc123",
       "2026-07-20T12:00:00Z",
+      '[{"name":"Asha","age":"29"}]',
     ])
   })
 

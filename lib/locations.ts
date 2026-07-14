@@ -3,6 +3,7 @@ export interface LocationEvent {
   date: string
   time: string
   price: number
+  maxMember: number  // remaining seats, incl. registrant
 }
 
 export async function fetchLocations(): Promise<LocationEvent[]> {

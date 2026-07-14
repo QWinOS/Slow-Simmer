@@ -36,8 +36,8 @@ vi.mock("sonner", () => ({
 }))
 
 const mockLocations = [
-  { location: "Kolkata", date: "Dec 15, 2024", time: "7:00 PM", price: 50000 },
-  { location: "Delhi", date: "Jan 20, 2025", time: "6:30 PM", price: 75000 },
+  { location: "Kolkata", date: "Dec 15, 2024", time: "7:00 PM", price: 50000, maxMember: 4 },
+  { location: "Delhi", date: "Jan 20, 2025", time: "6:30 PM", price: 75000, maxMember: 1 },
 ]
 
 beforeEach(() => {
@@ -66,6 +66,17 @@ async function selectLocation(user: ReturnType<typeof userEvent.setup>, name = "
   await user.click(await screen.findByRole("option", { name: new RegExp(name, "i") }))
 }
 
+// Fill every required field for a valid submit (about + social are required).
+async function fillRequired(user: ReturnType<typeof userEvent.setup>) {
+  await selectLocation(user)
+  await user.type(screen.getByLabelText(/full name/i), "Test User")
+  await user.type(screen.getByLabelText(/contact number/i), "9876543210")
+  await user.type(screen.getByLabelText(/email address/i), "test@example.com")
+  await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
+  await user.type(screen.getByLabelText(/about yourself/i), "Love good food and people")
+  await user.type(screen.getByLabelText(/instagram or linkedin/i), "https://instagram.com/test")
+}
+
 describe("RegistrationForm Integration", () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -90,7 +101,7 @@ describe("RegistrationForm Integration", () => {
       expect(screen.getByLabelText(/contact number/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/email address/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/aadhar number/i)).toBeInTheDocument()
-      expect(screen.getByText("Bringing a guest?")).toBeInTheDocument()
+      expect(screen.getByText("Additional guests")).toBeInTheDocument()
       expect(screen.getByLabelText(/about yourself/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/instagram or linkedin/i)).toBeInTheDocument()
     })
@@ -169,14 +180,15 @@ describe("RegistrationForm Integration", () => {
       expect(aadharLabel?.textContent).toContain("*")
     })
 
-    it("does not display asterisk on optional field labels", () => {
+    it("displays asterisk on required About and Social labels", () => {
       renderForm()
 
+      // About + Social are required in the shipped schema (min length / URL).
       const aboutLabel = screen.getByText("About Yourself").closest("label")
       const socialLabel = screen.getByText("Instagram or LinkedIn").closest("label")
 
-      expect(aboutLabel?.textContent).not.toContain("*")
-      expect(socialLabel?.textContent).not.toContain("*")
+      expect(aboutLabel?.textContent).toContain("*")
+      expect(socialLabel?.textContent).toContain("*")
     })
   })
 
@@ -248,29 +260,50 @@ describe("RegistrationForm Integration", () => {
     })
   })
 
-  /* ── 4. Guest fields toggle with checkbox ── */
-  describe("4. Guest fields toggle with checkbox", () => {
-    it("renders guest fields in DOM always (CSS visibility toggles via animation)", () => {
+  /* ── 4. Guest counter adds/removes guest rows ── */
+  describe("4. Guest counter adds/removes guest rows", () => {
+    it("renders no guest rows initially", () => {
       renderForm()
 
-      // With the slide animation pattern, guest fields are always rendered
-      // in the DOM but are visually hidden via grid-rows-[0fr] + opacity-0
-      expect(screen.getByLabelText(/guest name/i)).toBeInTheDocument()
-      expect(screen.getByLabelText(/guest age/i)).toBeInTheDocument()
+      expect(screen.queryByLabelText(/guest 1 name/i)).not.toBeInTheDocument()
+      expect(screen.getByLabelText("Guest count")).toHaveTextContent("0")
     })
 
-    it("toggles checkbox checked state on click", async () => {
+    it("disables add until a location is selected", () => {
+      renderForm()
+      expect(screen.getByRole("button", { name: /add guest/i })).toBeDisabled()
+    })
+
+    it("adds and removes guest rows via the counter", async () => {
       const user = userEvent.setup()
       renderForm()
 
-      const checkbox = screen.getByRole("checkbox")
-      expect(checkbox).not.toBeChecked()
+      await selectLocation(user) // Kolkata, maxMember 4 → up to 3 guests
+      const add = screen.getByRole("button", { name: /add guest/i })
 
-      await user.click(checkbox)
-      expect(checkbox).toBeChecked()
+      await user.click(add)
+      expect(screen.getByLabelText(/guest 1 name/i)).toBeInTheDocument()
+      expect(screen.getByLabelText("Guest count")).toHaveTextContent("1")
 
-      await user.click(checkbox)
-      expect(checkbox).not.toBeChecked()
+      await user.click(add)
+      expect(screen.getByLabelText(/guest 2 name/i)).toBeInTheDocument()
+
+      await user.click(screen.getByRole("button", { name: /remove guest/i }))
+      expect(screen.queryByLabelText(/guest 2 name/i)).not.toBeInTheDocument()
+    })
+
+    it("caps the counter at maxMember - 1 guests", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      await selectLocation(user) // maxMember 4 → max 3 guests
+      const add = screen.getByRole("button", { name: /add guest/i })
+
+      await user.click(add)
+      await user.click(add)
+      await user.click(add)
+      expect(screen.getByLabelText("Guest count")).toHaveTextContent("3")
+      expect(add).toBeDisabled() // can't exceed capacity
     })
   })
 
@@ -303,12 +336,7 @@ describe("RegistrationForm Integration", () => {
       const user = userEvent.setup()
       renderForm()
 
-      // Fill all required fields
-      await selectLocation(user)
-      await user.type(screen.getByLabelText(/full name/i), "Test User")
-      await user.type(screen.getByLabelText(/contact number/i), "9876543210")
-      await user.type(screen.getByLabelText(/email address/i), "test@example.com")
-      await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
+      await fillRequired(user)
 
       await user.click(
         screen.getByRole("button", { name: /submit registration/i })
@@ -346,83 +374,36 @@ describe("RegistrationForm Integration", () => {
     })
   })
 
-  /* ── 8. Guest fields conditionally required ── */
-  describe("8. Guest fields conditionally required", () => {
-    it("shows guest errors when bringingGuest is checked but guest fields empty", async () => {
+  /* ── 8. Added guest rows are required ── */
+  describe("8. Added guest rows are required", () => {
+    it("shows guest errors when a guest row is added but left empty", async () => {
       const user = userEvent.setup()
       renderForm()
 
-      // Fill main required fields to avoid noise from non-guest errors
       await selectLocation(user)
       await user.type(screen.getByLabelText(/full name/i), "Test User")
       await user.type(screen.getByLabelText(/contact number/i), "9876543210")
       await user.type(screen.getByLabelText(/email address/i), "test@example.com")
       await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
 
-      // Check "Bringing a guest?"
-      await user.click(screen.getByRole("checkbox"))
-
-      // Submit with empty guest fields
+      // Add a guest row, leave it empty
+      await user.click(screen.getByRole("button", { name: /add guest/i }))
       await user.click(
         screen.getByRole("button", { name: /submit registration/i })
       )
 
-      // Text appears in both the error summary and inline FieldError —
-      // confirm at least one instance exists
       await waitFor(() => {
-        const nameErrors = screen.getAllByText("Guest name is required")
-        expect(nameErrors.length).toBeGreaterThanOrEqual(1)
-        const ageErrors = screen.getAllByText("Guest age is required")
-        expect(ageErrors.length).toBeGreaterThanOrEqual(1)
+        expect(screen.getAllByText("Guest name is required").length).toBeGreaterThanOrEqual(1)
+        expect(screen.getAllByText("Guest age is required").length).toBeGreaterThanOrEqual(1)
       })
     })
 
-    it("does not require guest fields when bringingGuest is unchecked", async () => {
+    it("does not require guest fields when no guest rows added", async () => {
       const user = userEvent.setup()
       renderForm()
 
-      // Fill main required fields only (no guest)
-      await selectLocation(user)
-      await user.type(screen.getByLabelText(/full name/i), "Test User")
-      await user.type(screen.getByLabelText(/contact number/i), "9876543210")
-      await user.type(screen.getByLabelText(/email address/i), "test@example.com")
-      await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
+      await fillRequired(user)
 
-      await user.click(
-        screen.getByRole("button", { name: /submit registration/i })
-      )
-
-      // Only non-guest errors should be absent (valid submit)
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/please fix the following errors/i)
-        ).not.toBeInTheDocument()
-      })
-      // queryByText with a string that appears only once in the document
-      // will return null if not found — safe to call directly
-      expect(screen.queryAllByText("Guest name is required").length).toBe(0)
-      expect(screen.queryAllByText("Guest age is required").length).toBe(0)
-    })
-
-    it("clears guest errors when guest fields are filled", async () => {
-      const user = userEvent.setup()
-      renderForm()
-
-      // Fill main required fields
-      await selectLocation(user)
-      await user.type(screen.getByLabelText(/full name/i), "Test User")
-      await user.type(screen.getByLabelText(/contact number/i), "9876543210")
-      await user.type(screen.getByLabelText(/email address/i), "test@example.com")
-      await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
-
-      // Check bringing guest
-      await user.click(screen.getByRole("checkbox"))
-
-      // Fill guest fields with valid data
-      await user.type(screen.getByLabelText(/guest name/i), "Jane Doe")
-      await user.type(screen.getByLabelText(/guest age/i), "28")
-
-      // Submit — should succeed with no errors
       await user.click(
         screen.getByRole("button", { name: /submit registration/i })
       )
@@ -432,9 +413,29 @@ describe("RegistrationForm Integration", () => {
           screen.queryByText(/please fix the following errors/i)
         ).not.toBeInTheDocument()
       })
-      // Use queryAllByText to avoid multi-match errors (returns empty array if not found)
       expect(screen.queryAllByText("Guest name is required").length).toBe(0)
-      expect(screen.queryAllByText("Guest age is required").length).toBe(0)
+    })
+
+    it("submits cleanly when guest rows are filled", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      await fillRequired(user)
+
+      await user.click(screen.getByRole("button", { name: /add guest/i }))
+      await user.type(screen.getByLabelText(/guest 1 name/i), "Jane Doe")
+      await user.type(screen.getByLabelText(/guest 1 age/i), "28")
+
+      await user.click(
+        screen.getByRole("button", { name: /submit registration/i })
+      )
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText(/please fix the following errors/i)
+        ).not.toBeInTheDocument()
+      })
+      expect(screen.queryAllByText("Guest name is required").length).toBe(0)
     })
   })
 })

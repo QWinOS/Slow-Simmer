@@ -42,7 +42,8 @@ async function handlePayment(
   try {
     setStatus("awaiting");
 
-    // 1. Create order on server
+    // 1. Create order on server. Amount + capacity are recomputed server-side
+    //    from location + guestCount — the amount below is only for display.
     const notes: Record<string, string> = {
       location: registration.location,
       eventDate: registration.eventDate || "",
@@ -51,9 +52,7 @@ async function handlePayment(
       contact: registration.contact,
       email: registration.email,
       aadhar: registration.aadhar,
-      bringingGuest: String(registration.bringingGuest),
-      guestName: registration.guestName || "",
-      guestAge: registration.guestAge || "",
+      guests: JSON.stringify(registration.guests || []),
       about: registration.about || "",
       social: registration.social || "",
     };
@@ -61,7 +60,11 @@ async function handlePayment(
     const res = await fetch("/api/orders/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, notes }),
+      body: JSON.stringify({
+        location: registration.location,
+        guestCount: registration.guests?.length || 0,
+        notes,
+      }),
     });
 
     if (!res.ok) {
@@ -69,7 +72,8 @@ async function handlePayment(
       return;
     }
 
-    const { orderId } = await res.json();
+    const { orderId, amount: serverAmount } = await res.json();
+    amount = serverAmount || amount; // trust server amount for the modal
 
     // 2. Load RazorPay checkout script
     await loadRazorpayScript();
@@ -240,8 +244,11 @@ export function PaymentSection() {
     );
   }
 
-  // Summary card + Pay button (idle or awaiting)
-  const displayAmount = Math.round(((data as any).price || 50000) / 100);
+  // Summary card + Pay button (idle or awaiting).
+  // party = registrant + guests; amount = per-seat price × party (paise).
+  const party = 1 + (data.guests?.length || 0);
+  const amountPaise = (data.price || 50000) * party;
+  const displayAmount = Math.round(amountPaise / 100);
 
   return (
     <section
@@ -280,15 +287,21 @@ export function PaymentSection() {
                   <span className="text-muted-foreground">Guest</span>
                   <span className="font-medium">{data.name}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Party size</span>
+                  <span className="font-medium">
+                    {party} {party === 1 ? "person" : "people"}
+                    {data.guests?.length ? ` (you + ${data.guests.length})` : ""}
+                  </span>
+                </div>
               </div>
 
-              {/* Pay button — uses amount from data (in paise, per D-14) */}
+              {/* Pay button — server recomputes the authoritative amount */}
               <Button
                 className="w-full"
                 disabled={status === "awaiting"}
                 onClick={() => {
-                  const amount = (data as any).price || 50000;
-                  handlePayment(amount, data, setStatus, setPaymentId);
+                  handlePayment(amountPaise, data, setStatus, setPaymentId);
                 }}
               >
                 {status === "awaiting" ? (

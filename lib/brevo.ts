@@ -19,7 +19,8 @@ export async function sendConfirmationEmail(
   if (!apiKey) throw new Error("BREVO_API_KEY not configured");
 
   const contactNumber = process.env.CONTACT_NUMBER || "";
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_URL || "";
+  const whatsappNumberLink = process.env.NEXT_PUBLIC_WHATSAPP_URL || "";
+  const whatsappDisplay = whatsappNumberLink.replace(/^https?:\/\/wa\.me\//, "");
   // Email copy — env-driven, falls back to current text. Server-only (no
   // NEXT_PUBLIC_ prefix): this runs in the API route, never the browser.
   const brand = process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "Slow Simmer";
@@ -52,21 +53,103 @@ export async function sendConfirmationEmail(
       ],
       subject,
       htmlContent: [
-        '<div style="font-family: Karla, sans-serif; max-width: 600px; margin: 0 auto;">',
-        "  <h1 style=\"font-family: 'Playfair Display SC', serif; color: #A16207;\">You're in!</h1>",
-        `  <p>Hi <strong>${params.name}</strong>,</p>`,
-        `  <p>${bodyLine}</p>`,
-        '  <div style="background: #FEF2F2; border-radius: 12px; padding: 20px; margin: 20px 0;">',
-        `    <p><strong>Location:</strong> ${params.location}</p>`,
-        `    <p><strong>Date:</strong> ${params.eventDate}</p>`,
-        `    <p><strong>Time:</strong> ${params.eventTime}</p>`,
-        "  </div>",
-        "  <p>You'll receive remaining details within 24 hours.</p>",
+        '<!DOCTYPE html>',
+        '<html lang="en" style="color-scheme: light dark;">',
+        '<head>',
+        '  <meta name="color-scheme" content="light dark" />',
+        '  <meta name="supported-color-schemes" content="light dark" />',
+        '  <style>',
+        '    @media (prefers-color-scheme: dark) {',
+        '      .e-bg { background: #121212 !important; }',
+        '      .e-card { background: #1e1e1e !important; }',
+        '      .e-card2 { background: #242424 !important; }',
+        '      .e-gold { color: #d4b87a !important; }',
+        '      .e-line { background: #d4b87a !important; }',
+        '      .e-body { color: #c0bfbc !important; }',
+        '      .e-dark { color: #e0dfdc !important; }',
+        '      .e-border { border-color: #333 !important; }',
+        '      .e-sub { color: #999 !important; }',
+        '    }',
+        '    [data-ogsc] .e-bg { background: #121212 !important; }',
+        '    [data-ogsc] .e-card { background: #1e1e1e !important; }',
+        '    [data-ogsc] .e-card2 { background: #242424 !important; }',
+        '    [data-ogsc] .e-gold { color: #d4b87a !important; }',
+        '    [data-ogsc] .e-body { color: #c0bfbc !important; }',
+        '    [data-ogsc] .e-dark { color: #e0dfdc !important; }',
+        '    [data-ogsc] .e-border { border-color: #333 !important; }',
+        '    [data-ogsc] .e-sub { color: #999 !important; }',
+        '  </style>',
+        '</head>',
+        '<body class="e-bg" style="margin: 0; padding: 0; background: #f5f3ef; -webkit-font-smoothing: antialiased;">',
+        '<table align="center" role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; font-family: Karla, -apple-system, sans-serif; color: #2c2c2c;">',
+        `  <tr>`,
+        `    <td class="e-card" style="background: #ffffff; padding: 0;">`,
+        `      <table role="presentation" style="width: 100%; border-collapse: collapse;">`,
+        `        <tr>`,
+        `          <td style="padding: 40px 44px 0; text-align: center;">`,
+        `            <p class="e-sub" style="font-size: 10px; color: #c9a96e; letter-spacing: 3.5px; text-transform: uppercase; margin: 0 0 20px;">slow simmer · private dining</p>`,
+        `            <div class="e-line" style="width: 32px; height: 1.5px; background: #c9a96e; margin: 0 auto 24px;"></div>`,
+        `            <h1 class="e-dark" style="font-family: 'Playfair Display SC', Georgia, serif; font-size: 28px; font-weight: 400; color: #1a1a1a; margin: 0; line-height: 1.35; letter-spacing: 0.2px;">Your reservation is confirmed</h1>`,
+        `            <p class="e-body" style="font-size: 14px; line-height: 1.7; color: #666; margin: 16px 0 0; max-width: 400px; margin-left: auto; margin-right: auto;">${params.name}, ${bodyLine.toLowerCase()}</p>`,
+        `          </td>`,
+        `        </tr>`,
+        `        <tr>`,
+        `          <td style="padding: 28px 44px 4px;">`,
+        `            <table role="presentation" style="width: 100%; border-collapse: collapse;">`,
+        `              <tr>`,
+        `                <td class="e-card2 e-border" style="background: #faf8f4; border: 1px solid #e8e0d4; padding: 0;">`,
+        `                  <table role="presentation" style="width: 100%; border-collapse: collapse;">`,
+        `                    <tr>`,
+        `                      <td class="e-border" style="padding: 18px 24px; border-bottom: 1px solid #e8e0d4;">`,
+        `                        <p class="e-sub" style="font-size: 10px; color: #c9a96e; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 3px;">date</p>`,
+        `                        <p class="e-dark" style="font-size: 15px; color: #2c2c2c; margin: 0; font-weight: 500;">${params.eventDate}</p>`,
+        `                      </td>`,
+        `                    </tr>`,
+        `                    <tr>`,
+        `                      <td class="e-border" style="padding: 18px 24px; border-bottom: 1px solid #e8e0d4;">`,
+        `                        <p class="e-sub" style="font-size: 10px; color: #c9a96e; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 3px;">time</p>`,
+        `                        <p class="e-dark" style="font-size: 15px; color: #2c2c2c; margin: 0; font-weight: 500;">${params.eventTime}</p>`,
+        `                      </td>`,
+        `                    </tr>`,
+        `                    <tr>`,
+        `                      <td style="padding: 18px 24px;">`,
+        `                        <p class="e-sub" style="font-size: 10px; color: #c9a96e; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 3px;">location</p>`,
+        `                        <p class="e-dark" style="font-size: 15px; color: #2c2c2c; margin: 0; font-weight: 500;">${params.location}</p>`,
+        `                      </td>`,
+        `                    </tr>`,
+        `                  </table>`,
+        `                </td>`,
+        `              </tr>`,
+        `            </table>`,
+        `          </td>`,
+        `        </tr>`,
+        `        <tr>`,
+        `          <td style="padding: 24px 44px 36px;">`,
+        `            <p class="e-body" style="font-size: 14px; line-height: 1.7; color: #555; margin: 0;">The exact address and final details will arrive 24 hours before. A member of our team will be in touch if anything is needed before then.</p>`,
         contactNumber
-          ? `  <or>For queries, contact: <strong>${contactNumber}</strong> or Whatsapp: <strong>${whatsappNumber}></strong> </p> `
+          ? `            <div class="e-border" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e0d8;">`
+            + `              <table role="presentation" style="width: 100%;">`
+            + `                <tr>`
+            + `                  <td class="e-sub" style="font-size: 13px; color: #888; padding: 4px 0; letter-spacing: 0.3px;">call</td>`
+            + `                  <td class="e-dark" style="font-size: 14px; color: #2c2c2c; padding: 4px 0; text-align: right; letter-spacing: 0.3px;">${contactNumber}</td>`
+            + `                </tr>`
+            + `                <tr>`
+            + `                  <td class="e-sub" style="font-size: 13px; color: #888; padding: 4px 0; letter-spacing: 0.3px;">whatsapp</td>`
+            + `                  <td style="font-size: 14px; padding: 4px 0; text-align: right; letter-spacing: 0.3px;"><a href="${whatsappNumberLink}" class="e-gold" style="color: #c9a96e; text-decoration: none; border-bottom: 1px solid #e0d5c2;">${whatsappDisplay}</a></td>`
+            + `                </tr>`
+            + `              </table>`
+            + `            </div>`
           : "",
-        `  <p style="color: #666; margin-top: 30px;">${signature}</p>`,
-        "</div>",
+        `            <div class="e-line" style="width: 24px; height: 1px; background: #ddd; margin: 28px auto 0;"></div>`,
+        `            <p class="e-sub" style="font-size: 11px; color: #bbb; margin: 16px 0 0; text-align: center; letter-spacing: 1.2px;">${signature}</p>`,
+        `          </td>`,
+        `        </tr>`,
+        `      </table>`,
+        `    </td>`,
+        `  </tr>`,
+        "</table>",
+        "</body>",
+        "</html>",
       ].join("\n"),
     }),
   });
