@@ -96,7 +96,7 @@ export default function AboutSection() {
         </div>
 
         {/* Glass value cards */}
-        <div className="md:col-span-2">
+        <div className="self-center md:col-span-2">
           <Reveal delay={200}>
             <div className="grid grid-cols-1 gap-4">
               {highlights.map((item) => (
