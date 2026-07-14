@@ -23,6 +23,7 @@ const opt = (v: string | undefined): string | undefined => {
 }
 
 export const site = {
+  url: opt(process.env.NEXT_PUBLIC_SITE_URL) ?? "https://slowsimmer.example",
   brand: {
     name: opt(process.env.NEXT_PUBLIC_BRAND_NAME) ?? "Slow Simmer",
     tagline: opt(process.env.NEXT_PUBLIC_BRAND_TAGLINE) ?? "An Unhurried Supper Club",

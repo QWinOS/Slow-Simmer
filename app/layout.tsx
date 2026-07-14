@@ -21,13 +21,34 @@ const jost = Jost({
   variable: "--font-sans",
 });
 
+const seoTitle =
+  process.env.NEXT_PUBLIC_SEO_TITLE?.trim() ||
+  `${site.brand.name} — ${site.brand.tagline}`;
+
+const seoDescription =
+  process.env.NEXT_PUBLIC_SEO_DESCRIPTION?.trim() ||
+  "A supper club for good food and better company. Seasonal menus, shared tables, and evenings made to linger. Join us at the next supper.";
+
 export const metadata: Metadata = {
-  title:
-    process.env.NEXT_PUBLIC_SEO_TITLE?.trim() ||
-    `${site.brand.name} — ${site.brand.tagline}`,
-  description:
-    process.env.NEXT_PUBLIC_SEO_DESCRIPTION?.trim() ||
-    "A supper club for good food and better company. Seasonal menus, shared tables, and evenings made to linger. Join us at the next supper.",
+  title: seoTitle,
+  description: seoDescription,
+  metadataBase: new URL(site.url),
+  openGraph: {
+    title: seoTitle,
+    description: seoDescription,
+    url: "/",
+    siteName: site.brand.name,
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: seoTitle,
+    description: seoDescription,
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +56,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: site.brand.name,
+    description: seoDescription,
+    url: site.url,
+    areaServed: ["Kolkata", "Bangalore"],
+    sameAs: Object.values(site.social).filter(Boolean),
+  };
+
   return (
     <html
       lang="en"
@@ -47,6 +78,10 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
           <Toaster />

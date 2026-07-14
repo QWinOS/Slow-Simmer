@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import NavBar from "@/components/NavBar"
 import Footer from "@/components/Footer"
 import { termsClauses, lastUpdated } from "@/lib/terms"
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  robots: { index: false },
+}
 
 export default function TermsPage() {
   return (
