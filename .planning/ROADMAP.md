@@ -158,14 +158,23 @@ Plans:
 **Requirements**: TC-01, TC-02, TC-03, TC-04, TC-05
 
 **Success Criteria** (what must be TRUE):
-1. Guest can navigate to `/terms` and read the full 8-clause T&C text (Playfair Display SC heading, Karla body)
+1. Guest can navigate to `/terms` and read the full 8-clause T&C text (Bodoni Moda heading via `font-heading`, Jost body via `font-sans`)
 2. Registration form shows a visible link to the T&C page and a required "I agree" checkbox
 3. Submitting without checking the checkbox shows a validation error and blocks submission
 4. Page matches brand styling (warm red/gold palette, consistent layout with main page)
 
-**Plans**: TBD
+**Plans**: 4 plans
 
-**UI hint**: yes
+Plans:
+**Wave 1** *(parallel)*
+
+- [ ] 05-01-PLAN.md — T&C Data + Validation (lib/terms.ts, schema termsAccepted, validation tests)
+- [ ] 05-02-PLAN.md — NavBar Terms Link (add Terms to NAV_SECTIONS, usePathname guard)
+
+**Wave 2** *(blocked on 05-01 + 05-02)*
+
+- [ ] 05-03-PLAN.md — T&C Route Page (app/terms/page.tsx, TermsPage tests)
+- [ ] 05-04-PLAN.md — Registration Checkbox (Controller-wrapped Checkbox, form tests)
 
 ## Progress
 
