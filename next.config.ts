@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
         hostname: "i.ytimg.com",
       },
     ],
+    qualities: [60, 75],
   },
 };
 
