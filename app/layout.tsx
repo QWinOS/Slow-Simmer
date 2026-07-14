@@ -23,11 +23,11 @@ const jost = Jost({
 
 const seoTitle =
   process.env.NEXT_PUBLIC_SEO_TITLE?.trim() ||
-  `${site.brand.name} — ${site.brand.tagline}`;
+  `${site.brand.name} | Supper Club in ${site.hero.cities}`;
 
 const seoDescription =
   process.env.NEXT_PUBLIC_SEO_DESCRIPTION?.trim() ||
-  "A supper club for good food and better company. Seasonal menus, shared tables, and evenings made to linger. Join us at the next supper.";
+  `Seasonal supper club events in ${site.hero.cities}. Intimate gatherings with curated menus, shared tables, and evenings made to linger. ${site.hero.seats} guests.`;
 
 export const metadata: Metadata = {
   title: seoTitle,

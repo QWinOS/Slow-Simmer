@@ -13,24 +13,30 @@
  * Copy falls back to the current shipped text, so an empty .env renders the
  * site identically to today. Social URLs return undefined when unset so the
  * footer can hide the icon instead of linking to "#".
+ *
+ * SEO titles/descriptions should be ~60 chars and ~160 chars respectively for
+ * optimal SERP display. Use geography + what you do + brand name. Example:
+ * - NEXT_PUBLIC_SEO_TITLE="Slow Simmer | Supper Club in Kolkata & Bangalore"
+ * - NEXT_PUBLIC_SEO_DESCRIPTION="Seasonal supper club events in Kolkata and Bangalore. Intimate gatherings, curated menus, shared tables. Book your event."
  */
 
 // "" from Vercel is "unset", not a value (the v1.0 email incident was a
 // present-but-empty env var). Trim + coalesce empty to undefined.
 const opt = (v: string | undefined): string | undefined => {
-  const t = v?.trim()
-  return t ? t : undefined
-}
+  const t = v?.trim();
+  return t ? t : undefined;
+};
 
 export const site = {
   url: opt(process.env.NEXT_PUBLIC_SITE_URL) ?? "https://slowsimmer.example",
   brand: {
     name: opt(process.env.NEXT_PUBLIC_BRAND_NAME) ?? "Slow Simmer",
-    tagline: opt(process.env.NEXT_PUBLIC_BRAND_TAGLINE) ?? "An Unhurried Supper Club",
+    tagline:
+      opt(process.env.NEXT_PUBLIC_BRAND_TAGLINE) ?? "An Unhurried Supper Club",
   },
   hero: {
     badge: opt(process.env.NEXT_PUBLIC_HERO_BADGE) ?? "Join Us at the Table",
-    seats: opt(process.env.NEXT_PUBLIC_SEAT_COUNT) ?? "10–14",
+    seats: opt(process.env.NEXT_PUBLIC_SEAT_COUNT) ?? "5-6",
     cities: opt(process.env.NEXT_PUBLIC_EVENT_CITIES) ?? "Kolkata & Bangalore",
   },
   // undefined = hide the icon; never render a link to "#"/"".
@@ -39,4 +45,4 @@ export const site = {
     youtube: opt(process.env.NEXT_PUBLIC_YOUTUBE_URL),
     whatsapp: opt(process.env.NEXT_PUBLIC_WHATSAPP_URL),
   },
-} as const
+} as const;
