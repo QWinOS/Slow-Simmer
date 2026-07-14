@@ -56,7 +56,7 @@ export const termsClauses: TermClause[] = [
     id: "privacy",
     title: "7. Privacy",
     content:
-      "The information you provide during registration (name, contact, Aadhar, preferences) is used solely for event coordination, check-in, and communication. Your data is never shared with third parties except as required for event operations (e.g., venue for dietary requirements). Aadhar numbers are used only for in-person verification at check-in.",
+      "The information you provide during registration (name, contact, Aadhar, preferences) is used solely for event coordination, check-in, and communication. Your data is never shared with third parties except as required for event operations (e.g., venue for dietary requirements). Aadhar numbers are not stored beyond 30 days after the event and are used solely for in-person verification at check-in. To request removal of your data, contact us via Instagram or the details on our website.",
   },
   {
     id: "contact-modification",

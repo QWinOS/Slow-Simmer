@@ -30,7 +30,17 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { termsClauses, lastUpdated } from "@/lib/terms";
 import {
   registrationSchema,
   type RegistrationFormData,
@@ -76,7 +86,8 @@ export function RegistrationForm() {
       guests: [],
       about: "",
       social: "",
-    },
+      termsAccepted: false,
+    } as unknown as RegistrationFormData,
   });
 
   const { fields: guestFields, append, remove } = useFieldArray({
@@ -546,6 +557,67 @@ export function RegistrationForm() {
                 )}
               />
             </FieldGroup>
+
+            <Separator className="my-6" />
+
+            <div className="font-heading text-lg font-bold mb-4">
+              Agreement
+            </div>
+
+            <Controller
+              name="termsAccepted"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id={field.name}
+                      checked={field.value ?? false}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      onBlur={field.onBlur}
+                      aria-invalid={fieldState.invalid}
+                      aria-label="I agree to the Terms & Conditions"
+                    />
+                    <span className="text-sm leading-relaxed text-muted-foreground">
+                      <label htmlFor={field.name}>I agree to the </label>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="underline underline-offset-4 hover:text-primary"
+                          >
+                            Terms &amp; Conditions
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[80dvh] overflow-y-auto sm:max-w-lg">
+                          <DialogHeader>
+                            <DialogTitle className="font-heading">
+                              Terms &amp; Conditions
+                            </DialogTitle>
+                            <DialogDescription>
+                              Last updated: {lastUpdated}
+                            </DialogDescription>
+                          </DialogHeader>
+                          {termsClauses.map((clause) => (
+                            <section key={clause.id}>
+                              <h3 className="font-heading text-sm font-semibold mb-1">
+                                {clause.title}
+                              </h3>
+                              <p className="text-sm leading-relaxed text-muted-foreground">
+                                {clause.content}
+                              </p>
+                            </section>
+                          ))}
+                        </DialogContent>
+                      </Dialog>
+                    </span>
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
             <Button
               type="submit"

@@ -93,7 +93,7 @@ describe("sendConfirmationEmail", () => {
     const body = JSON.parse(options.body)
 
     expect(body.htmlContent).toContain("+91-9876543210")
-    expect(body.htmlContent).toContain("For queries, contact:")
+    expect(body.htmlContent).toContain("security check")
   })
 
   it("omits contact number section when env var is empty", async () => {

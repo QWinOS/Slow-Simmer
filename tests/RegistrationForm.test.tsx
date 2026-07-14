@@ -66,7 +66,7 @@ async function selectLocation(user: ReturnType<typeof userEvent.setup>, name = "
   await user.click(await screen.findByRole("option", { name: new RegExp(name, "i") }))
 }
 
-// Fill every required field for a valid submit (about + social are required).
+// Fill every required field for a valid submit (about + social + termsAccepted are required).
 async function fillRequired(user: ReturnType<typeof userEvent.setup>) {
   await selectLocation(user)
   await user.type(screen.getByLabelText(/full name/i), "Test User")
@@ -75,6 +75,9 @@ async function fillRequired(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
   await user.type(screen.getByLabelText(/about yourself/i), "Love good food and people")
   await user.type(screen.getByLabelText(/instagram or linkedin/i), "https://instagram.com/test")
+  await user.click(
+    screen.getByRole("checkbox", { name: /i agree to the terms & conditions/i })
+  )
 }
 
 describe("RegistrationForm Integration", () => {
@@ -374,7 +377,89 @@ describe("RegistrationForm Integration", () => {
     })
   })
 
-  /* ── 8. Added guest rows are required ── */
+  /* ── 8. T&C Checkbox behavior ── */
+  describe("8. T&C Checkbox behavior", () => {
+    it("renders the Agreement section with checkbox and inline T&C dialog", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      expect(screen.getByText("Agreement")).toBeInTheDocument()
+
+      const checkbox = screen.getByRole("checkbox", {
+        name: /i agree to the terms & conditions/i,
+      })
+      expect(checkbox).toBeInTheDocument()
+      expect(checkbox).not.toBeChecked()
+
+      // T&C opens inline in a dialog, not a new tab
+      await user.click(
+        screen.getByRole("button", { name: /^terms & conditions$/i })
+      )
+      const dialog = await screen.findByRole("dialog")
+      expect(dialog).toHaveTextContent(/1\. introduction/i)
+      expect(dialog).toHaveTextContent(/8\. contact & modifications/i)
+    })
+
+    it("shows validation error when submitting without checking terms", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      // Fill all fields manually except the T&C checkbox
+      await selectLocation(user)
+      await user.type(screen.getByLabelText(/full name/i), "Test User")
+      await user.type(screen.getByLabelText(/contact number/i), "9876543210")
+      await user.type(screen.getByLabelText(/email address/i), "test@example.com")
+      await user.type(screen.getByLabelText(/aadhar number/i), "123456789012")
+      await user.type(screen.getByLabelText(/about yourself/i), "Love good food and people")
+      await user.type(screen.getByLabelText(/instagram or linkedin/i), "https://instagram.com/test")
+
+      await user.click(
+        screen.getByRole("button", { name: /submit registration/i })
+      )
+
+      await waitFor(() => {
+        const errors = screen.getAllByText(
+          "You must agree to the Terms & Conditions"
+        )
+        expect(errors.length).toBeGreaterThanOrEqual(1)
+      })
+    })
+
+    it("allows submission when checkbox is checked", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      await fillRequired(user)
+
+      await user.click(
+        screen.getByRole("button", { name: /submit registration/i })
+      )
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText(/please fix the following errors/i)
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    it("toggles checkbox state on click", async () => {
+      const user = userEvent.setup()
+      renderForm()
+
+      const checkbox = screen.getByRole("checkbox", {
+        name: /i agree to the terms & conditions/i,
+      })
+      expect(checkbox).not.toBeChecked()
+
+      await user.click(checkbox)
+      expect(checkbox).toBeChecked()
+
+      await user.click(checkbox)
+      expect(checkbox).not.toBeChecked()
+    })
+  })
+
+  /* ── 9. Added guest rows are required ── */
   describe("8. Added guest rows are required", () => {
     it("shows guest errors when a guest row is added but left empty", async () => {
       const user = userEvent.setup()
