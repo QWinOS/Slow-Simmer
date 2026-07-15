@@ -10,7 +10,7 @@ const highlights = [
   {
     icon: Users,
     label: "By Invitation",
-    desc: "Intimate tables of ten to fourteen. Introductions made, never crowds gathered.",
+    desc: "Intimate tables of five to six. Introductions made, never crowds gathered.",
   },
   {
     icon: Clock,
