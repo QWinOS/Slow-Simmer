@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { site } from "@/lib/site-config";
+import LenisProvider from "@/components/LenisProvider";
 
 // Bodoni Moda — high-contrast display serif for headings (luxury, editorial)
 const bodoniModa = Bodoni_Moda({
@@ -83,7 +84,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <LenisProvider>
+            {children}
+          </LenisProvider>
           <Toaster />
         </ThemeProvider>
       </body>

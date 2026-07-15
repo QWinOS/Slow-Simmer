@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef } from "react"
+import { useGSAP } from "@gsap/react"
+import gsap from "gsap"
 import { Button } from "@/components/ui/button";
 import { site } from "@/lib/site-config";
 
@@ -10,9 +13,21 @@ const DETAILS = [
 ];
 
 export default function HeroSection() {
+  const container = useRef<HTMLElement>(null)
+
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { duration: 0.8, ease: "power2.out" } })
+    tl.fromTo("[data-animate='badge'],[data-animate='heading']", { opacity: 0, y: 20 }, { opacity: 1, y: 0 })
+      .fromTo("[data-animate='desc']", { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, "-=0.35")
+      .fromTo("[data-animate='buttons']", { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, "-=0.35")
+      .fromTo("[data-animate='details']", { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, "-=0.35")
+      .fromTo("[data-animate='scroll']", { opacity: 0 }, { opacity: 1, duration: 1 }, "-=0.2")
+  }, { scope: container })
+
   return (
     <section
       id="hero"
+      ref={container}
       className="relative flex min-h-dvh items-center justify-center overflow-hidden scroll-mt-16"
     >
       {/* ── Ambient liquid-glass backdrop ─────────────────────── */}
@@ -45,14 +60,14 @@ export default function HeroSection() {
       {/* ── Content ───────────────────────────────────────────── */}
       <div className="relative z-10 mx-auto max-w-4xl px-5 py-24 text-center sm:px-6">
         {/* Invitation badge (glass pill) */}
-        <div className="animate-[fadeUp_0.8s_ease-out_both] flex justify-center">
+        <div data-animate="badge" className="opacity-0 flex justify-center">
           <span className="glass glass-edge inline-flex items-center gap-2.5 rounded-full px-5 py-2 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-foreground/80">
             <span className="size-1.5 rounded-full bg-gold shadow-[0_0_10px_2px_var(--glow-gold)]" />
             {site.hero.badge}
           </span>
         </div>
 
-        <h1 className="mt-8 animate-[fadeUp_0.8s_ease-out_both] font-heading text-5xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+        <h1 data-animate="heading" className="mt-8 opacity-0 font-heading text-5xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
           <span className="text-gold-foil">Slow Simmer</span>
           <br />
           <span className="text-black dark:text-white italic">
@@ -60,12 +75,12 @@ export default function HeroSection() {
           </span>
         </h1>
 
-        <p className="mx-auto mt-7 max-w-xl animate-[fadeUp_0.8s_ease-out_0.3s_both] text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
+        <p data-animate="desc" className="mx-auto mt-7 max-w-xl opacity-0 text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
           A private supper club for those who believe the finest evenings are
           measured not in courses, but in the conversations they leave behind.
         </p>
 
-        <div className="mt-10 flex animate-[fadeUp_0.8s_ease-out_0.45s_both] flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+        <div data-animate="buttons" className="mt-10 opacity-0 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <Button
             asChild
             size="lg"
@@ -91,7 +106,7 @@ export default function HeroSection() {
         </div>
 
         {/* Glass detail bar */}
-        <div className="mx-auto mt-14 max-w-2xl animate-[fadeUp_0.8s_ease-out_0.6s_both]">
+        <div data-animate="details" className="mx-auto mt-14 max-w-2xl opacity-0">
           <dl className="glass glass-edge grid grid-cols-3 divide-x divide-[var(--glass-border)] overflow-hidden rounded-2xl">
             {DETAILS.map((d) => (
               <div key={d.v} className="px-3 py-5 sm:px-6">
@@ -110,7 +125,8 @@ export default function HeroSection() {
       {/* Scroll indicator */}
       <div
         aria-hidden
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-[fadeIn_1s_ease-out_1s_both]"
+        data-animate="scroll"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0"
       >
         <div className="flex flex-col items-center gap-2 text-muted-foreground">
           <span className="text-[10px] font-medium uppercase tracking-[0.2em]">
